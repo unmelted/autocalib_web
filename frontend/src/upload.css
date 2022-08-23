@@ -1,0 +1,12 @@
+#uploadProgress {
+    width: 100%;
+    background-color: grey;
+  }
+  
+.item-wrapper {
+  margin: 15px 0 15px 0
+}
+
+.item-btn-wrapper {
+  margin: 0 5px 0 5px
+}
