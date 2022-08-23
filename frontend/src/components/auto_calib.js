@@ -221,8 +221,73 @@ const AutoCalib = props => {
     }
 
     let calibMode2D = false
-    let calibMode3D = false
+    let calibMode3D = true
     const styleBtn = { float: 'left', width: '80px', marginLeft: '20px' };
+    function ModeChange() {
+        clearPoints();
+        if (calibMode3D == true) {
+            targetPoint2D.current.left[0].x = targetPointRef.current.left[0].x
+            targetPoint2D.current.left[0].y = targetPointRef.current.left[0].y
+            targetPoint2D.current.left[1].x = targetPointRef.current.left[1].x
+            targetPoint2D.current.left[1].y = targetPointRef.current.left[1].y
+
+            targetPoint2D.current.right[0].x = targetPointRef.current.right[0].x
+            targetPoint2D.current.right[0].y = targetPointRef.current.right[0].y
+            targetPoint2D.current.right[1].x = targetPointRef.current.right[1].x
+            targetPoint2D.current.right[1].y = targetPointRef.current.right[1].y
+
+            targetPointRef.current.left[0].x = targetPoint3D.current.left[0].x
+            targetPointRef.current.left[0].y = targetPoint3D.current.left[0].y
+            targetPointRef.current.left[1].x = targetPoint3D.current.left[1].x
+            targetPointRef.current.left[1].y = targetPoint3D.current.left[1].y
+            targetPointRef.current.left[2].x = targetPoint3D.current.left[2].x
+            targetPointRef.current.left[2].y = targetPoint3D.current.left[2].y
+            targetPointRef.current.left[3].x = targetPoint3D.current.left[3].x
+            targetPointRef.current.left[3].y = targetPoint3D.current.left[3].y
+
+            targetPointRef.current.right[0].x = targetPoint3D.current.right[0].x
+            targetPointRef.current.right[0].y = targetPoint3D.current.right[0].y
+            targetPointRef.current.right[1].x = targetPoint3D.current.right[1].x
+            targetPointRef.current.right[1].y = targetPoint3D.current.right[1].y
+            targetPointRef.current.right[2].x = targetPoint3D.current.right[2].x
+            targetPointRef.current.right[2].y = targetPoint3D.current.right[2].y
+            targetPointRef.current.right[3].x = targetPoint3D.current.right[3].x
+            targetPointRef.current.right[3].y = targetPoint3D.current.right[3].y
+        }
+        else if (calibMode2D == true) {
+            targetPoint3D.current.left[0].x = targetPointRef.current.left[0].x
+            targetPoint3D.current.left[0].y = targetPointRef.current.left[0].y
+            targetPoint3D.current.left[1].x = targetPointRef.current.left[1].x
+            targetPoint3D.current.left[1].y = targetPointRef.current.left[1].y
+            targetPoint3D.current.left[2].x = targetPointRef.current.left[2].x
+            targetPoint3D.current.left[2].y = targetPointRef.current.left[2].y
+            targetPoint3D.current.left[3].x = targetPointRef.current.left[3].x
+            targetPoint3D.current.left[3].y = targetPointRef.current.left[3].y
+
+            targetPoint3D.current.right[0].x = targetPointRef.current.right[0].x
+            targetPoint3D.current.right[0].y = targetPointRef.current.right[0].y
+            targetPoint3D.current.right[1].x = targetPointRef.current.right[1].x
+            targetPoint3D.current.right[1].y = targetPointRef.current.right[1].y
+            targetPoint3D.current.right[2].x = targetPointRef.current.right[2].x
+            targetPoint3D.current.right[2].y = targetPointRef.current.right[2].y
+            targetPoint3D.current.right[3].x = targetPointRef.current.right[3].x
+            targetPoint3D.current.right[3].y = targetPointRef.current.right[3].y
+
+
+            targetPointRef.current.left[0].x = targetPoint2D.current.left[0].x
+            targetPointRef.current.left[0].y = targetPoint2D.current.left[0].y
+            targetPointRef.current.left[1].x = targetPoint2D.current.left[1].x
+            targetPointRef.current.left[1].y = targetPoint2D.current.left[1].y
+
+            targetPointRef.current.right[0].x = targetPoint2D.current.right[0].x
+            targetPointRef.current.right[0].y = targetPoint2D.current.right[0].y
+            targetPointRef.current.right[1].x = targetPoint2D.current.right[1].x
+            targetPointRef.current.right[1].y = targetPoint2D.current.right[1].y
+        }
+
+        drawTarget('left');
+        drawTarget('right');
+    }
 
     const ModeButton2D = ({ id, label }) => {
         const [varClass, setvarClass] = React.useState("item-btn-wrapper btn-secondary")
@@ -239,6 +304,7 @@ const AutoCalib = props => {
                     console.log(" 2d calib mode false")
                 }
             }
+            ModeChange();
         }
 
         return (
@@ -257,7 +323,7 @@ const AutoCalib = props => {
     };
 
     const ModeButton3D = ({ id, label }) => {
-        const [varClass, setvarClass] = React.useState("item-btn-wrapper btn-secondary")
+        const [varClass, setvarClass] = React.useState("item-btn-wrapper")
         const handleModeChange = () => {
             if (calibMode3D == false) {
                 calibMode3D = true
