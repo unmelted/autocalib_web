@@ -222,79 +222,80 @@ const AutoCalib = props => {
 
     let calibMode2D = false
     let calibMode3D = true
+    useEffect(() => {
+
+    }, [calibMode2D, calibMode3D]);
+
     const styleBtn = { float: 'left', width: '80px', marginLeft: '20px' };
     function ModeChange() {
-        clearPoints();
+
+        setIsAllTarget(false);
+        setIsSubmitted(false);
+        setIsSubmitCompleted(false);
+        drawImageToCanvas(null, 'left');
+        drawImageToCanvas(null, 'right');
+
+
         if (calibMode3D == true) {
-            targetPoint2D.current.left[0].x = targetPointRef.current.left[0].x
-            targetPoint2D.current.left[0].y = targetPointRef.current.left[0].y
-            targetPoint2D.current.left[1].x = targetPointRef.current.left[1].x
-            targetPoint2D.current.left[1].y = targetPointRef.current.left[1].y
+            targetPoint2D.current.left = [];
+            targetPoint2D.current.right = [];
+            for (let i = 0; i < targetPointRef.current.left.length; i++) {
+                targetPoint2D.current['left'].push({ x: targetPointRef.current.left[i].x, y: targetPointRef.current.left[i].y });
+            }
 
-            targetPoint2D.current.right[0].x = targetPointRef.current.right[0].x
-            targetPoint2D.current.right[0].y = targetPointRef.current.right[0].y
-            targetPoint2D.current.right[1].x = targetPointRef.current.right[1].x
-            targetPoint2D.current.right[1].y = targetPointRef.current.right[1].y
+            for (let i = 0; i < targetPointRef.current.right.length; i++) {
+                targetPoint2D.current['right'].push({ x: targetPointRef.current.right[i].x, y: targetPointRef.current.right[i].y });
+            }
 
-            targetPointRef.current.left[0].x = targetPoint3D.current.left[0].x
-            targetPointRef.current.left[0].y = targetPoint3D.current.left[0].y
-            targetPointRef.current.left[1].x = targetPoint3D.current.left[1].x
-            targetPointRef.current.left[1].y = targetPoint3D.current.left[1].y
-            targetPointRef.current.left[2].x = targetPoint3D.current.left[2].x
-            targetPointRef.current.left[2].y = targetPoint3D.current.left[2].y
-            targetPointRef.current.left[3].x = targetPoint3D.current.left[3].x
-            targetPointRef.current.left[3].y = targetPoint3D.current.left[3].y
-
-            targetPointRef.current.right[0].x = targetPoint3D.current.right[0].x
-            targetPointRef.current.right[0].y = targetPoint3D.current.right[0].y
-            targetPointRef.current.right[1].x = targetPoint3D.current.right[1].x
-            targetPointRef.current.right[1].y = targetPoint3D.current.right[1].y
-            targetPointRef.current.right[2].x = targetPoint3D.current.right[2].x
-            targetPointRef.current.right[2].y = targetPoint3D.current.right[2].y
-            targetPointRef.current.right[3].x = targetPoint3D.current.right[3].x
-            targetPointRef.current.right[3].y = targetPoint3D.current.right[3].y
+            targetPointRef.current.left = [];
+            targetPointRef.current.right = [];
+            for (let i = 0; i < targetPoint3D.current.left.length; i++) {
+                targetPointRef.current['left'].push({ x: targetPoint3D.current.left[i].x, y: targetPoint3D.current.left[i].y });
+            }
+            for (let i = 0; i < targetPoint3D.current.right.length; i++) {
+                targetPointRef.current['right'].push({ x: targetPoint3D.current.right[i].x, y: targetPoint3D.current.right[i].y });
+            }
         }
         else if (calibMode2D == true) {
-            targetPoint3D.current.left[0].x = targetPointRef.current.left[0].x
-            targetPoint3D.current.left[0].y = targetPointRef.current.left[0].y
-            targetPoint3D.current.left[1].x = targetPointRef.current.left[1].x
-            targetPoint3D.current.left[1].y = targetPointRef.current.left[1].y
-            targetPoint3D.current.left[2].x = targetPointRef.current.left[2].x
-            targetPoint3D.current.left[2].y = targetPointRef.current.left[2].y
-            targetPoint3D.current.left[3].x = targetPointRef.current.left[3].x
-            targetPoint3D.current.left[3].y = targetPointRef.current.left[3].y
+            targetPoint3D.current.left = [];
+            targetPoint3D.current.right = [];
+            for (let i = 0; i < targetPointRef.current.left.length; i++) {
+                targetPoint3D.current['left'].push({ x: targetPointRef.current.left[i].x, y: targetPointRef.current.left[i].y });
+            }
 
-            targetPoint3D.current.right[0].x = targetPointRef.current.right[0].x
-            targetPoint3D.current.right[0].y = targetPointRef.current.right[0].y
-            targetPoint3D.current.right[1].x = targetPointRef.current.right[1].x
-            targetPoint3D.current.right[1].y = targetPointRef.current.right[1].y
-            targetPoint3D.current.right[2].x = targetPointRef.current.right[2].x
-            targetPoint3D.current.right[2].y = targetPointRef.current.right[2].y
-            targetPoint3D.current.right[3].x = targetPointRef.current.right[3].x
-            targetPoint3D.current.right[3].y = targetPointRef.current.right[3].y
+            for (let i = 0; i < targetPointRef.current.right.length; i++) {
+                targetPoint3D.current['right'].push({ x: targetPointRef.current.right[i].x, y: targetPointRef.current.right[i].y });
+            }
 
+            targetPointRef.current.left = [];
+            targetPointRef.current.right = [];
 
-            targetPointRef.current.left[0].x = targetPoint2D.current.left[0].x
-            targetPointRef.current.left[0].y = targetPoint2D.current.left[0].y
-            targetPointRef.current.left[1].x = targetPoint2D.current.left[1].x
-            targetPointRef.current.left[1].y = targetPoint2D.current.left[1].y
+            for (let i = 0; i < targetPoint2D.current.left.length; i++) {
+                targetPointRef.current['left'].push({ x: targetPoint2D.current.left[i].x, y: targetPoint2D.current.left[i].y });
+            }
+            for (let i = 0; i < targetPoint2D.current.right.length; i++) {
+                targetPointRef.current['right'].push({ x: targetPoint2D.current.right[i].x, y: targetPoint2D.current.right[i].y });
+            }
 
-            targetPointRef.current.right[0].x = targetPoint2D.current.right[0].x
-            targetPointRef.current.right[0].y = targetPoint2D.current.right[0].y
-            targetPointRef.current.right[1].x = targetPoint2D.current.right[1].x
-            targetPointRef.current.right[1].y = targetPoint2D.current.right[1].y
         }
 
         drawTarget('left');
         drawTarget('right');
     }
 
+    function modeButtonClick({ id }) {
+        console.log(id)
+        // document.getElementById({ id }).onClick();
+    }
+
     const ModeButton2D = ({ id, label }) => {
+        console.log(id)
         const [varClass, setvarClass] = React.useState("item-btn-wrapper btn-secondary")
         const handleModeChange = () => {
             if (id == '2d') {
                 if (calibMode2D == false) {
                     calibMode2D = true
+                    calibMode3D = false
                     setvarClass("item-btn-wrapper btn-danger")
                     console.log(" 2d calib mode true")
                 }
@@ -304,6 +305,8 @@ const AutoCalib = props => {
                     console.log(" 2d calib mode false")
                 }
             }
+            const bc = '3d'
+            modeButtonClick(id = { bc })
             ModeChange();
         }
 
@@ -327,6 +330,7 @@ const AutoCalib = props => {
         const handleModeChange = () => {
             if (calibMode3D == false) {
                 calibMode3D = true
+                calibMode2D = false
                 setvarClass("item-btn-wrapper btn-danger")
                 console.log(" 3d calib mode true")
             }
@@ -335,6 +339,8 @@ const AutoCalib = props => {
                 setvarClass("item-btn-wrapper btn-secondary")
                 console.log(" 3d calib mode false")
             }
+            modeButtonClick('2d')
+            ModeChange();
         }
 
         return (
@@ -613,12 +619,12 @@ const AutoCalib = props => {
         }
     }, [calculateState]);
 
-    useEffect(() => {
-        targetPointRef.current = {
-            left: [],
-            right: []
-        };
-    }, []);
+    // useEffect(() => {
+    //     targetPointRef.current = {
+    //         left: [],
+    //         right: []
+    //     };
+    // }, []);
 
     return (
         <>
