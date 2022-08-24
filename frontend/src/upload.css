@@ -1,12 +1,18 @@
 #uploadProgress {
-    width: 100%;
-    background-color: grey;
-  }
-  
+  width: 100%;
+  background-color: grey;
+}
+
 .item-wrapper {
   margin: 15px 0 15px 0
 }
 
 .item-btn-wrapper {
   margin: 0 5px 0 5px
+}
+
+.modeButton {
+  text-align: left;
+  margin: 15px 15px 15px 15px;
+  color: yellowgreen;
 }

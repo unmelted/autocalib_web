@@ -69,7 +69,8 @@ const AutoCalib = props => {
         process.env.REACT_APP_POINT_COLOR_4
     ];
     const pointRadius = parseInt(process.env.REACT_APP_POINT_RADIUS, 10);
-    const maxTargetNum = parseInt(process.env.REACT_APP_MAX_TARGET_NUM, 10);
+    const maxTargetNum = useRef(0);
+    const calibMode = useRef(null);
 
     const getTotalFileSize = (files) => {
         let size = 0;
@@ -157,6 +158,7 @@ const AutoCalib = props => {
     }
 
     const calculate = async () => {
+        console.log("Calculate async calib mode", calibMode)
         canvasLeftRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'left'), { passive: false });
         canvasLeftRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'left'), { passive: false });
         canvasLeftRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'left'), { passive: false });
@@ -220,11 +222,6 @@ const AutoCalib = props => {
         window.location.reload();
     }
 
-    let calibMode2D = false
-    let calibMode3D = true
-    useEffect(() => {
-
-    }, [calibMode2D, calibMode3D]);
 
     const styleBtn = { float: 'left', width: '80px', marginLeft: '20px' };
     function ModeChange() {
@@ -234,7 +231,7 @@ const AutoCalib = props => {
         setIsSubmitCompleted(false);
         drawImageToCanvas(null, 'left');
         drawImageToCanvas(null, 'right');
-
+        console.log("now calibration mode is ", calibMode.current)
 
         if (calibMode3D == true) {
             targetPoint2D.current.left = [];
@@ -278,42 +275,50 @@ const AutoCalib = props => {
             }
 
         }
+        if (targetPointRef.current['left'].length > 0) {
+            drawTarget('left');
+        }
+        if (targetPointRef.current['right'].length > 0) {
+            drawTarget('right');
+        }
 
-        drawTarget('left');
-        drawTarget('right');
     }
 
-    function modeButtonClick({ id }) {
-        console.log(id)
-        // document.getElementById({ id }).onClick();
-    }
+    const [varClass2D, setvarClass2D] = React.useState("btn-secondary")
+    const [varClass3D, setvarClass3D] = React.useState("btn-secondary")
+    const [calibMode2D, setCalibMode2D] = React.useState(false)
+    const [calibMode3D, setCalibMode3D] = React.useState(false)
+    const [eMessage, seteMessage] = React.useState("Please select Calibration mode.")
+    // useEffect(() => {
+    // }, [calibMode2D, calibMode3D]);
 
     const ModeButton2D = ({ id, label }) => {
-        console.log(id)
-        const [varClass, setvarClass] = React.useState("item-btn-wrapper btn-secondary")
         const handleModeChange = () => {
-            if (id == '2d') {
-                if (calibMode2D == false) {
-                    calibMode2D = true
-                    calibMode3D = false
-                    setvarClass("item-btn-wrapper btn-danger")
-                    console.log(" 2d calib mode true")
-                }
-                else {
-                    calibMode2D = false
-                    setvarClass("item-btn-wrapper btn-secondary")
-                    console.log(" 2d calib mode false")
-                }
+            console.log("2d button change", calibMode2D, calibMode3D)
+            if (calibMode2D == false) {
+                setCalibMode2D(true)
+                setCalibMode3D(false)
+                setvarClass2D("btn-danger")
+                setvarClass3D("btn-secondary")
+                seteMessage("2D Calibration mode : You should pick 2 points per each image.")
+                calibMode.current = '2D'
+                maxTargetNum.current = 2
+                console.log(" 2d calib mode true")
             }
-            const bc = '3d'
-            modeButtonClick(id = { bc })
+            else {
+                setCalibMode2D(false)
+                calibMode.current = null
+                setvarClass2D("btn-secondary")
+                seteMessage("")
+                console.log(" 2d calib mode false")
+            }
             ModeChange();
         }
 
         return (
             <Button size="sm"
                 variant='primary'
-                className={varClass}
+                className={varClass2D}
                 id={id}
                 as="input"
                 type='button'
@@ -326,27 +331,32 @@ const AutoCalib = props => {
     };
 
     const ModeButton3D = ({ id, label }) => {
-        const [varClass, setvarClass] = React.useState("item-btn-wrapper")
         const handleModeChange = () => {
+            console.log("3d button change")
             if (calibMode3D == false) {
-                calibMode3D = true
-                calibMode2D = false
-                setvarClass("item-btn-wrapper btn-danger")
-                console.log(" 3d calib mode true")
+                setCalibMode2D(false)
+                setCalibMode3D(true)
+                setvarClass3D("btn-danger")
+                setvarClass2D("btn-secondary")
+                calibMode.current = '3D'
+                maxTargetNum.current = 4
+                seteMessage("3D Calibration mode : You should pick 4 points per each image.")
+                console.log(" 3d calib mode set true")
             }
             else {
-                calibMode3D = false
-                setvarClass("item-btn-wrapper btn-secondary")
-                console.log(" 3d calib mode false")
+                setCalibMode3D(false)
+                calibMode.current = null
+                setvarClass3D("btn-secondary")
+                seteMessage("")
+                console.log(" 3d calib mode set false")
             }
-            modeButtonClick('2d')
             ModeChange();
         }
 
         return (
             <Button size="sm"
                 variant='primary'
-                className={varClass}
+                className={varClass3D}
                 id={id}
                 as="input"
                 type='button'
@@ -418,7 +428,7 @@ const AutoCalib = props => {
     }
 
     const submitPoints = async () => {
-        if (targetPointRef.current.left.length < maxTargetNum || targetPointRef.current.right.length < maxTargetNum) {
+        if (targetPointRef.current.left.length < maxTargetNum.current || targetPointRef.current.right.length < maxTargetNum.current) {
             return;
         }
 
@@ -503,7 +513,7 @@ const AutoCalib = props => {
         context[type].strokeStyle = process.env.REACT_APP_LINE_COLOR;
 
         context[type].beginPath();
-        for (let i = 0; i < maxTargetNum; i++) {
+        for (let i = 0; i < maxTargetNum.current; i++) {
             context[type].lineTo(targetPointRef.current[type][i].x, targetPointRef.current[type][i].y);
         }
         context[type].lineTo(targetPointRef.current[type][0].x, targetPointRef.current[type][0].y);
@@ -511,7 +521,7 @@ const AutoCalib = props => {
     }
 
     const drawTarget = (type) => {
-        if (targetPointRef.current[type].length > maxTargetNum) {
+        if (targetPointRef.current[type].length > maxTargetNum.current) {
             return;
         }
 
@@ -526,7 +536,7 @@ const AutoCalib = props => {
             targetInfo[type].current.innerText += `[${targetPointRef.current[type][i].x}, ${targetPointRef.current[type][i].y}], `;
         }
 
-        if (targetPointRef.current[type].length === maxTargetNum) {
+        if (targetPointRef.current[type].length === maxTargetNum.current) {
             drawTargetArea(type);
         }
 
@@ -549,23 +559,34 @@ const AutoCalib = props => {
         if (isDragging[type]) {
             context[type].translate(currentTransformedCursor[type].x - dragStartPosition[type].x, currentTransformedCursor[type].y - dragStartPosition[type].y);
             drawImageToCanvas(event, type);
-            drawTarget(type);
+            if (targetPointRef.current[type].length > 0 || targetPointRef.current[type].length > 0) {
+                drawTarget(type);
+            }
         }
     }
 
     const onRightClick = (e, type) => {
         e.preventDefault();
         console.log("onRightClick is called ")
-        console.log(currentTransformedCursor[type].x, currentTransformedCursor[type].y)
+        console.log(calibMode.current)
 
-        if (targetPointRef.current[type].length < maxTargetNum) {
+        if (calibMode.current == null) {
+            seteMessage("Please select calibration mode FIRST!")
+            return null
+        }
+
+        console.log(currentTransformedCursor[type].x, currentTransformedCursor[type].y)
+        console.log(targetPointRef.current[type].length)
+        console.log(maxTargetNum.current)
+
+        if (targetPointRef.current[type].length < maxTargetNum.current) {
             targetPointRef.current[type].push({ x: currentTransformedCursor[type].x, y: currentTransformedCursor[type].y });
 
             drawTarget(type);
         }
 
-        if (targetPointRef.current.left.length === maxTargetNum &&
-            targetPointRef.current.right.length === maxTargetNum) {
+        if (targetPointRef.current.left.length === maxTargetNum.current &&
+            targetPointRef.current.right.length === maxTargetNum.current) {
             setIsAllTarget(true);
         }
     }
@@ -577,7 +598,10 @@ const AutoCalib = props => {
         context[type].translate(-currentTransformedCursor[type].x, -currentTransformedCursor[type].y);
 
         drawImageToCanvas(event, type);
-        drawTarget(type);
+        if (targetPointRef.current[type].length > 0 || targetPointRef.current[type].length > 0) {
+            drawTarget(type);
+        }
+
         event.preventDefault();
     }
 
@@ -585,7 +609,6 @@ const AutoCalib = props => {
         clearInterval(calcProgressTimerRef.current);
         calcProgressTimerRef.current = null;
     }
-
     useEffect(() => {
         initContext();
         console.log("usereffect canvas is called")
@@ -695,10 +718,11 @@ const AutoCalib = props => {
                         height: '60px'
                     }}
                 >
-                    <div>
-                        <Form.Group style={{ marginTop: '15px', marginLeft: '10px' }}>
-                            <ModeButton2D id='2d' label='2D' ></ModeButton2D>
-                            <ModeButton3D id='3d' label='3D' ></ModeButton3D>
+                    <div >
+                        <Form.Group className="modeButton">
+                            <ModeButton2D id='2d-mode' label='2D' ></ModeButton2D>
+                            <ModeButton3D id='3d-mode' label='3D' ></ModeButton3D>
+                            <span style={{ marginLeft: '30px' }}>{eMessage}</span>
                         </Form.Group>
                     </div>
                 </div>
