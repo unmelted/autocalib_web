@@ -222,18 +222,8 @@ const AutoCalib = props => {
         window.location.reload();
     }
 
-
-    const styleBtn = { float: 'left', width: '80px', marginLeft: '20px' };
-    function ModeChange() {
-
-        setIsAllTarget(false);
-        setIsSubmitted(false);
-        setIsSubmitCompleted(false);
-        drawImageToCanvas(null, 'left');
-        drawImageToCanvas(null, 'right');
-        console.log("now calibration mode is ", calibMode.current)
-
-        if (calibMode3D == true) {
+    const InsertRefPointToStorate = (storeMode) => {
+        if (storeMode == '2D') {
             targetPoint2D.current.left = [];
             targetPoint2D.current.right = [];
             for (let i = 0; i < targetPointRef.current.left.length; i++) {
@@ -244,16 +234,7 @@ const AutoCalib = props => {
                 targetPoint2D.current['right'].push({ x: targetPointRef.current.right[i].x, y: targetPointRef.current.right[i].y });
             }
 
-            targetPointRef.current.left = [];
-            targetPointRef.current.right = [];
-            for (let i = 0; i < targetPoint3D.current.left.length; i++) {
-                targetPointRef.current['left'].push({ x: targetPoint3D.current.left[i].x, y: targetPoint3D.current.left[i].y });
-            }
-            for (let i = 0; i < targetPoint3D.current.right.length; i++) {
-                targetPointRef.current['right'].push({ x: targetPoint3D.current.right[i].x, y: targetPoint3D.current.right[i].y });
-            }
-        }
-        else if (calibMode2D == true) {
+        } else if (storeMode == '3D') {
             targetPoint3D.current.left = [];
             targetPoint3D.current.right = [];
             for (let i = 0; i < targetPointRef.current.left.length; i++) {
@@ -263,6 +244,35 @@ const AutoCalib = props => {
             for (let i = 0; i < targetPointRef.current.right.length; i++) {
                 targetPoint3D.current['right'].push({ x: targetPointRef.current.right[i].x, y: targetPointRef.current.right[i].y });
             }
+
+        }
+    }
+
+    const styleBtn = { float: 'left', width: '80px', marginLeft: '20px' };
+    function ModeChange() {
+
+        setIsAllTarget(false);
+        setIsSubmitted(false);
+        setIsSubmitCompleted(false);
+        drawImageToCanvas(null, 'left');
+        drawImageToCanvas(null, 'right');
+        console.log("now calibration mode is ", calibMode.current)
+        console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D, process.env.REACT_APP_MAX_TARGET_NUM_3D)
+
+        if (calibMode.current == '3D') {
+            InsertRefPointToStorate('2D')
+
+            targetPointRef.current.left = [];
+            targetPointRef.current.right = [];
+            for (let i = 0; i < targetPoint3D.current.left.length; i++) {
+                targetPointRef.current['left'].push({ x: targetPoint3D.current.left[i].x, y: targetPoint3D.current.left[i].y });
+            }
+            for (let i = 0; i < targetPoint3D.current.right.length; i++) {
+                targetPointRef.current['right'].push({ x: targetPoint3D.current.right[i].x, y: targetPoint3D.current.right[i].y });
+            }
+        }
+        else if (calibMode.current == '2D') {
+            InsertRefPointToStorate('3D')
 
             targetPointRef.current.left = [];
             targetPointRef.current.right = [];
@@ -282,6 +292,12 @@ const AutoCalib = props => {
             drawTarget('right');
         }
 
+        if ((targetPoint2D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_2D &&
+            targetPoint2D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_2D) ||
+            (targetPoint3D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_3D &&
+                targetPoint3D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_3D)) {
+            setIsAllTarget(true);
+        }
     }
 
     const [varClass2D, setvarClass2D] = React.useState("btn-secondary")
@@ -298,7 +314,7 @@ const AutoCalib = props => {
             if (calibMode2D == false) {
                 setCalibMode2D(true)
                 setCalibMode3D(false)
-                setvarClass2D("btn-danger")
+                setvarClass2D("btn-primary")
                 setvarClass3D("btn-secondary")
                 seteMessage("2D Calibration mode : You should pick 2 points per each image.")
                 calibMode.current = '2D'
@@ -336,7 +352,7 @@ const AutoCalib = props => {
             if (calibMode3D == false) {
                 setCalibMode2D(false)
                 setCalibMode3D(true)
-                setvarClass3D("btn-danger")
+                setvarClass3D("btn-privary")
                 setvarClass2D("btn-secondary")
                 calibMode.current = '3D'
                 maxTargetNum.current = 4
@@ -380,56 +396,94 @@ const AutoCalib = props => {
     }
 
     const makeTargetData_3d = () => {
+        if (targetPoint3D.current.left.length < process.env.REACT_APP_MAX_TARGET_NUM_3D &&
+            targetPoint3D.current.right.length < process.env.REACT_APP_MAX_TARGET_NUM_3D) {
+            console.log("3d point is not enough")
+            return
+        }
+
         console.log("[Target points - Left]");
-        console.log(`x: ${targetPointRef.current.left[0].x}, y: ${targetPointRef.current.left[0].y}`);
-        console.log(`x: ${targetPointRef.current.left[1].x}, y: ${targetPointRef.current.left[1].y}`);
-        console.log(`x: ${targetPointRef.current.left[2].x}, y: ${targetPointRef.current.left[2].y}`);
-        console.log(`x: ${targetPointRef.current.left[3].x}, y: ${targetPointRef.current.left[3].y}`);
+        console.log(`x: ${targetPoint3D.current.left[0].x}, y: ${targetPoint3D.current.left[0].y}`);
+        console.log(`x: ${targetPoint3D.current.left[1].x}, y: ${targetPoint3D.current.left[1].y}`);
+        console.log(`x: ${targetPoint3D.current.left[2].x}, y: ${targetPoint3D.current.left[2].y}`);
+        console.log(`x: ${targetPoint3D.current.left[3].x}, y: ${targetPoint3D.current.left[3].y}`);
 
         console.log("[Target points - Right]");
-        console.log(`x: ${targetPointRef.current.right[0].x}, y: ${targetPointRef.current.right[0].y}`);
-        console.log(`x: ${targetPointRef.current.right[1].x}, y: ${targetPointRef.current.right[1].y}`);
-        console.log(`x: ${targetPointRef.current.right[2].x}, y: ${targetPointRef.current.right[2].y}`);
-        console.log(`x: ${targetPointRef.current.right[3].x}, y: ${targetPointRef.current.right[3].y}`);
+        console.log(`x: ${targetPoint3D.current.right[0].x}, y: ${targetPoint3D.current.right[0].y}`);
+        console.log(`x: ${targetPoint3D.current.right[1].x}, y: ${targetPoint3D.current.right[1].y}`);
+        console.log(`x: ${targetPoint3D.current.right[2].x}, y: ${targetPoint3D.current.right[2].y}`);
+        console.log(`x: ${targetPoint3D.current.right[3].x}, y: ${targetPoint3D.current.right[3].y}`);
 
         const points = [
-            targetPointRef.current.left[0].x, targetPointRef.current.left[0].y,
-            targetPointRef.current.left[1].x, targetPointRef.current.left[1].y,
-            targetPointRef.current.left[2].x, targetPointRef.current.left[2].y,
-            targetPointRef.current.left[3].x, targetPointRef.current.left[3].y,
+            targetPoint3D.current.left[0].x, targetPoint3D.current.left[0].y,
+            targetPoint3D.current.left[1].x, targetPoint3D.current.left[1].y,
+            targetPoint3D.current.left[2].x, targetPoint3D.current.left[2].y,
+            targetPoint3D.current.left[3].x, targetPoint3D.current.left[3].y,
 
-            targetPointRef.current.right[0].x, targetPointRef.current.right[0].y,
-            targetPointRef.current.right[1].x, targetPointRef.current.right[1].y,
-            targetPointRef.current.right[2].x, targetPointRef.current.right[2].y,
-            targetPointRef.current.right[3].x, targetPointRef.current.right[3].y,
+            targetPoint3D.current.right[0].x, targetPoint3D.current.right[0].y,
+            targetPoint3D.current.right[1].x, targetPoint3D.current.right[1].y,
+            targetPoint3D.current.right[2].x, targetPoint3D.current.right[2].y,
+            targetPoint3D.current.right[3].x, targetPoint3D.current.right[3].y,
         ];
 
         return points;
     }
 
     const makeTargetData_2d = () => {
+        if (targetPoint2D.current.left.length < process.env.REACT_APP_MAX_TARGET_NUM_2D ||
+            targetPoint2D.current.right.length < process.env.REACT_APP_MAX_TARGET_NUM_2D) {
+            console.log("2d points is not enough")
+            return
+        }
+
         console.log("[Target points - Left]");
-        console.log(`x: ${targetPointRef.current.left[0].x}, y: ${targetPointRef.current.left[0].y}`);
-        console.log(`x: ${targetPointRef.current.left[1].x}, y: ${targetPointRef.current.left[1].y}`);
+        console.log(`x: ${targetPoint2D.current.left[0].x}, y: ${targetPoint2D.current.left[0].y}`);
+        console.log(`x: ${targetPoint2D.current.left[1].x}, y: ${targetPoint2D.current.left[1].y}`);
 
         console.log("[Target points - Right]");
-        console.log(`x: ${targetPointRef.current.right[0].x}, y: ${targetPointRef.current.right[0].y}`);
-        console.log(`x: ${targetPointRef.current.right[1].x}, y: ${targetPointRef.current.right[1].y}`);
+        console.log(`x: ${targetPoint2D.current.right[0].x}, y: ${targetPoint2D.current.right[0].y}`);
+        console.log(`x: ${targetPoint2D.current.right[1].x}, y: ${targetPoint2D.current.right[1].y}`);
 
         const points = [
-            targetPointRef.current.left[0].x, targetPointRef.current.left[0].y,
-            targetPointRef.current.left[1].x, targetPointRef.current.left[1].y,
+            targetPoint2D.current.left[0].x, targetPoint2D.current.left[0].y,
+            targetPoint2D.current.left[1].x, targetPoint2D.current.left[1].y,
 
-            targetPointRef.current.right[0].x, targetPointRef.current.right[0].y,
-            targetPointRef.current.right[1].x, targetPointRef.current.right[1].y,
+            targetPoint2D.current.right[0].x, targetPoint2D.current.right[0].y,
+            targetPoint2D.current.right[1].x, targetPoint2D.current.right[1].y,
         ];
 
         return points;
     }
 
     const submitPoints = async () => {
-        if (targetPointRef.current.left.length < maxTargetNum.current || targetPointRef.current.right.length < maxTargetNum.current) {
-            return;
+        let activeMode = 0
+        if (calibMode.current == '2D') {
+            InsertRefPointToStorate('2D')
+        } else if (calibMode.current == '3D') {
+            InsertRefPointToStorate('3D')
+        }
+
+        console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D)
+        console.log(process.env.REACT_APP_MAX_TARGET_NUM_3D)
+
+        if (targetPoint2D.current.left.length == process.env.REACT_APP_MAX_TARGET_NUM_2D &&
+            targetPoint2D.current.right.length == process.env.REACT_APP_MAX_TARGET_NUM_2D) {
+            activeMode = activeMode + 2
+        }
+        if (targetPoint3D.current.left.length == process.env.REACT_APP_MAX_TARGET_NUM_3D &&
+            targetPoint3D.current.right.length == process.env.REACT_APP_MAX_TARGET_NUM_3D) {
+            activeMode = activeMode + 3
+        }
+        console.log("submitPoints ", activeMode)
+        if (activeMode == 0) {
+            seteMessage("NOT enough to generate calibration data. Please pick points again")
+            return
+        } else if (activeMode == 2) {
+            seteMessage("2D calibraiton data will be generated.")
+        } else if (activeMode == 3) {
+            seteMessage("3D calibraiton data will be generated.")
+        } else if (activeMode == 5) {
+            seteMessage("2D+3D calibraiton data will be generated.")
         }
 
         setIsSubmitted(true);
