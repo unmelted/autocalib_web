@@ -248,7 +248,7 @@ const AutoCalib = props => {
         }
     }
 
-    const styleBtn = { float: 'left', width: '80px', marginLeft: '20px' };
+    const styleBtn = { float: 'left', width: '100px', marginLeft: '20px' };
     function ModeChange() {
 
         setIsAllTarget(false);
@@ -696,12 +696,12 @@ const AutoCalib = props => {
         }
     }, [calculateState]);
 
-    // useEffect(() => {
-    //     targetPointRef.current = {
-    //         left: [],
-    //         right: []
-    //     };
-    // }, []);
+    useEffect(() => {
+        targetPointRef.current = {
+            left: [],
+            right: []
+        };
+    }, []);
 
     return (
         <>
@@ -769,7 +769,7 @@ const AutoCalib = props => {
                     style={{
                         border: '1px solid gray',
                         marginTop: '15px',
-                        height: '60px'
+                        height: '65px'
                     }}
                 >
                     <div >
@@ -777,6 +777,19 @@ const AutoCalib = props => {
                             <ModeButton2D id='2d-mode' label='2D' ></ModeButton2D>
                             <ModeButton3D id='3d-mode' label='3D' ></ModeButton3D>
                             <span style={{ marginLeft: '30px' }}>{eMessage}</span>
+                            <Button
+                                size="sm"
+                                variant="primary"
+                                id='clear-point'
+                                as="input"
+                                type='button'
+                                value="Clear Points"
+                                onClick={clearPoints}
+                                style={{ float: 'right', width: '150px', marginRight: '10px' }}
+                                disabled={!isUploaded || calculateState !== CALC_STATE.COMPLETE}
+                            // hidden={calculateState !== 2}
+                            >
+                            </Button>
                         </Form.Group>
                     </div>
                 </div>
@@ -869,7 +882,7 @@ const AutoCalib = props => {
                 <div className='row' style={{ float: 'right' }}>
                     <div style={{ display: 'flex' }} >
                         <Form.Group hidden={calculateState !== 2}>
-                            <Button
+                            {/* <Button
                                 variant="primary"
                                 className="item-btn-wrapper"
                                 id='clear-point'
@@ -880,7 +893,7 @@ const AutoCalib = props => {
                                 style={{ float: 'right' }}
                                 disabled={!isUploaded || calculateState !== CALC_STATE.COMPLETE}
                             >
-                            </Button>
+                            </Button> */}
                             <Button
                                 variant="primary"
                                 className="item-btn-wrapper"
@@ -891,7 +904,7 @@ const AutoCalib = props => {
                                 onClick={submitPoints}
                                 style={{ float: 'right' }}
                                 disabled={!isUploaded || calculateState !== CALC_STATE.COMPLETE || !isAllTarget || isSubmitted}
-                                hidden={isSubmitted}
+                            // hidden={isSubmitted}
                             >
                             </Button>
                             <Button
