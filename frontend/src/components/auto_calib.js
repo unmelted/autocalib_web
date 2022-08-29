@@ -291,11 +291,12 @@ const AutoCalib = props => {
         if (targetPointRef.current['right'].length > 0) {
             drawTarget('right');
         }
-
-        if ((targetPoint2D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_2D &&
-            targetPoint2D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_2D) ||
-            (targetPoint3D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_3D &&
-                targetPoint3D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_3D)) {
+        console.log(`2d left length: ${targetPoint2D.current.left.length} , 2d right length : ${targetPoint2D.current.right.length}`)
+        console.log(`3d left length: ${targetPoint3D.current.left.length} , 3d right length : ${targetPoint3D.current.right.length}`)
+        if ((targetPoint2D.current.left.length == process.env.REACT_APP_MAX_TARGET_NUM_2D &&
+            targetPoint2D.current.right.length == process.env.REACT_APP_MAX_TARGET_NUM_2D) ||
+            (targetPoint3D.current.left.length == process.env.REACT_APP_MAX_TARGET_NUM_3D &&
+                targetPoint3D.current.right.length == process.env.REACT_APP_MAX_TARGET_NUM_3D)) {
             setIsAllTarget(true);
         }
     }
@@ -518,6 +519,7 @@ const AutoCalib = props => {
 
     const downloadResult = () => {
         saveAs(downloadInfo.url, downloadInfo.name);
+        setIsSubmitted(false);
     }
 
     const initContext = () => {
@@ -666,6 +668,7 @@ const AutoCalib = props => {
     useEffect(() => {
         initContext();
         console.log("usereffect canvas is called")
+        console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
     }, [canvas]);
 
     useEffect(() => {
