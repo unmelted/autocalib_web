@@ -6,8 +6,7 @@ const route_api = require('./routes/api')
 const path = require("path");
 const app = express()
 
-// const node_env = "production"; //process.env.NODE_ENV || "development";
-const node_env = 'local'
+const node_env = "production"; //process.env.NODE_ENV || "development";
 let envPath = "";
 switch (node_env) {
   case "local":
