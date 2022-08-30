@@ -198,8 +198,7 @@ const AutoCalib = props => {
 
         try {
             console.log({ jobId })
-            // response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${jobId}`);
-            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/1029`);
+            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${jobId}`);
         } catch (err) {
             console.log(err);
             setStatusMessage('Unable to get images!');
