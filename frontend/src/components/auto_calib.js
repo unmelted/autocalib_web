@@ -117,7 +117,7 @@ const AutoCalib = props => {
                 setStatusMessage("Upload Failed! - Invalid file: " + e.target.files[key].name);
                 return;
             }
-            if (getFileExt(file) == '.DS_Store') {
+            if (getFileExt(e.target.files[key]) == '.DS_Store') {
                 continue;
             }
 
