@@ -98,7 +98,7 @@ const AutoCalib = props => {
         const mimeType = file.type;
         const ext = getFileExt(file);
 
-        return isValidImage(file) || ext == "pts" || ext == "txt";
+        return isValidImage(file) || ext == "pts" || ext == "txt" || ext == '.DS_Store';
     }
 
     const uploadFiles = async (e) => {
@@ -116,6 +116,9 @@ const AutoCalib = props => {
             if (!isValidFile(e.target.files[key])) {
                 setStatusMessage("Upload Failed! - Invalid file: " + e.target.files[key].name);
                 return;
+            }
+            if (getFileExt(file) == '.DS_Store') {
+                continue;
             }
 
             if (isValidImage(e.target.files[key])) {
