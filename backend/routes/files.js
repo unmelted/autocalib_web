@@ -2,13 +2,16 @@ require("dotenv").config();
 const util = require('util');
 const fs = require("fs");
 const express = require('express'),
-    multer = require('multer'),
-    router = express.Router();
+  multer = require('multer'),
+  router = express.Router();
 
-const upload_images = () => {
+var taskManager = require('./task.js')
+
+const upload_images = (destPath) => {
   const storage = multer.diskStorage({
     destination: (req, file, cb) => {
-      cb(null, process.env.AUTO_CALIB_DIR);
+      // cb(null, process.env.AUTO_CALIB_DIR);
+      cb(null, destPath);
     },
     filename: (req, file, cb) => {
       cb(null, file.originalname);
@@ -23,14 +26,14 @@ const upload_images = () => {
     const isValidMimeType = (mimeType == "image/png" || mimeType == "image/jpeg");
     const isValidExt = (ext == "png" || ext == "jpg" || ext == "jpeg");
 
-    return (isValidMimeType && isValidExt) || ext=="pts" || ext=="txt";
+    return (isValidMimeType && isValidExt) || ext == "pts" || ext == "txt";
   }
 
   const upload = multer({
     storage: storage,
     fileFilter: (req, file, cb) => {
       if (isValidFile(file)) {
-          cb(null, true);
+        cb(null, true);
       } else {
         cb(null, false);
         return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
@@ -43,30 +46,37 @@ const upload_images = () => {
 router.post('/upload', async (req, res, next) => {
 
   const imageDir = process.env.AUTO_CALIB_DIR;
-  try {
-    if (fs.existsSync(imageDir)) {
-      fs.readdirSync(imageDir).forEach(function(file, index){
-        var curPath = imageDir + "/" + file;
-        fs.unlinkSync(curPath);
-        console.log("Delete old image: " + curPath);
-      });
-    }
+  console.log("upload post start : " + imageDir)
+  let taskId = 0;
+  let taskPath = 0;
+  [taskId, taskPath] = taskManager.createNewTask()
+  console.log("post upload: " + taskPath)
 
-    const upload = upload_images();
-    upload.array('imgCollection', 1000);
-    const uploadObj = util.promisify(upload.any());
+  // try {
+  //   if (fs.existsSync(imageDir)) {
+  //     fs.readdirSync(imageDir).forEach(function (file, index) {
+  //       var curPath = imageDir + "/" + file;
+  //       fs.unlinkSync(curPath);
+  //       console.log("Delete old image: " + curPath);
+  //     });
+  //   }
 
-    await uploadObj(req, res);
-    res.send({
-      status: 0,
-      message: 'success'
-    });
+  const upload = upload_images(taskPath);
+  upload.array('imgCollection', 1000);
+  const uploadObj = util.promisify(upload.any());
 
-  } catch (err) {
-    console.log(err)
-    res.status(500).json({})
-  }
+  await uploadObj(req, res);
+  res.send({
+    status: 0,
+    message: 'success',
+    taskId: taskId,
+    taskPath: taskPath,
+  });
 
+  // } catch (err) {
+  //   console.log(err)
+  //   res.status(500).json({})
+  // }
 
 });
 

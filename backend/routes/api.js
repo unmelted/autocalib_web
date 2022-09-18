@@ -13,15 +13,16 @@ router.post('/calculate', (req, res, next) => {
     uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib',
     method: 'POST',
     body: {
-      input_dir: process.env.AUTO_CALIB_DIR_SEND,
+      // input_dir: process.env.AUTO_CALIB_DIR_SEND,
+      input_dir: req.body.taskPath,
       group: ''
     },
     json: true
   }
 
   console.log("Call Exodus API: " + options.uri);
-  //  console.log("body input_dir: " + process.env.AUTO_CALIB_DIR_SEND);
-  console.log("body input_dir: " + process.env.AUTO_CALIB_DIR);
+  console.log(req.body.taskId);
+  console.log(req.body.taskPath);
   request.post(options, function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));

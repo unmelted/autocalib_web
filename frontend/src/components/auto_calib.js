@@ -61,6 +61,8 @@ const AutoCalib = props => {
         left: { x: 0, y: 0 },
         right: { x: 0, y: 0 }
     }
+    const [taskId, setTaskId] = useState('');
+    const [taskPath, setTaskPath] = useState('');
 
     const pointColorPallet = [
         process.env.REACT_APP_POINT_COLOR_1,
@@ -156,6 +158,10 @@ const AutoCalib = props => {
         if (response && response.data && response.data.status === 0) {
             setIsUploaded(true);
             setStatusMessage("Upload Completed!");
+            console.log(response.data.taskId)
+            console.log(response.data.taskPath)
+            setTaskId(response.data.taskId);
+            setTaskPath(response.data.taskPath);
         }
 
     }
@@ -174,7 +180,10 @@ const AutoCalib = props => {
         canvasRightRef.current.addEventListener('wheel', (event) => onWheel(event, 'right'));
         canvasRightRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'right'), { passive: false });
 
+        console.log("before calculate " + taskId + " " + taskPath);
         const data = {
+            taskId: taskId,
+            taskPath: taskPath
             //group: string 그룹 이름
         }
 
