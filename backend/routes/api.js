@@ -3,18 +3,21 @@ let express = require('express'),
   multer = require('multer'),
   router = express.Router();
 const request = require('request');
+const path = require("path");
 
 // Test Progress
 let counter = 0;
 
 router.post('/calculate', (req, res, next) => {
   // Exodus API: Call 7.1.1	POST /exodus/autocalib
+  const fullPath = path.join(process.env.AUTO_CALIB_DIR_SEND, req.body.taskPath)
+  console.log("calculate input_dir : " + fullPath)
   const options = {
     uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib',
     method: 'POST',
     body: {
       // input_dir: process.env.AUTO_CALIB_DIR_SEND,
-      input_dir: req.body.taskPath,
+      input_dir: fullPath,
       group: ''
     },
     json: true
@@ -71,6 +74,39 @@ router.get('/calculate/status/:job_id', (req, res) => {
   });
 
 });
+
+router.delete('/cancel/:job_id', (req, res) => {
+  // Exodus API: 7.1.2	GET /exodus/autocalib/status/{ job_id }
+  const options = {
+    uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/cancel/' + req.params.job_id,
+    method: 'DELETE',
+    json: true
+  }
+
+  // Exodus Calculation Simulator
+  // counter += 20;
+  //
+  // if (counter > 100) {
+  //   counter = 0;
+  // }
+
+  console.log("Call Exodus API: " + options.uri);
+  request.get(options, function (err, response, body) {
+    if (!err) {
+      console.log("Response: " + JSON.stringify(body));
+      res.status(200).json({
+        status: body.result,
+        job_id: body.job_id,
+        message: "success"
+      });
+    } else {
+      console.log(err)
+      res.status(500).json({})
+    }
+  });
+
+});
+
 
 router.get('/image/:job_id', (req, res) => {
   // Exodus API: 7.1.3	GET /exodus/autocalib/getpair/{job_id}

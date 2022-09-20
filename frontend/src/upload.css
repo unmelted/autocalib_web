@@ -16,3 +16,7 @@
   margin: 15px 5px 15px 5px;
   color: yellowgreen;
 }
+
+.mymodal .modal-content {
+  color: black;
+}

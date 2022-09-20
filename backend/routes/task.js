@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const { NONAME } = require("dns");
 const fs = require('fs');
 const path = require("path");
 
@@ -15,32 +16,34 @@ getTaskPath = function (obj = {}) {
     const baseDir = process.env.AUTO_CALIB_DIR;
     console.log("task js : " + baseDir)
 
-    task = this.task_id
-    const date_ob = new Date();
-    const date = date_ob.getDate();
-    const month = date_ob.getMonth() + 1;
-    const year = date_ob.getFullYear();
+    task = this.taskId
+    const today = new Date();
+    const date = today.getDate();
+    const month = today.getMonth() + 1;
+    const year = today.getFullYear();
     const now = year + "_" + month + date + "_" + String(task);
-    console.log(month)
-    const folderName = path.join(String(baseDir), String(now))
-    console.log(folderName);
+    const folderName = String(now)
+    const fullName = path.join(String(baseDir), String(now))
+    console.log(fullName);
 
     try {
-        fs.mkdirSync(folderName);
+        fs.mkdirSync(fullName);
     } catch (err) {
         console.error(err);
     }
 
-    return folderName;
+    return [fullName, folderName];
 }
 
 exports.createNewTask = function () {
     console.log("start createnewtask")
-    task_id = getTaskId();
-    console.log("task id " + task_id)
-    task_path = getTaskPath();
-    console.log("task path : " + task_path)
-    return [task_id, task_path];
+    taskId = getTaskId();
+    console.log("task id " + taskId)
+    let taskPath = 0;
+    let fullPath = 0;
+    [fullPath, taskPath] = getTaskPath();
+    console.log("task path : " + taskPath)
+    return [taskId, fullPath, taskPath];
 }
 
 

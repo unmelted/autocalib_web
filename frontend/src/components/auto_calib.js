@@ -1,9 +1,11 @@
 import React, { useEffect, useState, useRef } from 'react';
+import ReactDOM from "react-dom";
 import axios from 'axios';
 import '../upload.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
-import Button from 'react-bootstrap/Button';
+import Button from 'react-bootstrap/Button'
+import Modal from 'react-bootstrap/Modal';
 import { saveAs } from 'file-saver';
 
 const AutoCalib = props => {
@@ -23,7 +25,8 @@ const AutoCalib = props => {
     const CALC_STATE = {
         READY: 0,
         START: 1,
-        COMPLETE: 2
+        COMPLETE: 2,
+        CANCEL: 3,
     }
 
     const [percent, setPercent] = useState(0);
@@ -33,10 +36,12 @@ const AutoCalib = props => {
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
     const [calculateState, setCalculateState] = useState(CALC_STATE.READY);
     const [isAllTarget, setIsAllTarget] = useState(false);
+    const [show, setShow] = useState(false);
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
     const [jobId, setJobId] = useState(0);
     const [downloadInfo, setDownloadInfo] = useState({});
+
 
     const canvasWidth = parseInt(process.env.REACT_APP_CANVAS_WIDTH, 10);
     const canvasHeight = parseInt(process.env.REACT_APP_CANVAS_HEIGHT, 10);
@@ -205,6 +210,61 @@ const AutoCalib = props => {
         }
     }
 
+
+    const cancelSend = async () => {
+        console.log("cancel Send is called " + taskId)
+        let response = null;
+
+        try {
+            response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${taskId}`);
+        } catch (err) {
+            console.log(err);
+            setStatusMessage('Unable to cancel');
+            return;
+        }
+
+        if (response && response.data.status === 0) {
+            setCalculateState(CALC_STATE.CANCEL);
+            setPercent(0);
+            setStatusMessage('Canceled.');
+        }
+    }
+
+    const handleModalClose = () => {
+        setShow(false);
+    }
+
+    const handleModalCancel = () => {
+        setShow(false);
+        console.log(`handle modal cancel  ${show}`)
+        cancelSend()
+    }
+
+    const ShowModal = () => {
+        console.log("show modal is called")
+        return (
+            <Modal className="mymodal" show={show}>
+                <Modal.Header closeButton>
+                    <Modal.Title>CANCEL WARN!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure that cancel this calculation? <br></br><b> can't revert after cancel. </b></Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={handleModalClose}>
+                        No, won't cancel.
+                    </Button>
+                    <Button variant="danger" onClick={handleModalCancel}>
+                        Sure. want to Cancel.
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
+    const cancelClick = () => {
+        setShow(true);
+        console.log(`cancel clicked show : ${show}`)
+    }
+
     const getTwoImage = async () => {
         let response = null;
 
@@ -217,7 +277,7 @@ const AutoCalib = props => {
             return;
         }
 
-        const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL;
+        const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskPath + '/';
 
         if (response && response.data.status === 0) {
             const imageUrlFirst = imageUrl + response.data.first_image;
@@ -521,7 +581,7 @@ const AutoCalib = props => {
         if (response && response.data.status === 0) {
             if (response.data.status === 0) {
                 const fileName = process.env.REACT_APP_PTS_FILENAME + response.data.job_id + '.' + process.env.REACT_APP_PTS_FILE_EXT;
-                const downloadUrl = process.env.REACT_APP_SERVER_IMAGE_URL + fileName;
+                const downloadUrl = process.env.REACT_APP_SERVER_IMAGE_URL + taskPath + '/' + fileName;
                 setDownloadInfo({ url: downloadUrl, name: fileName });
                 setIsSubmitCompleted(true);
             }
@@ -676,6 +736,7 @@ const AutoCalib = props => {
         clearInterval(calcProgressTimerRef.current);
         calcProgressTimerRef.current = null;
     }
+
     useEffect(() => {
         initContext();
         console.log("usereffect canvas is called")
@@ -723,6 +784,7 @@ const AutoCalib = props => {
                 <div className="row">
                     <form>
                         <div className="form-group">
+                            <ShowModal />
                             <Form.Group className='item-wrapper'>
                                 <Form.Control size="sm"
                                     type='file'
@@ -758,8 +820,20 @@ const AutoCalib = props => {
                                     type='button'
                                     value="Reset"
                                     onClick={reset}
-                                    style={{ float: 'right' }}
+                                    style={{ float: 'left' }}
                                     disabled={!isUploaded}
+                                >
+                                </Button>
+                                <Button size="sm"
+                                    variant="primary"
+                                    className="btn-danger"
+                                    id='cancel'
+                                    as="input"
+                                    type='button'
+                                    value="Cancel"
+                                    onClick={cancelClick}
+                                    style={{ float: 'right' }}
+                                // disabled={!isUploaded || calculateState !== CALC_STATE.READY}
                                 >
                                 </Button>
                                 <Button size="sm"
@@ -771,9 +845,10 @@ const AutoCalib = props => {
                                     value="Calculate"
                                     onClick={calculate}
                                     style={{ float: 'right' }}
-                                    disabled={!isUploaded || calculateState !== CALC_STATE.READY}
+                                    disabled={calculateState !== CALC_STATE.START}
                                 >
                                 </Button>
+
                             </Form.Group>
                         </div>
                     </form>

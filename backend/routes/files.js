@@ -49,8 +49,8 @@ router.post('/upload', async (req, res, next) => {
   console.log("upload post start : " + imageDir)
   let taskId = 0;
   let taskPath = 0;
-  [taskId, taskPath] = taskManager.createNewTask()
-  console.log("post upload: " + taskPath)
+  [taskId, fullPath, taskPath] = taskManager.createNewTask()
+  console.log("post upload: " + fullPath)
 
   // try {
   //   if (fs.existsSync(imageDir)) {
@@ -61,7 +61,7 @@ router.post('/upload', async (req, res, next) => {
   //     });
   //   }
 
-  const upload = upload_images(taskPath);
+  const upload = upload_images(fullPath);
   upload.array('imgCollection', 1000);
   const uploadObj = util.promisify(upload.any());
 
