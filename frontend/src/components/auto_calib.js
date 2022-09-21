@@ -1,5 +1,4 @@
 import React, { useEffect, useState, useRef } from 'react';
-import ReactDOM from "react-dom";
 import axios from 'axios';
 import '../upload.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
@@ -212,11 +211,11 @@ const AutoCalib = props => {
 
 
     const cancelSend = async () => {
-        console.log("cancel Send is called " + taskId)
+        console.log("cancel Send is called " + jobId)
         let response = null;
 
         try {
-            response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${taskId}`);
+            response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${jobId}`);
         } catch (err) {
             console.log(err);
             setStatusMessage('Unable to cancel');
@@ -241,7 +240,7 @@ const AutoCalib = props => {
     }
 
     const ShowModal = () => {
-        console.log("show modal is called")
+
         return (
             <Modal className="mymodal" show={show}>
                 <Modal.Header closeButton>
@@ -739,7 +738,6 @@ const AutoCalib = props => {
 
     useEffect(() => {
         initContext();
-        console.log("usereffect canvas is called")
         console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
     }, [canvas]);
 
@@ -765,6 +763,9 @@ const AutoCalib = props => {
                         removeCalcTimer();
                     });
             }, 2000);
+        } else if (calculateState == CALC_STATE.CANCEL) {
+            removeCalcTimer();
+            setStatusMessage('Calculate is cancled. Start another Task.');
         }
         return () => {
             removeCalcTimer();
@@ -833,7 +834,7 @@ const AutoCalib = props => {
                                     value="Cancel"
                                     onClick={cancelClick}
                                     style={{ float: 'right' }}
-                                // disabled={!isUploaded || calculateState !== CALC_STATE.READY}
+                                    disabled={!isUploaded || calculateState !== CALC_STATE.START}
                                 >
                                 </Button>
                                 <Button size="sm"
@@ -845,7 +846,7 @@ const AutoCalib = props => {
                                     value="Calculate"
                                     onClick={calculate}
                                     style={{ float: 'right' }}
-                                    disabled={calculateState !== CALC_STATE.START}
+                                    disabled={!isUploaded || calculateState !== CALC_STATE.READY}
                                 >
                                 </Button>
 

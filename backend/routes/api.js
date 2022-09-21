@@ -76,22 +76,15 @@ router.get('/calculate/status/:job_id', (req, res) => {
 });
 
 router.delete('/cancel/:job_id', (req, res) => {
-  // Exodus API: 7.1.2	GET /exodus/autocalib/status/{ job_id }
+  // Exodus API: 7.1.2	GET /exodus/autocalib/cancle/{ job_id }
   const options = {
     uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/cancel/' + req.params.job_id,
     method: 'DELETE',
     json: true
   }
 
-  // Exodus Calculation Simulator
-  // counter += 20;
-  //
-  // if (counter > 100) {
-  //   counter = 0;
-  // }
-
   console.log("Call Exodus API: " + options.uri);
-  request.get(options, function (err, response, body) {
+  request.delete(options, function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
       res.status(200).json({
