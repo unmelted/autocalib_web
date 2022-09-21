@@ -4,7 +4,9 @@ const { NONAME } = require("dns");
 const fs = require('fs');
 const path = require("path");
 
-let globalTaskId = 1000;
+var handler = require('../db/handler.js')
+
+let globalTaskId = 2002;
 
 getTaskId = function () {
     globalTaskId = globalTaskId + 1;
@@ -43,7 +45,12 @@ exports.createNewTask = function () {
     let fullPath = 0;
     [fullPath, taskPath] = getTaskPath();
     console.log("task path : " + taskPath)
-    return [taskId, fullPath, taskPath];
+
+    result = handler.insertNewTask(taskPath, fullPath)
+
+    if (result < 0) {
+        return [-1, -1, -1]
+    } else {
+        return [taskId, fullPath, taskPath];
+    }
 }
-
-

@@ -5,7 +5,7 @@ const express = require('express'),
   multer = require('multer'),
   router = express.Router();
 
-var taskManager = require('./task.js')
+const taskManager = require('./task.js')
 
 const upload_images = (destPath) => {
   const storage = multer.diskStorage({
@@ -52,6 +52,10 @@ router.post('/upload', async (req, res, next) => {
   [taskId, fullPath, taskPath] = taskManager.createNewTask()
   console.log("post upload: " + fullPath)
 
+  if (taskId == -1) {
+    res.status(500).json({})
+  }
+
   // try {
   //   if (fs.existsSync(imageDir)) {
   //     fs.readdirSync(imageDir).forEach(function (file, index) {
@@ -59,7 +63,7 @@ router.post('/upload', async (req, res, next) => {
   //       fs.unlinkSync(curPath);
   //       console.log("Delete old image: " + curPath);
   //     });
-  //   }
+  //   } for delete already existed
 
   const upload = upload_images(fullPath);
   upload.array('imgCollection', 1000);
