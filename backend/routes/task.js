@@ -1,17 +1,27 @@
 require("dotenv").config();
-
-const { NONAME } = require("dns");
 const fs = require('fs');
 const path = require("path");
 
 var handler = require('../db/handler.js')
 
-let globalTaskId = 2002;
+let globalTaskId = 310;
 
-getTaskId = function () {
-    globalTaskId = globalTaskId + 1;
-    console.log("getTaskId is called return : ", globalTaskId);
-    return globalTaskId;
+getNewTaskNo = async function () {
+    // globalTaskId = globalTaskId + 1;
+    try {
+        // let newNo = await handler.getTaskNo();
+        let newNo = -1;
+        await handler.getTaskNo(function (newNo) {
+            console.log(newNo)
+            newNo = newNo + 1
+            console.log("getTaskId is called return : ", newNo);
+            return newNo;
+        })
+
+    } catch (err) {
+        console.log(err)
+        return -1
+    }
 }
 
 getTaskPath = function (obj = {}) {
@@ -25,7 +35,7 @@ getTaskPath = function (obj = {}) {
     const year = today.getFullYear();
     const now = year + "_" + month + date + "_" + String(task);
     const folderName = String(now)
-    const fullName = path.join(String(baseDir), String(now))
+    const fullName = path.join(String(baseDir), String(now)) + '/'
     console.log(fullName);
 
     try {
@@ -37,20 +47,73 @@ getTaskPath = function (obj = {}) {
     return [fullName, folderName];
 }
 
-exports.createNewTask = function () {
+exports.createNewTask = async function () {
     console.log("start createnewtask")
-    taskId = getTaskId();
-    console.log("task id " + taskId)
-    let taskPath = 0;
+    taskNo = await getNewTaskNo();
+    if (taskNo < 0) {
+        return [-1, -1, -1];
+    }
+    console.log("task no " + taskNo)
+    let taskId = 0;
     let fullPath = 0;
-    [fullPath, taskPath] = getTaskPath();
-    console.log("task path : " + taskPath)
+    [fullPath, taskId] = getTaskPath();
+    console.log("task path : " + taskId)
 
-    result = handler.insertNewTask(taskPath, fullPath)
+    result = handler.insertNewTask(taskNo, taskId, fullPath)
 
     if (result < 0) {
         return [-1, -1, -1]
     } else {
-        return [taskId, fullPath, taskPath];
+        return [taskNo, taskId, fullPath];
     }
+}
+
+
+
+exports.parsingGroupINfo = function (taskNo, taskId, fullPath) {
+    console.log("full path : " + taskId)
+    let ptsfile = '';
+    fs.readdir(fullPath, function (err, filelist) {
+
+        for (const file of filelist) {
+            const ext = file.split('.');
+            if (ext[1].toLowerCase() == 'pts') {
+                ptsfile = file;
+                break;
+            }
+        }
+        console.log("selected pts file : " + ptsfile)
+
+        if (ptsfile == '') {
+            return -1
+        }
+
+        let group = {}
+        pts = fullPath + ptsfile;
+        console.log("parsingGroupinfo : " + pts)
+        fs.readFile(pts, 'utf-8', function (err, data) {
+            if (err) {
+                return -1
+            }
+
+            obj = JSON.parse(data)
+            console.log(Object.keys(obj.points).length)
+            for (let i = 0; i < Object.keys(obj.points).length; i++) {
+                if (Object.keys(group).indexOf(obj.points[i].Group) !== -1) {
+                    group[obj.points[i].Group].push(obj.points[i].dsc_id)
+                } else {
+                    group[obj.points[i].Group] = [obj.points[i].dsc_id]
+                }
+            }
+            console.log("result : " + group)
+            for (let i = 0; i < Object.keys(group).length; i++) {
+                console.log("insert new group info " + taskId);
+                console.log(Object.keys(group)[i])
+                console.log(group[Object.keys(group)[i]].length)
+                handler.insertNewGroupInfo([taskId, Object.keys(group)[i], group[Object.keys(group)[i]].length])
+            }
+        });
+    });
+
+    return 0
 }

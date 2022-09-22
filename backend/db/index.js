@@ -17,12 +17,12 @@ pool.query('SELECT NOW()', (err, res) => {
 
 module.exports = {
     async query(text, callback, client) {
-        return client.query(text, (err, res) => {
+        return await client.query(text, (err, res) => {
             callback(err, res);
         });
     },
     async queryParams(text, params, callback, client) {
-        const res = client.query(text, params, (err, res) => {
+        const res = await client.query(text, params, (err, res) => {
             callback(err, res)
         });
     },

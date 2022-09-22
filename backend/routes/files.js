@@ -47,12 +47,12 @@ router.post('/upload', async (req, res, next) => {
 
   const imageDir = process.env.AUTO_CALIB_DIR;
   console.log("upload post start : " + imageDir)
+  let taskNo = 0;
   let taskId = 0;
-  let taskPath = 0;
-  [taskId, fullPath, taskPath] = taskManager.createNewTask()
+  [taskNo, taskId, fullPath] = await taskManager.createNewTask()
   console.log("post upload: " + fullPath)
 
-  if (taskId == -1) {
+  if (taskNo == -1) {
     res.status(500).json({})
   }
 
@@ -70,17 +70,14 @@ router.post('/upload', async (req, res, next) => {
   const uploadObj = util.promisify(upload.any());
 
   await uploadObj(req, res);
+  result = taskManager.parsingGroupINfo(taskNo, taskId, fullPath)
+
   res.send({
     status: 0,
     message: 'success',
     taskId: taskId,
-    taskPath: taskPath,
+    taskPath: fullPath,
   });
-
-  // } catch (err) {
-  //   console.log(err)
-  //   res.status(500).json({})
-  // }
 
 });
 
