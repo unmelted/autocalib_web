@@ -1,6 +1,6 @@
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
-import '../upload.css';
+import '../css/autocalib.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
@@ -8,6 +8,7 @@ import Modal from 'react-bootstrap/Modal';
 import { saveAs } from 'file-saver';
 
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
+import { Task } from './task.js'
 
 const AutoCalib = props => {
     const canvasLeftRef = useRef(null);
@@ -97,7 +98,7 @@ const AutoCalib = props => {
                 setStatusMessage("Upload Failed! - Invalid file: " + e.target.files[key].name);
                 return;
             }
-            if (getFileExt(e.target.files[key]) == 'ds_store') {
+            if (getFileExt(e.target.files[key]) === 'ds_store') {
                 continue;
             }
 
@@ -267,7 +268,7 @@ const AutoCalib = props => {
     }
 
     const InsertRefPointToStorate = (storeMode) => {
-        if (storeMode == '2D') {
+        if (storeMode === '2D') {
             targetPoint2D.current.left = [];
             targetPoint2D.current.right = [];
             for (let i = 0; i < targetPointRef.current.left.length; i++) {
@@ -278,7 +279,7 @@ const AutoCalib = props => {
                 targetPoint2D.current['right'].push({ x: targetPointRef.current.right[i].x, y: targetPointRef.current.right[i].y });
             }
 
-        } else if (storeMode == '3D') {
+        } else if (storeMode === '3D') {
             targetPoint3D.current.left = [];
             targetPoint3D.current.right = [];
             for (let i = 0; i < targetPointRef.current.left.length; i++) {
@@ -303,7 +304,7 @@ const AutoCalib = props => {
         console.log("now calibration mode is ", calibMode.current)
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D, process.env.REACT_APP_MAX_TARGET_NUM_3D)
 
-        if (calibMode.current == '3D') {
+        if (calibMode.current === '3D') {
             InsertRefPointToStorate('2D')
 
             targetPointRef.current.left = [];
@@ -315,7 +316,7 @@ const AutoCalib = props => {
                 targetPointRef.current['right'].push({ x: targetPoint3D.current.right[i].x, y: targetPoint3D.current.right[i].y });
             }
         }
-        else if (calibMode.current == '2D') {
+        else if (calibMode.current === '2D') {
             InsertRefPointToStorate('3D')
 
             targetPointRef.current.left = [];
@@ -337,10 +338,10 @@ const AutoCalib = props => {
         }
         console.log(`2d left length: ${targetPoint2D.current.left.length} , 2d right length : ${targetPoint2D.current.right.length}`)
         console.log(`3d left length: ${targetPoint3D.current.left.length} , 3d right length : ${targetPoint3D.current.right.length}`)
-        if ((targetPoint2D.current.left.length == process.env.REACT_APP_MAX_TARGET_NUM_2D &&
-            targetPoint2D.current.right.length == process.env.REACT_APP_MAX_TARGET_NUM_2D) ||
-            (targetPoint3D.current.left.length == process.env.REACT_APP_MAX_TARGET_NUM_3D &&
-                targetPoint3D.current.right.length == process.env.REACT_APP_MAX_TARGET_NUM_3D)) {
+        if ((targetPoint2D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_2D &&
+            targetPoint2D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_2D) ||
+            (targetPoint3D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_3D &&
+                targetPoint3D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_3D)) {
             setIsAllTarget(true);
         }
     }
@@ -356,7 +357,7 @@ const AutoCalib = props => {
     const ModeButton2D = ({ id, label }) => {
         const handleModeChange = () => {
             console.log("2d button change", calibMode2D, calibMode3D)
-            if (calibMode2D == false) {
+            if (calibMode2D === false) {
                 setCalibMode2D(true)
                 setCalibMode3D(false)
                 setvarClass2D("btn-primary")
@@ -394,7 +395,7 @@ const AutoCalib = props => {
     const ModeButton3D = ({ id, label }) => {
         const handleModeChange = () => {
             console.log("3d button change")
-            if (calibMode3D == false) {
+            if (calibMode3D === false) {
                 setCalibMode2D(false)
                 setCalibMode3D(true)
                 setvarClass3D("btn-privary")
@@ -502,32 +503,32 @@ const AutoCalib = props => {
 
     const submitPoints = async () => {
         let activeMode = 0
-        if (calibMode.current == '2D') {
+        if (calibMode.current === '2D') {
             InsertRefPointToStorate('2D')
-        } else if (calibMode.current == '3D') {
+        } else if (calibMode.current === '3D') {
             InsertRefPointToStorate('3D')
         }
 
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D)
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_3D)
 
-        if (targetPoint2D.current.left.length == process.env.REACT_APP_MAX_TARGET_NUM_2D &&
-            targetPoint2D.current.right.length == process.env.REACT_APP_MAX_TARGET_NUM_2D) {
+        if (targetPoint2D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_2D &&
+            targetPoint2D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_2D) {
             activeMode = activeMode + 2
         }
-        if (targetPoint3D.current.left.length == process.env.REACT_APP_MAX_TARGET_NUM_3D &&
-            targetPoint3D.current.right.length == process.env.REACT_APP_MAX_TARGET_NUM_3D) {
+        if (targetPoint3D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_3D &&
+            targetPoint3D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_3D) {
             activeMode = activeMode + 3
         }
         console.log("submitPoints ", activeMode)
-        if (activeMode == 0) {
+        if (activeMode === 0) {
             seteMessage("NOT enough to generate calibration data. Please pick points again")
             return
-        } else if (activeMode == 2) {
+        } else if (activeMode === 2) {
             seteMessage("2D calibraiton data will be generated.")
-        } else if (activeMode == 3) {
+        } else if (activeMode === 3) {
             seteMessage("3D calibraiton data will be generated.")
-        } else if (activeMode == 5) {
+        } else if (activeMode === 5) {
             seteMessage("2D+3D calibraiton data will be generated.")
         }
 
@@ -737,7 +738,7 @@ const AutoCalib = props => {
                         removeCalcTimer();
                     });
             }, 2000);
-        } else if (calculateState == CALC_STATE.CANCEL) {
+        } else if (calculateState === CALC_STATE.CANCEL) {
             removeCalcTimer();
             setStatusMessage('Calculate is cancled. Start another Task.');
         }
@@ -757,36 +758,35 @@ const AutoCalib = props => {
         <>
             <div className="container">
                 <div className="row">
-                    <form>
-                        <div className="form-group">
-                            <ShowModal />
-                            <Form.Group className='item-wrapper'>
-                                <Form.Control size="sm"
-                                    type='file'
-                                    id='files'
-                                    webkitdirectory={'webkitdirectory'}
-                                    mozdirectory={'mozdirectory'}
-                                    onChange={uploadFiles}
-                                    disabled={isUploaded}
-                                />
-                            </Form.Group>
-                            <Form.Group className='item-wrapper'>
-                                <ProgressBar size="sm"
-                                    id='progressbar'
-                                    now={percent}
-                                    label={`${percent}% completed`}
-                                />
-                            </Form.Group>
-                            <Form.Group className='item-wrapper'>
-                                <Form.Control size="sm"
-                                    id='status'
-                                    type='text'
-                                    value={statusMessage}
-                                    readOnly={true}
-                                    style={{ color: 'blue' }}
-                                />
-                            </Form.Group>
-                            <Form.Group className='item-wrapper'>
+                    <div className="form-group">
+                        <ShowModal />
+                        <Form.Group className='item-wrapper'>
+                            <Form.Control size="sm"
+                                type='file'
+                                id='files'
+                                webkitdirectory={'webkitdirectory'}
+                                mozdirectory={'mozdirectory'}
+                                onChange={uploadFiles}
+                                disabled={isUploaded}
+                            />
+                        </Form.Group>
+                        <Form.Group className='item-wrapper'>
+                            <ProgressBar size="sm"
+                                id='progressbar'
+                                now={percent}
+                                label={`${percent}% completed`}
+                            />
+                        </Form.Group>
+                        <Form.Group className='item-wrapper'>
+                            <Form.Control size="sm"
+                                id='upload-status'
+                                type='text'
+                                value={statusMessage}
+                                readOnly={true}
+                            />
+                        </Form.Group>
+                        <div className="row">
+                            <Form.Group className='item-btn-wrppter'>
                                 <Button size="sm"
                                     variant="primary"
                                     className="item-btn-wrapper"
@@ -799,34 +799,38 @@ const AutoCalib = props => {
                                     disabled={!isUploaded}
                                 >
                                 </Button>
+                            </Form.Group>
+                        </div>
+                        {/* <div hidden={!isUploaded}> */}
+                        <div className="item-wrapper">
+                            <Task taskId={taskId}></Task>
+                            <Form.Group className='item-group-wrapper'>
                                 <Button size="sm"
                                     variant="primary"
                                     className="btn-danger"
-                                    id='cancel'
+                                    id='cancel-btn'
                                     as="input"
                                     type='button'
                                     value="Cancel"
                                     onClick={cancelClick}
-                                    style={{ float: 'right' }}
+                                    // hidden={!isUploaded}
                                     disabled={!isUploaded || calculateState !== CALC_STATE.START}
                                 >
                                 </Button>
                                 <Button size="sm"
                                     variant="primary"
-                                    className="item-btn-wrapper"
-                                    id='calculate'
+                                    id='calculate-btn'
                                     as="input"
                                     type='button'
                                     value="Calculate"
                                     onClick={calculate}
-                                    style={{ float: 'right' }}
+                                    // hidden={!isUploaded}
                                     disabled={!isUploaded || calculateState !== CALC_STATE.READY}
                                 >
                                 </Button>
-
                             </Form.Group>
                         </div>
-                    </form>
+                    </div>
                 </div>
                 <div
                     className="container"
@@ -835,8 +839,9 @@ const AutoCalib = props => {
                         marginTop: '15px',
                         height: '65px'
                     }}
+                    hidden={!isUploaded}
                 >
-                    <div >
+                    <div>
                         <Form.Group className="modeButton">
                             <ModeButton2D id='2d-mode' label='2D' ></ModeButton2D>
                             <ModeButton3D id='3d-mode' label='3D' ></ModeButton3D>
@@ -865,6 +870,7 @@ const AutoCalib = props => {
                     marginTop: '20px',
                     height: '430px'
                 }}
+                hidden={!isUploaded}
             >
 
                 <div className="row">
@@ -946,18 +952,6 @@ const AutoCalib = props => {
                 <div className='row' style={{ float: 'right' }}>
                     <div style={{ display: 'flex' }} >
                         <Form.Group hidden={calculateState !== 2}>
-                            {/* <Button
-                                variant="primary"
-                                className="item-btn-wrapper"
-                                id='clear-point'
-                                as="input"
-                                type='button'
-                                value="Clear Points"
-                                onClick={clearPoints}
-                                style={{ float: 'right' }}
-                                disabled={!isUploaded || calculateState !== CALC_STATE.COMPLETE}
-                            >
-                            </Button> */}
                             <Button
                                 variant="primary"
                                 className="item-btn-wrapper"

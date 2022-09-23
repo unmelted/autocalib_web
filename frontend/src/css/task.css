@@ -1,0 +1,42 @@
+.table-container {
+    margin: 0 5px 0 5px;
+    width: 95%;
+    display: inline-block;
+}
+
+#task-title {
+    margin: 8px;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+    display: block;
+}
+
+
+#table-body {
+    width: 100%;
+    font-size: 13px;
+    font-weight: lighter;
+    text-align: center;
+}
+
+#th-name {
+    width: 15%;
+}
+
+#th-count {
+    width: 10%;
+}
+
+#th-request {
+    width: 30%;
+}
+
+#th-status {
+    width: 35%;
+}
+
+#td-request {
+    padding: 6px;
+    text-align: left;
+}
