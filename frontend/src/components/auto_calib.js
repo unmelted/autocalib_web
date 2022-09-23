@@ -7,6 +7,8 @@ import Button from 'react-bootstrap/Button'
 import Modal from 'react-bootstrap/Modal';
 import { saveAs } from 'file-saver';
 
+import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
+
 const AutoCalib = props => {
     const canvasLeftRef = useRef(null);
     const canvasRightRef = useRef(null);
@@ -78,34 +80,6 @@ const AutoCalib = props => {
     const maxTargetNum = useRef(0);
     const calibMode = useRef(null);
 
-    const getTotalFileSize = (files) => {
-        let size = 0;
-
-        for (const file of files) {
-            size += file.size;
-        }
-
-        return size;
-    }
-
-    const getFileExt = (file) => {
-        let ext = file.name.split('.');
-
-        return (ext.length > 1 ? ext[1].toLowerCase() : '');
-    }
-
-    const isValidImage = (file) => {
-        const ext = getFileExt(file);
-
-        return (file.type == "image/png" || file.type == "image/jpeg") && (ext == "png" || ext == "jpg" || ext == "jpeg");
-    }
-
-    const isValidFile = (file) => {
-        const mimeType = file.type;
-        const ext = getFileExt(file);
-
-        return isValidImage(file) || ext == "pts" || ext == "txt" || ext == 'ds_store';
-    }
 
     const uploadFiles = async (e) => {
         e.preventDefault();
@@ -162,8 +136,8 @@ const AutoCalib = props => {
         if (response && response.data && response.data.status === 0) {
             setIsUploaded(true);
             setStatusMessage("Upload Completed!");
-            console.log(response.data.taskId)
-            console.log(response.data.taskPath)
+            // console.log(response.data.taskId)
+            // console.log(response.data.taskPath)
             setTaskId(response.data.taskId);
             setTaskPath(response.data.taskPath);
         }

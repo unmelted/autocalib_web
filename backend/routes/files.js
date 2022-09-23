@@ -70,7 +70,7 @@ router.post('/upload', async (req, res, next) => {
   const uploadObj = util.promisify(upload.any());
 
   await uploadObj(req, res);
-  result = taskManager.parsingGroupINfo(taskNo, taskId, fullPath)
+  result = await taskManager.parsingGroupInfo(taskNo, taskId, fullPath)
 
   res.send({
     status: 0,

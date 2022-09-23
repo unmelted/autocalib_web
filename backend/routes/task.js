@@ -4,19 +4,15 @@ const path = require("path");
 
 var handler = require('../db/handler.js')
 
-let globalTaskId = 310;
 
 getNewTaskNo = async function () {
-    // globalTaskId = globalTaskId + 1;
     try {
-        // let newNo = await handler.getTaskNo();
         let newNo = -1;
-        await handler.getTaskNo(function (newNo) {
-            console.log(newNo)
-            newNo = newNo + 1
-            console.log("getTaskId is called return : ", newNo);
-            return newNo;
-        })
+        newNo = await handler.getTaskNo();
+        console.log(newNo)
+        newNo = newNo + 1
+        console.log("getTaskId is called return : ", newNo);
+        return newNo;
 
     } catch (err) {
         console.log(err)
@@ -24,31 +20,28 @@ getNewTaskNo = async function () {
     }
 }
 
-getTaskPath = function (obj = {}) {
+getTaskPath = function (taskNo) {
     const baseDir = process.env.AUTO_CALIB_DIR;
-    console.log("task js : " + baseDir)
-
-    task = this.taskId
     const today = new Date();
     const date = today.getDate();
     const month = today.getMonth() + 1;
     const year = today.getFullYear();
-    const now = year + "_" + month + date + "_" + String(task);
-    const folderName = String(now)
-    const fullName = path.join(String(baseDir), String(now)) + '/'
-    console.log(fullName);
+    const now = year + "_" + month + date + "_" + String(taskNo);
+    const taskId = String(now)
+    const fullPath = path.join(String(baseDir), String(now)) + '/'
+    console.log(fullPath);
 
     try {
-        fs.mkdirSync(fullName);
+        fs.mkdirSync(fullPath);
     } catch (err) {
         console.error(err);
     }
 
-    return [fullName, folderName];
+    return [fullPath, taskId];
 }
 
 exports.createNewTask = async function () {
-    console.log("start createnewtask")
+
     taskNo = await getNewTaskNo();
     if (taskNo < 0) {
         return [-1, -1, -1];
@@ -56,10 +49,10 @@ exports.createNewTask = async function () {
     console.log("task no " + taskNo)
     let taskId = 0;
     let fullPath = 0;
-    [fullPath, taskId] = getTaskPath();
+    [fullPath, taskId] = getTaskPath(taskNo);
     console.log("task path : " + taskId)
 
-    result = handler.insertNewTask(taskNo, taskId, fullPath)
+    result = await handler.insertNewTask(taskNo, taskId, fullPath)
 
     if (result < 0) {
         return [-1, -1, -1]
@@ -70,7 +63,7 @@ exports.createNewTask = async function () {
 
 
 
-exports.parsingGroupINfo = function (taskNo, taskId, fullPath) {
+exports.parsingGroupInfo = async function (taskNo, taskId, fullPath) {
     console.log("full path : " + taskId)
     let ptsfile = '';
     fs.readdir(fullPath, function (err, filelist) {
@@ -105,13 +98,14 @@ exports.parsingGroupINfo = function (taskNo, taskId, fullPath) {
                     group[obj.points[i].Group] = [obj.points[i].dsc_id]
                 }
             }
-            console.log("result : " + group)
-            for (let i = 0; i < Object.keys(group).length; i++) {
+
+            // for (let i = 0; i < Object.keys(group).length; i++) {
+            Object.keys(group).forEach(async data => {
                 console.log("insert new group info " + taskId);
-                console.log(Object.keys(group)[i])
-                console.log(group[Object.keys(group)[i]].length)
-                handler.insertNewGroupInfo([taskId, Object.keys(group)[i], group[Object.keys(group)[i]].length])
-            }
+                console.log(data);
+                console.log(group[data].length);
+                await handler.insertNewGroupInfo([taskId, data, group[data].length]);
+            });
         });
     });
 
