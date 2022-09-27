@@ -19,7 +19,7 @@ router.post('/calculate', (req, res, next) => {
     body: {
       // input_dir: process.env.AUTO_CALIB_DIR_SEND,
       input_dir: fullPath,
-      group: ''
+      group: req.body.groupId,
     },
     json: true
   }

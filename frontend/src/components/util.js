@@ -1,4 +1,6 @@
 
+import React from 'react';
+import axios from 'axios';
 
 export const getTotalFileSize = (files) => {
     let size = 0;
@@ -26,3 +28,17 @@ export const isValidFile = (file) => {
 
     return isValidImage(file) || ext === "pts" || ext === "txt" || ext === 'ds_store';
 }
+export const getGroupInfo = async function (taskId) {
+    console.log("getGroup .. " + taskId)
+    let response = null;
+    try {
+        response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/groupinfo/${taskId}`)
+    } catch (err) {
+        console.log("get groupinfo error")
+    }
+    if (response && response.data) {
+        console.log("get group info ", response.data.group)
+        return response.data.group;
+    }
+    return 0;
+};

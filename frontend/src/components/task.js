@@ -4,22 +4,9 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
+import Modal from 'react-bootstrap/Modal';
 import '../css/task.css';
-
-export const getGroupInfo = async function (taskId) {
-    console.log("getGroup .. " + taskId)
-    let response = null;
-    try {
-        response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/groupinfo/${taskId}`)
-    } catch (err) {
-        console.log("get groupinfo error")
-    }
-    if (response && response.data) {
-        console.log("get group info ", response.data.group)
-        return response.data.group;
-    }
-    return 0;
-};
+import { saveAs } from 'file-saver';
 
 const calculate = async (taskId, taskPath, groupId) => {
     console.log("Calculate click ", groupId);
@@ -50,7 +37,7 @@ const calculate = async (taskId, taskPath, groupId) => {
 }
 
 
-export const MakeTasktable = (taskId, taskPath, groupInfo) => {
+export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
     console.log("Task start : " + taskId);
 
     const CAL_STATE = {
@@ -60,8 +47,70 @@ export const MakeTasktable = (taskId, taskPath, groupInfo) => {
         CANCEL: 3,
     }
 
+    const [jobId, setJobId] = useState(0);
+    const [show, setShow] = useState(false);
     const [calState, setCalState] = useState(CAL_STATE.READY)
     const [statusMessage, setStatusMessage] = useState('')
+    const [downloadInfo, setDownloadInfo] = useState({});
+
+    const cancelSend = async () => {
+        console.log("cancel Send is called " + jobId)
+        let response = null;
+
+        try {
+            response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${jobId}`);
+        } catch (err) {
+            console.log(err);
+            setStatusMessage('Unable to cancel');
+            return;
+        }
+
+        if (response && response.data.status === 0) {
+            setCalState(CAL_STATE.CANCEL);
+            setStatusMessage('Canceled.');
+        }
+    }
+
+    const handleModalClose = () => {
+        setShow(false);
+    }
+
+    const handleModalCancel = () => {
+        setShow(false);
+        console.log(`handle modal cancel  ${show}`)
+        cancelSend()
+    }
+
+    const ShowModal = () => {
+
+        return (
+            <Modal className="mymodal" show={show}>
+                <Modal.Header closeButton>
+                    <Modal.Title>CANCEL WARN!</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>Are you sure that cancel this calculation? <br></br><b> can't revert after cancel. </b></Modal.Body>
+                <Modal.Footer>
+                    <Button variant="primary" onClick={handleModalClose}>
+                        No, won't cancel.
+                    </Button>
+                    <Button variant="danger" onClick={handleModalCancel}>
+                        Sure. want to Cancel.
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+        );
+    }
+
+    const cancelClick = () => {
+        setShow(true);
+        console.log(`cancel clicked show : ${show}`)
+    }
+
+    const downloadResult = () => {
+        saveAs(downloadInfo.url, downloadInfo.name);
+        // setIsSubmitted(false);
+    }
+
 
     const TaskRowRequest = ({ group }) => {
 
@@ -177,6 +226,7 @@ export const MakeTasktable = (taskId, taskPath, groupInfo) => {
         console.log("groupInfo length is not 0. ");
         return (
             <Fragment >
+                <ShowModal />
                 <div className='table-container'>
                     <p id="task-title" > CURRENT TASK ID : {taskId} </p>
                     <Table id="table-body" striped bordered variant="dark">
