@@ -4,6 +4,7 @@ let express = require('express'),
   router = express.Router();
 const request = require('request');
 const path = require("path");
+var handler = require('../db/handler.js')
 
 // Test Progress
 let counter = 0;
@@ -74,6 +75,25 @@ router.get('/calculate/status/:job_id', (req, res) => {
   });
 
 });
+
+router.get('/groupinfo/:task_id', async (req, res) => {
+
+  console.log("router groupinfo task id : ", req.params.task_id)
+
+  try {
+    result = await handler.getGroupInfo(req.params.task_id)
+    console.log("get group info end  : " + result[0].group_id)
+    res.status(200).json({
+      message: 'success',
+      group: result,
+    });
+
+  } catch (err) {
+    console.log(err)
+    res.status(500).json({})
+  }
+});
+
 
 router.delete('/cancel/:job_id', (req, res) => {
   // Exodus API: 7.1.2	GET /exodus/autocalib/cancle/{ job_id }

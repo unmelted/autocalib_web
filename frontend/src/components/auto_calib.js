@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, useMemo } from 'react';
 import axios from 'axios';
 import '../css/autocalib.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
@@ -8,7 +8,7 @@ import Modal from 'react-bootstrap/Modal';
 import { saveAs } from 'file-saver';
 
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
-import { Task } from './task.js'
+import { getGroupInfo, MakeTasktable } from './task.js'
 
 const AutoCalib = props => {
     const canvasLeftRef = useRef(null);
@@ -70,6 +70,8 @@ const AutoCalib = props => {
     }
     const [taskId, setTaskId] = useState('');
     const [taskPath, setTaskPath] = useState('');
+    const [groupInfo, setGroupInfo] = useState('');
+    const [taskLoad, setTaskLoad] = useState(false);
 
     const pointColorPallet = [
         process.env.REACT_APP_POINT_COLOR_1,
@@ -137,53 +139,10 @@ const AutoCalib = props => {
         if (response && response.data && response.data.status === 0) {
             setIsUploaded(true);
             setStatusMessage("Upload Completed!");
-            // console.log(response.data.taskId)
-            // console.log(response.data.taskPath)
             setTaskId(response.data.taskId);
             setTaskPath(response.data.taskPath);
         }
-
     }
-
-    const calculate = async () => {
-        console.log("Calculate async calib mode", calibMode)
-        canvasLeftRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'left'), { passive: false });
-        canvasLeftRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'left'), { passive: false });
-        canvasLeftRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'left'), { passive: false });
-        canvasLeftRef.current.addEventListener('wheel', (event) => onWheel(event, 'left'), { passive: false });
-        canvasLeftRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'left'), { passive: false });
-
-        canvasRightRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'right'), { passive: false });
-        canvasRightRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'right'), { passive: false });
-        canvasRightRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'right'), { passive: false });
-        canvasRightRef.current.addEventListener('wheel', (event) => onWheel(event, 'right'));
-        canvasRightRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'right'), { passive: false });
-
-        console.log("before calculate " + taskId + " " + taskPath);
-        const data = {
-            taskId: taskId,
-            taskPath: taskPath
-            //group: string 그룹 이름
-        }
-
-        let response = null;
-
-        try {
-            response = await axios.post(process.env.REACT_APP_SERVER_URL + "/api/calculate", data);
-        } catch (err) {
-            console.log(err);
-            setStatusMessage('Unable to calculate!');
-            return;
-        }
-
-        if (response && response.data.status === 0) {
-            setJobId(response.data.job_id);
-            setCalculateState(CALC_STATE.START);
-            setPercent(0);
-            setStatusMessage('Calculating...');
-        }
-    }
-
 
     const cancelSend = async () => {
         console.log("cancel Send is called " + jobId)
@@ -711,10 +670,39 @@ const AutoCalib = props => {
         calcProgressTimerRef.current = null;
     }
 
+    // useEffect(() => {
+    //     initContext();
+    //     console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
+    // }, [canvas]);
+
+    const TaskTable = () => {
+        if (taskLoad === true) {
+            console.log("MakeTaskTable will call ", taskId);
+            return MakeTasktable(taskId, taskPath, groupInfo);
+        }
+        else {
+            return (<></>)
+        }
+    };
+
+    const getGroup = async () => {
+        try {
+            const group = await getGroupInfo(taskId);
+            setGroupInfo(group);
+            console.log("await ? or not? ")
+            setTaskLoad(true)
+        } catch (err) {
+            console.log("getGroup info error : ", err);
+        }
+    };
+
     useEffect(() => {
-        initContext();
-        console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
-    }, [canvas]);
+
+        if (taskId !== '') {
+            console.log("task id useEffect ");
+            getGroup();
+        }
+    }, [taskId]);
 
     useEffect(() => {
         if (isUploaded && calculateState === CALC_STATE.START) {
@@ -747,12 +735,12 @@ const AutoCalib = props => {
         }
     }, [calculateState]);
 
-    useEffect(() => {
-        targetPointRef.current = {
-            left: [],
-            right: []
-        };
-    }, []);
+    // useEffect(() => {
+    //     targetPointRef.current = {
+    //         left: [],
+    //         right: []
+    //     };
+    // }, []);
 
     return (
         <>
@@ -802,9 +790,11 @@ const AutoCalib = props => {
                             </Form.Group>
                         </div>
                         {/* <div hidden={!isUploaded}> */}
-                        <div className="item-wrapper">
-                            <Task taskId={taskId}></Task>
-                            <Form.Group className='item-group-wrapper'>
+                        <div className="item-wrapper"
+                            id="div-task-table"
+                            hidden={!isUploaded}>
+                            <TaskTable />
+                            {/* <Form.Group className='item-group-wrapper'>
                                 <Button size="sm"
                                     variant="primary"
                                     className="btn-danger"
@@ -828,7 +818,7 @@ const AutoCalib = props => {
                                     disabled={!isUploaded || calculateState !== CALC_STATE.READY}
                                 >
                                 </Button>
-                            </Form.Group>
+                            </Form.Group> */}
                         </div>
                     </div>
                 </div>

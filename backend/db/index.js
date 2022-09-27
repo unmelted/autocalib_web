@@ -22,12 +22,13 @@ module.exports = {
         });
     },
     async queryParams(text, params, callback, client) {
-        const res = await client.query(text, params, (err, res) => {
+        console.log("queryPaarams : ", text)
+        return await client.query(text, params, (err, res) => {
             callback(err, res)
         });
     },
     async getClient(callback) {
-        const client = await pool.connect((err, client, done) => {
+        return client = await pool.connect((err, client, done) => {
             callback(err, client, done)
         });
     }

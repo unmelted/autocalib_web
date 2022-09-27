@@ -51,5 +51,9 @@
   margin: 0 5px 0 5px;
   float: right;
   display: block;
+}
 
+#div-task-table {
+  margin: 10px;
+  border: 1px solid rgb(99, 99, 99);
 }

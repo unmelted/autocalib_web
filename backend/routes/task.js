@@ -61,53 +61,72 @@ exports.createNewTask = async function () {
     }
 }
 
+async function insertGroup(taskId, group, item) {
+    result = await handler.insertNewGroupInfo([taskId, item, group[item].length]);
+}
 
+insertGroupInfo = async function (taskId, group) {
+    console.log("start insertGroupInfo .. " + group)
+    console.log(taskId)
+    Object.keys(group).forEach(data => {
+        console.log("insert new group info " + taskId);
+        console.log(data);
+    });
 
-exports.parsingGroupInfo = async function (taskNo, taskId, fullPath) {
+    for (const item of Object.keys(group)) {
+        await insertGroup(taskId, group, item);
+    }
+    console.log("end for")
+}
+
+exports.parsingGroupInfo = async function (taskId, fullPath) {
     console.log("full path : " + taskId)
     let ptsfile = '';
-    fs.readdir(fullPath, function (err, filelist) {
+    let group = {}
+    let result = -1;
+    return new Promise((resolve, reject) => {
+        fs.readdir(fullPath, function (err, filelist) {
 
-        for (const file of filelist) {
-            const ext = file.split('.');
-            if (ext[1].toLowerCase() == 'pts') {
-                ptsfile = file;
-                break;
-            }
-        }
-        console.log("selected pts file : " + ptsfile)
-
-        if (ptsfile == '') {
-            return -1
-        }
-
-        let group = {}
-        pts = fullPath + ptsfile;
-        console.log("parsingGroupinfo : " + pts)
-        fs.readFile(pts, 'utf-8', function (err, data) {
-            if (err) {
-                return -1
-            }
-
-            obj = JSON.parse(data)
-            console.log(Object.keys(obj.points).length)
-            for (let i = 0; i < Object.keys(obj.points).length; i++) {
-                if (Object.keys(group).indexOf(obj.points[i].Group) !== -1) {
-                    group[obj.points[i].Group].push(obj.points[i].dsc_id)
-                } else {
-                    group[obj.points[i].Group] = [obj.points[i].dsc_id]
+            for (const file of filelist) {
+                const ext = file.split('.');
+                if (ext[1].toLowerCase() == 'pts') {
+                    ptsfile = file;
+                    break;
                 }
             }
+            console.log("selected pts file : " + ptsfile)
 
-            // for (let i = 0; i < Object.keys(group).length; i++) {
-            Object.keys(group).forEach(async data => {
-                console.log("insert new group info " + taskId);
-                console.log(data);
-                console.log(group[data].length);
-                await handler.insertNewGroupInfo([taskId, data, group[data].length]);
+            if (ptsfile == '') {
+                resolve(-1)
+            }
+
+            pts = fullPath + ptsfile;
+            console.log("parsingGroupinfo : " + pts)
+            fs.readFile(pts, 'utf-8', async function (err, data) {
+                if (err) {
+                    resolve(-1)
+                }
+
+                obj = JSON.parse(data)
+                console.log(Object.keys(obj.points).length)
+                for (let i = 0; i < Object.keys(obj.points).length; i++) {
+                    if (Object.keys(group).indexOf(obj.points[i].Group) !== -1) {
+                        group[obj.points[i].Group].push(obj.points[i].dsc_id)
+                    } else {
+                        group[obj.points[i].Group] = [obj.points[i].dsc_id]
+                    }
+                }
+
+                Object.keys(group).forEach(data => {
+                    console.log("check.. ", data);
+                });
+
+                console.log("before.. " + taskId);
+                console.log("before insert .." + group);
+                await insertGroupInfo(taskId, group);
+                console.log("end insert group ..")
+                resolve(0)
             });
         });
     });
-
-    return 0
 }

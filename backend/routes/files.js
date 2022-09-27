@@ -43,6 +43,7 @@ const upload_images = (destPath) => {
 
   return upload;
 }
+
 router.post('/upload', async (req, res, next) => {
 
   const imageDir = process.env.AUTO_CALIB_DIR;
@@ -70,14 +71,20 @@ router.post('/upload', async (req, res, next) => {
   const uploadObj = util.promisify(upload.any());
 
   await uploadObj(req, res);
-  result = await taskManager.parsingGroupInfo(taskNo, taskId, fullPath)
+  result = await taskManager.parsingGroupInfo(taskId, fullPath)
 
-  res.send({
-    status: 0,
-    message: 'success',
-    taskId: taskId,
-    taskPath: fullPath,
-  });
+  console.log("parsing gourp info result  : ", result);
+  if (result == 0) {
+    console.log("end parsing groupinfo")
+    res.send({
+      status: 0,
+      message: 'success',
+      taskId: taskId,
+      taskPath: fullPath,
+    });
+  } else {
+    res.status(500).json({})
+  }
 
 });
 

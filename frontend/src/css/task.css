@@ -1,6 +1,6 @@
 .table-container {
-    margin: 0 5px 0 5px;
-    width: 95%;
+    /* margin: 0 5px 0 5px; */
+    width: 100%;
     display: inline-block;
 }
 
@@ -29,14 +29,34 @@
 }
 
 #th-request {
-    width: 30%;
+    width: 20%;
 }
 
 #th-status {
-    width: 35%;
+    width: 40%;
+}
+
+#th-result {
+    width: 6%;
 }
 
 #td-request {
     padding: 6px;
     text-align: left;
+}
+
+#td-status {
+    padding: 6px;
+    text-align: left;
+}
+
+#td-result {
+    padding: 6px;
+    text-align: left;
+}
+
+.label {
+    margin: 0 10px 10px 0;
+    min-width: 24rem;
+    display: inline-block;
 }
