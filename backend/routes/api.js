@@ -9,9 +9,9 @@ var handler = require('../db/handler.js')
 // Test Progress
 let counter = 0;
 
-router.post('/calculate', (req, res, next) => {
+router.post('/calculate', async (req, res, next) => {
   // Exodus API: Call 7.1.1	POST /exodus/autocalib
-  const fullPath = path.join(process.env.AUTO_CALIB_DIR_SEND, req.body.taskPath)
+  const fullPath = path.join(process.env.AUTO_CALIB_DIR_SEND, req.body.task_id)
   console.log("calculate input_dir : " + fullPath)
   const options = {
     uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib',
@@ -19,21 +19,25 @@ router.post('/calculate', (req, res, next) => {
     body: {
       // input_dir: process.env.AUTO_CALIB_DIR_SEND,
       input_dir: fullPath,
-      group: req.body.groupId,
+      group: req.body.group_id,
     },
     json: true
   }
 
   console.log("Call Exodus API: " + options.uri);
-  console.log(req.body.taskId);
-  console.log(req.body.taskPath);
-  request.post(options, function (err, response, body) {
+  console.log(req.body.task_id);
+  console.log(req.body.task_path);
+  request.post(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
+      result = await handler.insertNewTaskRequest(['CALCULATE', req.body.task_id, req.body.group_id, body.job_id])
+      console.log("insert task request , return : " + result);
+
       res.status(200).json({
         status: body.status,
         job_id: body.job_id,
-        message: body.message
+        message: body.message,
+        request_id: result,
       });
     } else {
       console.log(err)

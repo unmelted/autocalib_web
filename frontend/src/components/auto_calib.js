@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useEffect, useState, useRef, createContext, useContext } from 'react';
 import axios from 'axios';
 import '../css/autocalib.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
@@ -6,15 +6,10 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage, getGroupInfo } from './util.js'
-import { TaskGroupTable } from './task.js'
+import { TaskGroupTable, TableDataProvider } from './task.js'
+
 
 function AutoCalib(props) {
-    const CALC_STATE = {
-        READY: 0,
-        START: 1,
-        COMPLETE: 2,
-        CANCEL: 3,
-    }
 
     const [statusMessage, setStatusMessage] = useState("");
     const [isUploaded, setIsUploaded] = useState(false)
@@ -104,12 +99,21 @@ function AutoCalib(props) {
     const TaskTable = () => {
         if (taskLoad === true) {
             console.log("MakeTaskTable will call ", taskId);
-            return TaskGroupTable(taskId, taskPath, groupInfo);
+
+            return (
+                <TableDataProvider>
+                    {TaskGroupTable(taskId, taskPath, groupInfo)}
+                </TableDataProvider>
+            )
         }
         else {
             return (<></>)
         }
     };
+
+    // useEffect(() => {
+    //     console.log("childChange state change ");
+    // }, [childChange])
 
     const getGroup = async () => {
         try {
@@ -213,36 +217,10 @@ function AutoCalib(props) {
                                 </Button>
                             </Form.Group>
                         </div>
-                        {/* <div hidden={!isUploaded}> */}
                         <div className="item-wrapper"
                             id="div-task-table"
                             hidden={!isUploaded}>
                             <TaskTable />
-                            {/* <Form.Group className='item-group-wrapper'>
-                                <Button size="sm"
-                                    variant="primary"
-                                    className="btn-danger"
-                                    id='cancel-btn'
-                                    as="input"
-                                    type='button'
-                                    value="Cancel"
-                                    onClick={cancelClick}
-                                    // hidden={!isUploaded}
-                                    disabled={!isUploaded || calculateState !== CALC_STATE.START}
-                                >
-                                </Button>
-                                <Button size="sm"
-                                    variant="primary"
-                                    id='calculate-btn'
-                                    as="input"
-                                    type='button'
-                                    value="Calculate"
-                                    onClick={calculate}
-                                    // hidden={!isUploaded}
-                                    disabled={!isUploaded || calculateState !== CALC_STATE.READY}
-                                >
-                                </Button>
-                            </Form.Group> */}
                         </div>
                     </div>
                 </div>

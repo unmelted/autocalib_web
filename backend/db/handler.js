@@ -107,14 +107,29 @@ exports.insertNewTaskRequest = function (params) {
                 resolve(-1)
             }
 
-            db.queryParams("INSERT INTO task_request (subtask_id, task_id, group_id, cam_count ) VALUES ($1, $2, $3)", params, (err) => {
-                client.release(true);
+            db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id ) VALUES ($1, $2, $3, $4)", params, (err) => {
+                // client.release(true);
                 if (err) {
                     console.log(err)
                     resolve(-1)
                 }
-                console.log('insertNewGroupInfo query success');
-                resolve(0)
+                console.log('insertNewTaskRequest query success');
+
+                db.queryParams("SELECT request_id FROM  task_request WHERE request_category = $1 and task_id = $2 and group_id = $3 and job_id = $4", params, (err, res) => {
+                    client.release(true);
+                    if (err) {
+                        console.log(err)
+                        resolve(-1)
+                    }
+                    if (res.rows.length > 0) {
+                        console.log('select current request_id ' + res.rows[0]['request_id']);
+                        resolve(res.rows[0]['request_id'])
+                    }
+                    else {
+                        resolve(-10)
+                    }
+                }, client)
+
             }, client);
 
         });
