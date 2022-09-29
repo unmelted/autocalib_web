@@ -1,6 +1,5 @@
-import React, { component, useEffect, useState, useRef, Fragment, createContext, useContext } from 'react';
+import React, { useState, useRef, Fragment, useContext } from 'react';
 import axios from 'axios';
-import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
@@ -8,31 +7,11 @@ import Modal from 'react-bootstrap/Modal';
 import '../css/task.css';
 import { saveAs } from 'file-saver';
 // import { PairCanvas } from './canvas.js'
-// import { TableDataContext } from './auto_calib';
+import { TableDataContext } from './auto_calib.js';
 
-const TableDataContext = createContext();
-const context = useContext(TableDataContext);
 
-const TableDataProvider = ({ children }) => {
-    const [data, setData] = useState(''); //define your inital 
-    return (
-        <TableDataContext.Provider value={{ data, setData }}>
-            {children}
-        </TableDataContext.Provider>
-    )
-};
+export const TaskGroupTable = ({ taskId, taskPath }) => {
 
-export { TableDataContext, TableDataProvider };
-
-export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
-    console.log("Task start : " + taskId);
-    let changeValue = 0;
-
-    const REQUEST_CATEGORY = {
-        CALCULATE: 1,
-        GENERATE: 2,
-        GET_RESULT: 3,
-    }
     const CAL_STATE = {
         READY: 0,
         START: 1,
@@ -41,11 +20,8 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
         PAIR_COMPLETE: 4,
     }
 
+    const { groupInfo, changeTableData } = useContext(TableDataContext);
     const [show, setShow] = useState(false);
-    const [jobId, setJobId] = useState('')
-    const [requestId, setRequestId] = useState('')
-    const [calState, setCalState] = useState(CAL_STATE.READY)
-    const [statusMessage, setStatusMessage] = useState('')
     const [downloadInfo, setDownloadInfo] = useState({});
 
     const Canvas = () => {
@@ -57,6 +33,10 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
 
     }
     const TaskRow = ({ group }) => {
+        const [jobId, setJobId] = useState('')
+        const [requestId, setRequestId] = useState('')
+        const [calState, setCalState] = useState(CAL_STATE.READY)
+        const [statusMessage, setStatusMessage] = useState('')
 
         const calculate = async (taskId, taskPath, groupId) => {
             console.log("before calculate " + taskId + " " + groupId);
@@ -81,7 +61,9 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
                 setJobId(response.data.job_id);
                 setRequestId(response.data.request_id);
                 setCalState(CAL_STATE.START);
-                setStatusMessage(`Send Request Calculate. Job id ${jobId}`);
+                const strmsg = `Send Request Calculate. Job id ${response.data.job_id}`
+                console.log("strmstg " + strmsg)
+                setStatusMessage(strmsg);
                 console.log("send calculate. job id : ", response.data.job_id);
             }
         }
@@ -118,9 +100,10 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
             }
 
             if (response && response.data.percent) {
-                setStatusMessage(`Processing .. ${response.data.percent}%`);
-                if (parseInt(response.data.percenet) === 100) {
+                setStatusMessage(` ${jobId} Processing .. ${response.data.percent}%`);
+                if (parseInt(response.data.percent) === 100) {
                     setCalState(CAL_STATE.COMPLETE);
+                    changeTableData(1, 1);
                 }
             }
         }
@@ -134,10 +117,6 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
             console.log(`handle modal cancel  ${show}`)
             cancelSend()
         }
-
-        useEffect(() => {
-            console.log("statusMessage useEffect is called ");
-        }, [statusMessage, calState]);
 
         const ShowModal = ({ groupId }) => {
 
@@ -240,7 +219,7 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
                         hidden={group.cam_count < 5}
                         disabled={calState === CAL_STATE.READY || calState === CAL_STATE.CANCEL}>
                     </Button>{' '}
-                    <span class="label label-md label-default">
+                    <span className="label label-md label-default">
                         {statusMessage}
                     </span>
                     <Button size="sm"
@@ -282,7 +261,6 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
     }
 
     const GroupTable = ({ groups }) => {
-        console.log("start GroupTable! ")
         return (
             groups.map((group =>
                 <tr key={group.no} >
@@ -300,7 +278,6 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
         return (<div />)
     }
     else {
-        console.log("groupInfo length is not 0. ");
         return (
             <Fragment >
                 <div className='table-container'>
@@ -320,9 +297,8 @@ export const TaskGroupTable = (taskId, taskPath, groupInfo) => {
                         </tbody>
                     </Table>
                 </div>
-                <div className='canvas-container'
-                    hidde={calState !== CAL_STATE.PAIR_COMPLETE}>
-                    <Canvas></Canvas>
+                <div className='canvas-containe'>
+                    {/* <Canvas></Canvas> */}
                 </div>
             </Fragment >
         )

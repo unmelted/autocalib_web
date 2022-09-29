@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useRef, createContext, useContext } from 'react';
+import React, { useEffect, useState, createContext } from 'react';
 import axios from 'axios';
 import '../css/autocalib.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
@@ -6,8 +6,24 @@ import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage, getGroupInfo } from './util.js'
-import { TaskGroupTable, TableDataProvider } from './task.js'
+import { TaskGroupTable } from './task.js'
 
+export const TableDataContext = createContext();
+const initial =
+    [
+        {
+            "group_id": "Group1",
+            "cam_count": 56,
+            "no": 102,
+            "status": "None"
+        },
+        {
+            "group_id": "Group2",
+            "cam_count": 24,
+            "no": 103,
+            "status": "None"
+        }
+    ]
 
 function AutoCalib(props) {
 
@@ -17,7 +33,7 @@ function AutoCalib(props) {
     const [percent, setPercent] = useState(0);
     const [taskId, setTaskId] = useState('');
     const [taskPath, setTaskPath] = useState('');
-    const [groupInfo, setGroupInfo] = useState('');
+    const [groupInfo, setGroupInfo] = useState(initial);
     const [taskLoad, setTaskLoad] = useState(false);
 
     const uploadFiles = async (e) => {
@@ -84,8 +100,6 @@ function AutoCalib(props) {
         window.location.reload();
     }
 
-
-
     // const removeCalcTimer = () => {
     //     clearInterval(calcProgressTimerRef.current);
     //     calcProgressTimerRef.current = null;
@@ -96,41 +110,54 @@ function AutoCalib(props) {
     //     console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
     // }, [canvas]);
 
-    const TaskTable = () => {
-        if (taskLoad === true) {
-            console.log("MakeTaskTable will call ", taskId);
+    const changeTableData = (groupNo, newStatus) => {
+        console.log(`changeTableData is called with ${groupNo}, ${newStatus}`)
 
-            return (
-                <TableDataProvider>
-                    {TaskGroupTable(taskId, taskPath, groupInfo)}
-                </TableDataProvider>
-            )
-        }
-        else {
-            return (<></>)
-        }
-    };
+        // for (const group of groupInfo) {
+        //     if (group.no === groupNo) {
+        //         group["status"] = newStatus;
+        //     }
+        // }
+    }
+
+    // const TaskTable = () => {
+    //     if (taskLoad === true) {
+    //         console.log("MakeTaskTable will call ", taskId);
+
+    //         return (
+    //             <TableDataContext.Provider value={{ groupInfo, setGroupInfo }}>
+    //                 {TaskGroupTable(taskId, taskPath, groupInfo)}
+    //             </TableDataContext.Provider>
+    //         )
+    //     }
+    //     else {
+    //         return (<></>)
+    //     }
+    // };
 
     // useEffect(() => {
     //     console.log("childChange state change ");
     // }, [childChange])
 
-    const getGroup = async () => {
-        try {
-            const group = await getGroupInfo(taskId);
-            setGroupInfo(group);
-            setTaskLoad(true)
-        } catch (err) {
-            console.log("getGroup info error : ", err);
-        }
-    };
-
     useEffect(() => {
 
-        if (taskId !== '') {
-            console.log("task id useEffect ");
-            getGroup();
+        async function getGroup() {
+            if (taskId !== '') {
+                console.log("task id useEffect ");
+                try {
+                    const group = await getGroupInfo(taskId);
+                    for (const g of group) {
+                        g["status"] = '';
+                    }
+
+                    setGroupInfo(group);
+                    setTaskLoad(true)
+                } catch (err) {
+                    console.log("getGroup info error : ", err);
+                }
+            }
         }
+        getGroup();
     }, [taskId]);
 
     // useEffect(() => {
@@ -219,8 +246,10 @@ function AutoCalib(props) {
                         </div>
                         <div className="item-wrapper"
                             id="div-task-table"
-                            hidden={!isUploaded}>
-                            <TaskTable />
+                            hidden={!taskLoad}>
+                            <TableDataContext.Provider value={{ groupInfo, changeTableData }}>
+                                <TaskGroupTable taskId={taskId} taskPath={taskPath} />
+                            </TableDataContext.Provider>
                         </div>
                     </div>
                 </div>
