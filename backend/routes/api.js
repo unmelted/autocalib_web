@@ -55,15 +55,8 @@ router.get('/calculate/status/:job_id', (req, res) => {
     json: true
   }
 
-  // Exodus Calculation Simulator
-  // counter += 20;
-  //
-  // if (counter > 100) {
-  //   counter = 0;
-  // }
-
   console.log("Call Exodus API: " + options.uri);
-  request.get(options, function (err, response, body) {
+  request.get(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
       res.status(200).json({
@@ -72,6 +65,10 @@ router.get('/calculate/status/:job_id', (req, res) => {
         job_id: body.job_id,
         message: "success"
       });
+
+      result = await handler.updateTaskRequest([body.status, '', body.message, req.params.job_id], false);
+      console.log("updateTask for status is done ");
+
     } else {
       console.log(err)
       res.status(500).json({})
@@ -108,7 +105,7 @@ router.delete('/cancel/:job_id', (req, res) => {
   }
 
   console.log("Call Exodus API: " + options.uri);
-  request.delete(options, function (err, response, body) {
+  request.delete(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
       res.status(200).json({
@@ -116,6 +113,10 @@ router.delete('/cancel/:job_id', (req, res) => {
         job_id: body.job_id,
         message: "success"
       });
+
+      result = await handler.updateTaskRequest(['CANCEL', '', req.params.job_id], true);
+      console.log("updateTask for cancel is done ");
+
     } else {
       console.log(err)
       res.status(500).json({})
@@ -185,6 +186,11 @@ router.post('/generate/:job_id', (req, res, next) => {
   //   download_url: 'http://localhost:4000/public/images/UserPointData_0.pts',
   //   message: "success" // 결과 메시지, eg. “SUCCCESS”
   // });
+});
+
+router.post('/loadtask/:task_id', (req, res, next) => {
+  taskId = req.body.taskId
+
 });
 
 module.exports = router;

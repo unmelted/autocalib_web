@@ -1,4 +1,4 @@
-import React, { useState, useRef, Fragment, useContext } from 'react';
+import React, { useState, useRef, Fragment, useContext, useEffect } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -6,7 +6,7 @@ import Table from 'react-bootstrap/Table';
 import Modal from 'react-bootstrap/Modal';
 import '../css/task.css';
 import { saveAs } from 'file-saver';
-// import { PairCanvas } from './canvas.js'
+import { PairCanvas } from './canvas.js'
 import { TableDataContext } from './auto_calib.js';
 
 
@@ -23,13 +23,22 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     const { groupInfo, changeTableData } = useContext(TableDataContext);
     const [show, setShow] = useState(false);
     const [downloadInfo, setDownloadInfo] = useState({});
+    const [leftImage, setLeftImage] = useState('');
+    const [rightImage, setRightImage] = useState('');
+    const [canvasJob, setCanvasJob] = useState('')
 
     const Canvas = () => {
-        return (
-            <>
-                {/* <PairCanvas
-                    hidden={calState !== CAL_STATE.COMPELETE}></PairCanvas> */}
-            </>)
+        if (rightImage !== '' && leftImage !== '') {
+            console.log("Canvas is called : " + rightImage)
+            return (
+                <>
+                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob}></PairCanvas>
+                </>)
+
+        }
+        else {
+            return <></>
+        }
 
     }
     const TaskRow = ({ group }) => {
@@ -37,6 +46,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         const [requestId, setRequestId] = useState('')
         const [calState, setCalState] = useState(CAL_STATE.READY)
         const [statusMessage, setStatusMessage] = useState('')
+
 
         const calculate = async (taskId, taskPath, groupId) => {
             console.log("before calculate " + taskId + " " + groupId);
@@ -53,7 +63,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 response = await axios.post(process.env.REACT_APP_SERVER_URL + "/api/calculate", data);
             } catch (err) {
                 console.log(err);
-                // setStatusMessage('Unable to calculate!');
+                setStatusMessage(` Unable to calculate! ${err}`);
                 return;
             }
 
@@ -62,27 +72,9 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 setRequestId(response.data.request_id);
                 setCalState(CAL_STATE.START);
                 const strmsg = `Send Request Calculate. Job id ${response.data.job_id}`
-                console.log("strmstg " + strmsg)
                 setStatusMessage(strmsg);
                 console.log("send calculate. job id : ", response.data.job_id);
-            }
-        }
-
-        const cancelSend = async () => {
-            console.log("cancel Send is called " + jobId)
-            let response = null;
-
-            try {
-                response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${jobId}`);
-            } catch (err) {
-                console.log(err);
-                setStatusMessage('Unable to cancel');
-                return;
-            }
-
-            if (response && response.data.status === 0) {
-                setCalState(CAL_STATE.CANCEL);
-                setStatusMessage('Canceled.');
+                changeTableData(group.no, response.data.job_id);
             }
         }
 
@@ -100,43 +92,40 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             }
 
             if (response && response.data.percent) {
-                setStatusMessage(` ${jobId} Processing .. ${response.data.percent}%`);
                 if (parseInt(response.data.percent) === 100) {
                     setCalState(CAL_STATE.COMPLETE);
-                    changeTableData(1, 1);
+                    setStatusMessage(` ${jobId} Done. ${response.data.percent}%`);
+                } else {
+                    setStatusMessage(` ${jobId} Processing .. ${response.data.percent}%`);
                 }
             }
         }
 
-        const handleModalClose = () => {
-            setShow(false);
-        }
+        // const ShowModal = ({ group }) => {
+        //     if (show === false) {
+        //         return;
+        //     } else {
+        //         console.log("showmodal group ", group)
+        //         console.log("showmodal group ", cancelJob)
 
-        const handleModalCancel = () => {
-            setShow(false);
-            console.log(`handle modal cancel  ${show}`)
-            cancelSend()
-        }
-
-        const ShowModal = ({ groupId }) => {
-
-            return (
-                <Modal className="mymodal" show={show}>
-                    <Modal.Header closeButton>
-                        <Modal.Title>CANCEL WARN! GROUP : {groupId}</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>Are you sure that cancel this calculation? <br></br><b> can't revert after cancel. </b></Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="primary" onClick={handleModalClose}>
-                            No, won't cancel.
-                        </Button>
-                        <Button variant="danger" onClick={handleModalCancel}>
-                            Sure. want to Cancel.
-                        </Button>
-                    </Modal.Footer>
-                </Modal>
-            );
-        }
+        //         return (
+        //             <Modal className="mymodal" show={show}>
+        //                 <Modal.Header closeButton>
+        //                     <Modal.Title>CANCEL WARN! </Modal.Title>
+        //                 </Modal.Header>
+        //                 <Modal.Body>Are you sure that cancel this calculation? <br></br><b> can't revert after cancel. </b></Modal.Body>
+        //                 <Modal.Footer>
+        //                     <Button variant="primary" onClick={handleModalClose}>
+        //                         No, won't cancel.
+        //                     </Button>
+        //                     <Button variant="danger" onClick={handleModalCancel}>
+        //                         Sure. want to Cancel.
+        //                     </Button>
+        //                 </Modal.Footer>
+        //             </Modal>
+        //         );
+        //     }
+        // }
 
         const downloadResult = () => {
             saveAs(downloadInfo.url, downloadInfo.name);
@@ -144,25 +133,42 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
 
         const TaskRowRequest = ({ group }) => {
+            console.log("taskrow request recieve : ", group);
 
             const onCalculateClick = () => {
                 calculate(taskId, taskPath, group.group_id);
                 setCalState(CAL_STATE.START);
             }
-            const onCancelClick = () => {
-                setShow(true);
-                console.log(`cancel clicked show : ${show}`)
+
+            const onCancelClick = async () => {
+                console.log("cancle send datacontext 2 : ", group)
+
+                let response = null;
+
+                try {
+                    response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${group['job_id']}`);
+                } catch (err) {
+                    console.log(err);
+                    setStatusMessage('Unable to cancel');
+                    return;
+                }
+
+                if (response && response.data.status === 0) {
+                    setCalState(CAL_STATE.CANCEL);
+                    setStatusMessage('Canceled.');
+                }
             }
 
             return (
                 <>
+                    {/* <ShowModal group={group} /> */}
                     <Button size="sm"
                         as="input"
                         type='button'
                         value="Calculate"
                         onClick={onCalculateClick}
                         hidden={group.cam_count < 5}
-                        disabled={calState === CAL_STATE.START}>
+                        disabled={calState !== CAL_STATE.READY}>
                     </Button>{' '}
                     <Button size="sm"
                         as="input"
@@ -179,6 +185,8 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
 
         const TaskRowStatus = ({ group }) => {
+            console.log("taskrow status recieve : ", group);
+
             const onGetStatus = () => {
                 getStatusSend();
             }
@@ -187,25 +195,29 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 let response = null;
 
                 try {
-                    console.log({ jobId })
-                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${jobId}`);
+                    console.log(group['job_id'])
+                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${group['job_id']}`);
                 } catch (err) {
                     console.log(err);
                     setStatusMessage('Unable to get images!');
                     return;
                 }
 
-                const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskPath + '/';
+                const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskId + '/';
 
                 if (response && response.data.status === 0) {
                     const imageUrlFirst = imageUrl + response.data.first_image;
                     const imageUrlSecond = imageUrl + response.data.second_image;
                     console.log(imageUrlFirst)
                     console.log(imageUrlSecond)
-                    // setLeftImage(imageUrlFirst);
-                    // setRightImage(imageUrlSecond);
+                    setLeftImage(imageUrlFirst);
+                    setRightImage(imageUrlSecond);
                     setCalState(CAL_STATE.PAIR_COMPLETE);
+                    setCanvasJob(jobId)
+                } else {
+                    return;
                 }
+
 
             }
 
@@ -229,7 +241,8 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         value="Pick Point"
                         onClick={onGetPairClick}
                         hidden={group.cam_count < 5}
-                        disabled={calState !== CAL_STATE.COMPLETE}>
+                    // disabled={calState !== CAL_STATE.COMPLETE && calState !== CAL_STATE.PAIR_COMPLETE}
+                    >
                     </Button>
                 </>
             )
@@ -245,7 +258,6 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
         return (
             <>
-                <ShowModal groupId={group.group_id} />
                 <td id="td-request">
                     <TaskRowRequest group={group}></TaskRowRequest>
                 </td>
@@ -298,7 +310,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     </Table>
                 </div>
                 <div className='canvas-containe'>
-                    {/* <Canvas></Canvas> */}
+                    <Canvas></Canvas>
                 </div>
             </Fragment >
         )

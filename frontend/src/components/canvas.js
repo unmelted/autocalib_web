@@ -1,10 +1,12 @@
 
 import React, { useEffect, useState, useRef } from 'react';
 import axios from 'axios';
+import Form from 'react-bootstrap/Form';
+import Button from 'react-bootstrap/Button'
 import '../css/canvas.css';
 
 
-export const PairCanvas = () => {
+export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
     const canvasLeftRef = useRef(null);
     const canvasRightRef = useRef(null);
     const leftImageRef = useRef(null);
@@ -16,14 +18,12 @@ export const PairCanvas = () => {
     const targetPointRef = useRef({ left: [], right: [] });
     const targetPoint2D = useRef({ left: [], right: [] })
     const targetPoint3D = useRef({ left: [], right: [] })
-    const calcProgressTimerRef = useRef(0);
+
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
     const [isAllTarget, setIsAllTarget] = useState(false);
-    const [leftImage, setLeftImage] = useState('');
-    const [rightImage, setRightImage] = useState('');
-
+    const [ctx, setCtx] = useState('')
     const canvasWidth = parseInt(process.env.REACT_APP_CANVAS_WIDTH, 10);
     const canvasHeight = parseInt(process.env.REACT_APP_CANVAS_HEIGHT, 10);
     const imageWidth = parseInt(process.env.REACT_APP_IMAGE_WIDTH, 10);
@@ -57,29 +57,6 @@ export const PairCanvas = () => {
     const maxTargetNum = useRef(0);
     const calibMode = useRef(null);
 
-    const getTwoImage = async () => {
-        let response = null;
-
-        try {
-            console.log({ jobId })
-            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${jobId}`);
-        } catch (err) {
-            console.log(err);
-            setStatusMessage('Unable to get images!');
-            return;
-        }
-
-        const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskPath + '/';
-
-        if (response && response.data.status === 0) {
-            const imageUrlFirst = imageUrl + response.data.first_image;
-            const imageUrlSecond = imageUrl + response.data.second_image;
-            console.log(imageUrlFirst)
-            console.log(imageUrlSecond)
-            setLeftImage(imageUrlFirst);
-            setRightImage(imageUrlSecond);
-        }
-    }
 
     const InsertRefPointToStorate = (storeMode) => {
         if (storeMode === '2D') {
@@ -113,8 +90,8 @@ export const PairCanvas = () => {
         setIsAllTarget(false);
         setIsSubmitted(false);
         setIsSubmitCompleted(false);
-        drawImageToCanvas(null, 'left');
-        drawImageToCanvas(null, 'right');
+        // drawImageToCanvas(null, 'left');
+        // drawImageToCanvas(null, 'right');
         console.log("now calibration mode is ", calibMode.current)
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D, process.env.REACT_APP_MAX_TARGET_NUM_3D)
 
@@ -362,40 +339,65 @@ export const PairCanvas = () => {
             response = await axios.post(url, data);
         } catch (err) {
             console.log(err);
-            setStatusMessage('Unable to calculate!');
+            // setStatusMessage('Unable to calculate!');
             return;
         }
 
         if (response && response.data.status === 0) {
             if (response.data.status === 0) {
                 const fileName = process.env.REACT_APP_PTS_FILENAME + response.data.job_id + '.' + process.env.REACT_APP_PTS_FILE_EXT;
-                const downloadUrl = process.env.REACT_APP_SERVER_IMAGE_URL + taskPath + '/' + fileName;
-                setDownloadInfo({ url: downloadUrl, name: fileName });
+                // const downloadUrl = process.env.REACT_APP_SERVER_IMAGE_URL + taskPath + '/' + fileName;
+                // setDownloadInfo({ url: downloadUrl, name: fileName });
                 setIsSubmitCompleted(true);
             }
         }
     }
-
     const initContext = () => {
         context = {
             left: canvasLeftRef.current.getContext('2d'),
             right: canvasRightRef.current.getContext('2d')
         };
+
+        console.log("addListener is called! ");
+        canvasLeftRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'left'), { passive: false });
+        canvasLeftRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'left'), { passive: false });
+        canvasLeftRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'left'), { passive: false });
+        canvasLeftRef.current.addEventListener('wheel', (event) => onWheel(event, 'left'), { passive: false });
+        canvasLeftRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'left'), { passive: false });
+
+        canvasRightRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'right'), { passive: false });
+        canvasRightRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'right'), { passive: false });
+        canvasRightRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'right'), { passive: false });
+        canvasRightRef.current.addEventListener('wheel', (event) => onWheel(event, 'right'));
+        canvasRightRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'right'), { passive: false });
+
+        setCtx(context)
     }
 
     const drawImageToCanvas = (e, type, isInit) => {
         if (isInit) {
             initContext();
         }
-        context[type].save();
-        context[type].setTransform(1, 0, 0, 1, 0, 0);
-        context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
-        context[type].restore();
+        console.log("dramwImageToCanvas : ", type);
+        console.log("drawImageToCanvas 1 : ", context[type]);
+        console.log("drawImageToCanvas 2 : ", ctx[type]);
+        // ctx[type].save();
+        // ctx[type].setTransform(1, 0, 0, 1, 0, 0);
+        // ctx[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
+        // ctx[type].restore();
+        if (context[type]) {
+            context[type].save();
+            context[type].setTransform(1, 0, 0, 1, 0, 0);
+            context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
+            context[type].restore();
 
-        if (isInit) {
-            context[type].scale(0.16, 0.16);
+            if (isInit) {
+                context[type].scale(0.16, 0.16);
+                // ctx[type].scale(0.16, 0.16);
+            }
+            context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
+            // ctx[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
         }
-        context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
     }
 
     const getTransformedPoint = (x, y, type) => {
@@ -477,7 +479,8 @@ export const PairCanvas = () => {
 
     const onRightClick = (e, type) => {
         e.preventDefault();
-        console.log("onRightClick is called ")
+        console.log("onRightClick is called ", type)
+        console.log("onRightClick context ", context);
         console.log(calibMode.current)
 
         if (calibMode.current == null) {
@@ -524,7 +527,6 @@ export const PairCanvas = () => {
                     marginTop: '15px',
                     height: '65px'
                 }}
-                hidden={!isUploaded}
             >
                 <div>
                     <Form.Group className="modeButton">
@@ -540,132 +542,109 @@ export const PairCanvas = () => {
                             value="Clear Points"
                             onClick={clearPoints}
                             style={{ float: 'right', width: '150px', marginRight: '10px' }}
-                            disabled={!isUploaded || calculateState !== CALC_STATE.COMPLETE}
-                        // hidden={calculateState !== 2}
                         >
                         </Button>
                     </Form.Group>
                 </div>
             </div>
-            <div
-                className="container"
-                style={{
-                    border: '1px solid gray',
-                    marginTop: '20px',
-                    height: '430px'
-                }}
-                hidden={!isUploaded}
-            >
+            <div className="row">
+                <div style={{ display: 'flex' }} >
 
-                <div className="row">
-                    <div style={{ display: 'flex' }} >
+                    <Form.Group className='item-wrapper'
+                        style={{
+                            marginLeft: '23px'
+                        }}
+                    >
+                        <img
+                            id='left-image'
+                            ref={leftImageRef}
+                            src={leftImage}
+                            onLoad={(e) => drawImageToCanvas(e, 'left', true)}
+                            hidden={true}
+                        />
+                        <canvas
+                            id='canvas-left'
+                            ref={canvasLeftRef}
+                            style={{
+                                border: '1px solid gray',
+                            }}
+                            width={canvasWidth}
+                            height={canvasHeight}
+                        >
+                        </canvas>
+                        <div
+                            id='mouse-pos-left'
+                            ref={mousePosLeftRef}
+                        />
+                        <div
+                            id='target-left'
+                            ref={targetInfoLeftRef}
+                        />
+                    </Form.Group>
+                    <Form.Group className='item-wrapper'
+                        style={{
+                            marginLeft: '23px'
+                        }}
+                    >
+                        <img
+                            id='right-image'
+                            ref={rightImageRef}
+                            src={rightImage}
+                            onLoad={(e) => drawImageToCanvas(e, 'right', true)}
+                            hidden={true}
+                        />
+                        <canvas
+                            id='canvas-right'
+                            ref={canvasRightRef}
+                            style={{
+                                border: '1px solid gray'
+                            }}
+                            width={canvasWidth}
+                            height={canvasHeight}
+                        >
+                        </canvas>
+                        <div
+                            id='mouse-pos-right'
+                            ref={mousePosRightRef}
+                        />
+                        <div
+                            id='target-right'
+                            ref={targetInfoRightRef}
+                        />
+                    </Form.Group>
+                </div>
+                <Form.Group>
+                    <Button
+                        variant="primary"
+                        className="item-btn-wrapper"
+                        id='submit'
+                        as="input"
+                        type='button'
+                        value="Submit"
+                        onClick={submitPoints}
+                        style={{ float: 'right' }}
+                    >
+                    </Button>
+                </Form.Group>
 
-                        <Form.Group className='item-wrapper'
-                            style={{
-                                marginLeft: '23px'
-                            }}
-                            hidden={calculateState !== CALC_STATE.COMPLETE}
-                        >
-                            <img
-                                id='left-image'
-                                ref={leftImageRef}
-                                src={leftImage}
-                                onLoad={(e) => drawImageToCanvas(e, 'left', true)}
-                                hidden={true}
-                            />
-                            <canvas
-                                id='canvas-left'
-                                ref={canvasLeftRef}
-                                style={{
-                                    border: '1px solid gray',
-                                }}
-                                width={canvasWidth}
-                                height={canvasHeight}
-                            >
-                            </canvas>
-                            <div
-                                id='mouse-pos-left'
-                                ref={mousePosLeftRef}
-                            />
-                            <div
-                                id='target-left'
-                                ref={targetInfoLeftRef}
-                            />
-                        </Form.Group>
-                        <Form.Group className='item-wrapper'
-                            style={{
-                                marginLeft: '23px'
-                            }}
-                            hidden={calculateState !== 2}
-                        >
-                            <img
-                                id='right-image'
-                                ref={rightImageRef}
-                                src={rightImage}
-                                onLoad={(e) => drawImageToCanvas(e, 'right', true)}
-                                hidden={true}
-                            />
-                            <canvas
-                                id='canvas-right'
-                                ref={canvasRightRef}
-                                style={{
-                                    border: '1px solid gray'
-                                }}
-                                width={canvasWidth}
-                                height={canvasHeight}
-                            >
-                            </canvas>
-                            <div
-                                id='mouse-pos-right'
-                                ref={mousePosRightRef}
-                            />
-                            <div
-                                id='target-right'
-                                ref={targetInfoRightRef}
-                            />
-                        </Form.Group>
-                    </div>
-                </div>
             </div>
-            <div
-                className="container"
-                style={{
-                    marginTop: '15px',
-                }}
-            >
-                <div className='row' style={{ float: 'right' }}>
-                    <div style={{ display: 'flex' }} >
-                        <Form.Group hidden={calculateState !== 2}>
-                            <Button
-                                variant="primary"
-                                className="item-btn-wrapper"
-                                id='submit'
-                                as="input"
-                                type='button'
-                                value="Submit"
-                                onClick={submitPoints}
-                                style={{ float: 'right' }}
-                                disabled={!isUploaded || calculateState !== CALC_STATE.COMPLETE || !isAllTarget || isSubmitted}
-                            // hidden={isSubmitted}
-                            >
-                            </Button>
-                            <Button
-                                variant="primary"
-                                className="item-btn-wrapper"
-                                id='submit'
-                                as="input"
-                                type='button'
-                                value="Download Result"
-                                onClick={downloadResult}
-                                style={{ float: 'right' }}
-                                disabled={!isSubmitCompleted}
-                                hidden={!isSubmitted}
-                            >
-                            </Button>
-                        </Form.Group>
-                    </div>
+            {/* <div className='row' style={{ float: 'right' }}>
+                <div style={{ display: 'flex' }} >
+                    <Form.Group>
+                        <Button
+                            variant="primary"
+                            className="item-btn-wrapper"
+                            id='submit'
+                            as="input"
+                            type='button'
+                            value="Submit"
+                            onClick={submitPoints}
+                            style={{ float: 'right' }}
+                        >
+                        </Button>
+                    </Form.Group>
                 </div>
-            </div>
+            </div> */}
         </>
     );
 }

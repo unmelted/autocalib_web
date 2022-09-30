@@ -13,15 +13,17 @@ const initial =
     [
         {
             "group_id": "Group1",
-            "cam_count": 56,
+            "cam_count": 0,
             "no": 102,
-            "status": "None"
+            "status": "None",
+            "job_id": 2067
         },
         {
             "group_id": "Group2",
-            "cam_count": 24,
+            "cam_count": 0,
             "no": 103,
-            "status": "None"
+            "status": "None",
+            "job_id": 2068
         }
     ]
 
@@ -110,34 +112,18 @@ function AutoCalib(props) {
     //     console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
     // }, [canvas]);
 
-    const changeTableData = (groupNo, newStatus) => {
-        console.log(`changeTableData is called with ${groupNo}, ${newStatus}`)
+    const changeTableData = (groupNo, jobid) => {
+        console.log(`changeTableData is called with ${groupNo}, ${jobid}`)
 
-        // for (const group of groupInfo) {
-        //     if (group.no === groupNo) {
-        //         group["status"] = newStatus;
-        //     }
-        // }
+        for (const group of groupInfo) {
+            if (group.no === groupNo) {
+                group["job_id"] = jobid;
+                console.log("changeTableData modify the jobid of group.. " + jobid)
+            }
+        }
+
+        console.log(groupInfo);
     }
-
-    // const TaskTable = () => {
-    //     if (taskLoad === true) {
-    //         console.log("MakeTaskTable will call ", taskId);
-
-    //         return (
-    //             <TableDataContext.Provider value={{ groupInfo, setGroupInfo }}>
-    //                 {TaskGroupTable(taskId, taskPath, groupInfo)}
-    //             </TableDataContext.Provider>
-    //         )
-    //     }
-    //     else {
-    //         return (<></>)
-    //     }
-    // };
-
-    // useEffect(() => {
-    //     console.log("childChange state change ");
-    // }, [childChange])
 
     useEffect(() => {
 
@@ -176,7 +162,7 @@ function AutoCalib(props) {
     //                     } else {
     //                         setPercent(percent);
     //                     }
-    //                 })
+    //                 })ㄴ
     //                 .catch(err => {
     //                     console.log(err);
     //                     removeCalcTimer();

@@ -136,23 +136,36 @@ exports.insertNewTaskRequest = function (params) {
     });
 }
 
-exports.updateTaskRequest = function (params) {
+exports.updateTaskRequest = function (params, isCancel) {
     return new Promise((resolve, reject) => {
         db.getClient((errClient, client) => {
             if (errClient) {
                 console.log("client connect err " + err)
                 resolve(-1)
             }
+            console.log("updateTaskRequest params ", params)
+            if (isCancel === true) {
+                db.queryParams("UPDATE task_request SET job_result = $1, job_message = $2, cancel_date = NOW() WHERE job_id = $3;", params, (err) => {
+                    client.release(true);
+                    if (err) {
+                        console.log(err)
+                        resolve(-1)
+                    }
+                    console.log('updateTaskRequest query success');
+                    resolve(0)
+                }, client);
 
-            db.queryParams("UPDATE task_request (job_id = $1 ) where subtask_id = $2; ", params, (err) => {
-                client.release(true);
-                if (err) {
-                    console.log(err)
-                    resolve(-1)
-                }
-                console.log('insertNewGroupInfo query success');
-                resolve(0)
-            }, client);
+            } else {
+                db.queryParams("UPDATE task_request SET job_status = $1, job_result = $2, job_message = $3  WHERE job_id = $4;", params, (err) => {
+                    client.release(true);
+                    if (err) {
+                        console.log(err)
+                        resolve(-1)
+                    }
+                    console.log('updateTaskRequest query success');
+                    resolve(0)
+                }, client);
+            }
         });
     });
 }
