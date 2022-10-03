@@ -128,10 +128,6 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         //     }
         // }
 
-        const downloadResult = () => {
-            saveAs(downloadInfo.url, downloadInfo.name);
-            // setIsSubmitted(false);
-        }
 
         const TaskRowRequest = ({ group }) => {
             console.log("taskrow request recieve : ", group);
@@ -285,6 +281,12 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             ));
     };
 
+    const downloadResult = () => {
+        // saveAs(downloadInfo.url, downloadInfo.name);
+        // setIsSubmitted(false)
+        console.log("download result");
+    }
+
     // task main retrun 
     if (groupInfo.length === 0) {
         console.log("groupInfo length is 0! ");
@@ -309,6 +311,18 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                             <GroupTable groups={groupInfo}></GroupTable>
                         </tbody>
                     </Table>
+                    <Button
+                        size="sm"
+                        variant="primary"
+                        className="item-btn-wrapper"
+                        id='result'
+                        as="input"
+                        type='button'
+                        value="DownLoad"
+                        onClick={downloadResult}
+                        style={{ float: 'right' }}
+                    >
+                    </Button>
                 </div>
                 <div className='canvas-containe'>
                     <Canvas></Canvas>

@@ -315,11 +315,11 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
             seteMessage("NOT enough to generate calibration data. Please pick points again")
             return
         } else if (activeMode === 2) {
-            seteMessage("2D calibraiton data will be generated.")
+            seteMessage("2D calibraiton data request is sended");
         } else if (activeMode === 3) {
-            seteMessage("3D calibraiton data will be generated.")
+            seteMessage("3D calibraiton data request is sended");
         } else if (activeMode === 5) {
-            seteMessage("2D+3D calibraiton data will be generated.")
+            seteMessage("2D+3D calibraiton data request is sended.");
         }
 
         setIsSubmitted(true);
@@ -552,14 +552,27 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                         <Button
                             size="sm"
                             variant="primary"
+                            className="item-btn-wrapper"
+                            id='submit'
+                            as="input"
+                            type='button'
+                            value="Submit"
+                            onClick={submitPoints}
+                            style={{ float: 'right', width: '160px', marginRight: '10px' }}
+                        >
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="primary"
                             id='clear-point'
                             as="input"
                             type='button'
                             value="Clear Points"
                             onClick={clearPoints}
-                            style={{ float: 'right', width: '150px', marginRight: '10px' }}
+                            style={{ float: 'right', width: '160px', marginRight: '10px' }}
                         >
                         </Button>
+
                     </Form.Group>
                 </div>
             </div>
@@ -629,7 +642,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                         />
                     </Form.Group>
                 </div>
-                <Form.Group>
+                {/* <Form.Group>
                     <Button
                         variant="primary"
                         className="item-btn-wrapper"
@@ -642,7 +655,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                     >
                     </Button>
                     <br></br><br></br>
-                </Form.Group>
+                </Form.Group> */}
 
             </div>
             {/* <div className='row' style={{ float: 'right' }}>
