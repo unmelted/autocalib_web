@@ -23,7 +23,8 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
     const [isAllTarget, setIsAllTarget] = useState(false);
-    const [ctx, setCtx] = useState('')
+    const [leftctx, setLeftCtx] = useState('')
+    const [rightctx, setRightCtx] = useState('')
     const canvasWidth = parseInt(process.env.REACT_APP_CANVAS_WIDTH, 10);
     const canvasHeight = parseInt(process.env.REACT_APP_CANVAS_HEIGHT, 10);
     const imageWidth = parseInt(process.env.REACT_APP_IMAGE_WIDTH, 10);
@@ -90,10 +91,9 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
         setIsAllTarget(false);
         setIsSubmitted(false);
         setIsSubmitCompleted(false);
-        // drawImageToCanvas(null, 'left');
-        // drawImageToCanvas(null, 'right');
+        drawImageToCanvas(null, 'left');
+        drawImageToCanvas(null, 'right');
         console.log("now calibration mode is ", calibMode.current)
-        console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D, process.env.REACT_APP_MAX_TARGET_NUM_3D)
 
         if (calibMode.current === '3D') {
             InsertRefPointToStorate('2D')
@@ -142,8 +142,6 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
     const [calibMode2D, setCalibMode2D] = React.useState(false)
     const [calibMode3D, setCalibMode3D] = React.useState(false)
     const [eMessage, seteMessage] = React.useState("Please select Calibration mode.")
-    // useEffect(() => {
-    // }, [calibMode2D, calibMode3D]);
 
     const ModeButton2D = ({ id, label }) => {
         const handleModeChange = () => {
@@ -228,8 +226,9 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
         setIsAllTarget(false);
         setIsSubmitted(false);
         setIsSubmitCompleted(false);
-        drawImageToCanvas(null, 'left');
-        drawImageToCanvas(null, 'right');
+        drawImageToCanvas(null, 'left', true);
+        drawImageToCanvas(null, 'right', true);
+        console.log("clear points is called .");
     }
 
     const makeTargetData_3d = () => {
@@ -303,12 +302,12 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D)
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_3D)
 
-        if (targetPoint2D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_2D &&
-            targetPoint2D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_2D) {
+        if (targetPoint2D.current.left.length === parseInt(process.env.REACT_APP_MAX_TARGET_NUM_2D) &&
+            targetPoint2D.current.right.length === parseInt(process.env.REACT_APP_MAX_TARGET_NUM_2D)) {
             activeMode = activeMode + 2
         }
-        if (targetPoint3D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_3D &&
-            targetPoint3D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_3D) {
+        if (targetPoint3D.current.left.length === parseInt(process.env.REACT_APP_MAX_TARGET_NUM_3D) &&
+            targetPoint3D.current.right.length === parseInt(process.env.REACT_APP_MAX_TARGET_NUM_3D)) {
             activeMode = activeMode + 3
         }
         console.log("submitPoints ", activeMode)
@@ -352,55 +351,62 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
             }
         }
     }
-    const initContext = () => {
+    const initContext = (type) => {
         context = {
             left: canvasLeftRef.current.getContext('2d'),
             right: canvasRightRef.current.getContext('2d')
         };
 
-        console.log("addListener is called! ");
-        canvasLeftRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'left'), { passive: false });
-        canvasLeftRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'left'), { passive: false });
-        canvasLeftRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'left'), { passive: false });
-        canvasLeftRef.current.addEventListener('wheel', (event) => onWheel(event, 'left'), { passive: false });
-        canvasLeftRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'left'), { passive: false });
+        if (type === 'left') {
+            canvasLeftRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'left', context), { passive: false });
+            canvasLeftRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'left', context), { passive: false });
+            canvasLeftRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'left', context), { passive: false });
+            canvasLeftRef.current.addEventListener('wheel', (event) => onWheel(event, 'left', context), { passive: false });
+            canvasLeftRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'left', context), { passive: false });
 
-        canvasRightRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'right'), { passive: false });
-        canvasRightRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'right'), { passive: false });
-        canvasRightRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'right'), { passive: false });
-        canvasRightRef.current.addEventListener('wheel', (event) => onWheel(event, 'right'));
-        canvasRightRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'right'), { passive: false });
-
-        setCtx(context)
-    }
-
-    const drawImageToCanvas = (e, type, isInit) => {
-        if (isInit) {
-            initContext();
         }
-        console.log("dramwImageToCanvas : ", type);
-        console.log("drawImageToCanvas 1 : ", context[type]);
-        console.log("drawImageToCanvas 2 : ", ctx[type]);
-        // ctx[type].save();
-        // ctx[type].setTransform(1, 0, 0, 1, 0, 0);
-        // ctx[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
-        // ctx[type].restore();
+        else {
+            canvasRightRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'right', context), { passive: false });
+            canvasRightRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'right', context), { passive: false });
+            canvasRightRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'right', context), { passive: false });
+            canvasRightRef.current.addEventListener('wheel', (event) => onWheel(event, 'right', context));
+            canvasRightRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'right', context), { passive: false });
+        }
+
+        console.log("addListener is called! ");
+
         if (context[type]) {
             context[type].save();
             context[type].setTransform(1, 0, 0, 1, 0, 0);
             context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
             context[type].restore();
-
-            if (isInit) {
-                context[type].scale(0.16, 0.16);
-                // ctx[type].scale(0.16, 0.16);
-            }
+            context[type].scale(0.16, 0.16);
             context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
-            // ctx[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
         }
+
     }
 
-    const getTransformedPoint = (x, y, type) => {
+    const drawImageToCanvas = (e, type, isInit) => {
+        context = {
+            left: canvasLeftRef.current.getContext('2d'),
+            right: canvasRightRef.current.getContext('2d')
+        };
+
+        console.log("drawImageToCanvas  : " + context['left']);
+        console.log("drawImageToCanvas  : " + context['right']);
+
+        context[type].save();
+        context[type].setTransform(1, 0, 0, 1, 0, 0);
+        context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
+        context[type].restore();
+        context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
+
+    }
+
+    const getTransformedPoint = (x, y, type, context) => {
+        console.log("getTransform context : ", context)
+        console.log("getTransform ctx : ", leftctx, rightctx)
+
         const transform = context[type].getTransform();
         const inverseZoom = 1 / transform.a;
 
@@ -411,6 +417,9 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
     }
 
     const drawCircle = (x, y, radius, color, type) => {
+        console.log("drawCircle is called context : " + context)
+        console.log("drawCircle is called ctx : " + leftctx, rightctx)
+
         context[type].beginPath();
         context[type].arc(x, y, radius, 0, 2 * Math.PI, false);
         context[type].fillStyle = 'transparent';
@@ -418,9 +427,11 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
         context[type].lineWidth = process.env.REACT_APP_POINT_LINE_WIDTH;
         context[type].strokeStyle = color;
         context[type].stroke();
+
     }
 
     const drawTargetArea = (type) => {
+
         context[type].lineWidth = process.env.REACT_APP_AREA_LINE_WIDTH;
         context[type].strokeStyle = process.env.REACT_APP_LINE_COLOR;
 
@@ -436,7 +447,9 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
         if (targetPointRef.current[type].length > maxTargetNum.current) {
             return;
         }
-
+        console.log("drawTarget context: ", context)
+        console.log("drawTarget : ", leftctx)
+        console.log("drawTarget : ", rightctx)
         //targetInfo[type].innerText = `X: ${currentTransformedCursor[type].x}, Y: ${currentTransformedCursor[type].y}`;
         targetInfo[type].current.style.fontSize = '12px';
         targetInfo[type].current.innerText = "Target Points: ";
@@ -454,17 +467,17 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
 
     }
 
-    const onMouseDown = (event, type) => {
+    const onMouseDown = (event, type, context) => {
         isDragging[type] = true;
-        dragStartPosition[type] = getTransformedPoint(event.offsetX, event.offsetY, type);
+        dragStartPosition[type] = getTransformedPoint(event.offsetX, event.offsetY, type, context);
     }
 
-    const onMouseUp = (event, type) => {
+    const onMouseUp = (event, type, context) => {
         isDragging[type] = false;
     }
 
-    const onMouseMove = (event, type) => {
-        currentTransformedCursor[type] = getTransformedPoint(event.offsetX, event.offsetY, type);
+    const onMouseMove = (event, type, context) => {
+        currentTransformedCursor[type] = getTransformedPoint(event.offsetX, event.offsetY, type, context);
         //mousePos[type].innerText = `Original X: ${event.offsetX}, Y: ${event.offsetY}`;
         mousePos[type].current.innerText = `X: ${currentTransformedCursor[type].x}, Y: ${currentTransformedCursor[type].y}`;
 
@@ -477,11 +490,12 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
         }
     }
 
-    const onRightClick = (e, type) => {
+    const onRightClick = (e, type, context) => {
         e.preventDefault();
-        console.log("onRightClick is called ", type)
+        e.stopImmediatePropagation();
+
         console.log("onRightClick context ", context);
-        console.log(calibMode.current)
+        console.log("onRightClick context ", leftctx, rightctx);
 
         if (calibMode.current == null) {
             seteMessage("Please select calibration mode FIRST!")
@@ -504,7 +518,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
         }
     }
 
-    const onWheel = (event, type) => {
+    const onWheel = (event, type, context) => {
         const zoom = event.deltaY < 0 ? 1.1 : 0.9;
         context[type].translate(currentTransformedCursor[type].x, currentTransformedCursor[type].y);
         context[type].scale(zoom, zoom);
@@ -559,7 +573,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
                             id='left-image'
                             ref={leftImageRef}
                             src={leftImage}
-                            onLoad={(e) => drawImageToCanvas(e, 'left', true)}
+                            onLoad={(e) => initContext('left')}
                             hidden={true}
                         />
                         <canvas
@@ -590,7 +604,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
                             id='right-image'
                             ref={rightImageRef}
                             src={rightImage}
-                            onLoad={(e) => drawImageToCanvas(e, 'right', true)}
+                            onLoad={(e) => initContext('right')}
                             hidden={true}
                         />
                         <canvas
@@ -625,6 +639,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
                         style={{ float: 'right' }}
                     >
                     </Button>
+                    <br></br><br></br>
                 </Form.Group>
 
             </div>
