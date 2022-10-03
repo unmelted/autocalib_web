@@ -29,10 +29,11 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
     const Canvas = () => {
         if (rightImage !== '' && leftImage !== '') {
-            console.log("Canvas is called : " + rightImage)
+            console.log("Canvas is called 1 : " + rightImage)
+            console.log("Canvas is called 2 : " + canvasJob)
             return (
                 <>
-                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob}></PairCanvas>
+                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
                 </>)
 
         }
@@ -213,7 +214,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     setLeftImage(imageUrlFirst);
                     setRightImage(imageUrlSecond);
                     setCalState(CAL_STATE.PAIR_COMPLETE);
-                    setCanvasJob(jobId)
+                    setCanvasJob([jobId, taskId, group.group_id])
                 } else {
                     return;
                 }

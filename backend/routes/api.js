@@ -166,9 +166,12 @@ router.post('/generate/:job_id', (req, res, next) => {
   }
 
   console.log("Call Exodus API: " + options.uri);
-  request.post(options, function (err, response, body) {
+  request.post(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
+      result = await handler.insertNewTaskRequest(['GENERATE', req.body.task_id, req.body.group_id, body.job_id])
+      console.log("insert task request(generate) , return : " + result);
+
       res.status(200).json({
         status: 0,
         job_id: body.job_id,

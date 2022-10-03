@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button'
 import '../css/canvas.css';
 
 
-export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
+export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) => {
     const canvasLeftRef = useRef(null);
     const canvasRightRef = useRef(null);
     const leftImageRef = useRef(null);
@@ -325,6 +325,8 @@ export const PairCanvas = ({ leftImage, rightImage, jobId }) => {
         setIsSubmitted(true);
 
         const data = {
+            task_id: taskId,
+            group_id: groupId,
             job_id: jobId,
             pts_2d: makeTargetData_2d(),
             pts_3d: makeTargetData_3d()
