@@ -186,58 +186,55 @@ function AutoCalib(props) {
 
     return (
         <>
-            <div className="container">
-                <div className="row">
-                    <div className="form-group">
-                        <Form.Group className='item-wrapper'>
-                            <Form.Control size="sm"
-                                type='file'
-                                id='files'
-                                webkitdirectory={'webkitdirectory'}
-                                mozdirectory={'mozdirectory'}
-                                onChange={uploadFiles}
-                                disabled={isUploaded}
-                            />
-                        </Form.Group>
-                        <Form.Group className='item-wrapper'>
-                            <ProgressBar size="sm"
-                                id='progressbar'
-                                now={percent}
-                                label={`${percent}% completed`}
-                            />
-                        </Form.Group>
-                        <Form.Group className='item-wrapper'>
-                            <Form.Control size="sm"
-                                id='upload-status'
-                                type='text'
-                                value={statusMessage}
-                                readOnly={true}
-                            />
-                        </Form.Group>
-                        <div className="row">
-                            <Form.Group className='item-btn-wrppter'>
-                                <Button size="sm"
-                                    variant="primary"
-                                    className="item-btn-wrapper"
-                                    id='reset'
-                                    as="input"
-                                    type='button'
-                                    value="Reset"
-                                    onClick={reset}
-                                    style={{ float: 'left' }}
-                                    disabled={!isUploaded}
-                                >
-                                </Button>
-                            </Form.Group>
-                        </div>
-                        <div className="item-wrapper"
-                            id="div-task-table"
-                            hidden={!taskLoad}>
-                            <TableDataContext.Provider value={{ groupInfo, changeTableData }}>
-                                <TaskGroupTable taskId={taskId} taskPath={taskPath} />
-                            </TableDataContext.Provider>
-                        </div>
-                    </div>
+            <div className="form-group">
+                <Form.Group className='item-wrapper'>
+                    <Form.Control size="sm"
+                        type='file'
+                        id='files'
+                        webkitdirectory={'webkitdirectory'}
+                        mozdirectory={'mozdirectory'}
+                        onChange={uploadFiles}
+                        disabled={isUploaded}
+                    />
+                </Form.Group>
+                <Form.Group className='item-wrapper'>
+                    <ProgressBar size="sm"
+                        id='progressbar'
+                        now={percent}
+                        label={`${percent}% completed`}
+                    />
+                </Form.Group>
+                <Form.Group className='item-wrapper'>
+                    <Form.Control size="sm"
+                        id='upload-status'
+                        type='text'
+                        value={statusMessage}
+                        readOnly={true}
+                    />
+                </Form.Group>
+                {/* <div className="row"> */}
+                <div>
+                    <Form.Group className='item-btn-wrppter'>
+                        <Button size="sm"
+                            variant="primary"
+                            className="item-btn-wrapper"
+                            id='reset'
+                            as="input"
+                            type='button'
+                            value="Reset"
+                            onClick={reset}
+                            style={{ float: 'left' }}
+                            disabled={!isUploaded}
+                        >
+                        </Button>
+                    </Form.Group>
+                </div>
+                <div className="item-wrapper"
+                    id="div-task-table"
+                    hidden={!taskLoad}>
+                    <TableDataContext.Provider value={{ groupInfo, changeTableData }}>
+                        <TaskGroupTable taskId={taskId} taskPath={taskPath} />
+                    </TableDataContext.Provider>
                 </div>
             </div>
         </>
