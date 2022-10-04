@@ -215,7 +215,7 @@ function AutoCalib(props) {
                 {/* <div className="row"> */}
                 <div>
                     <Form.Group className='item-btn-wrppter'>
-                        <Button size="sm"
+                        <Button size="md"
                             variant="primary"
                             className="item-btn-wrapper"
                             id='reset'
@@ -223,7 +223,7 @@ function AutoCalib(props) {
                             type='button'
                             value="Reset"
                             onClick={reset}
-                            style={{ float: 'left' }}
+                            // style={{ float: 'left' }}
                             disabled={!isUploaded}
                         >
                         </Button>

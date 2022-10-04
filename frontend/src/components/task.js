@@ -44,7 +44,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         const [requestId, setRequestId] = useState('')
         const [calState, setCalState] = useState(CAL_STATE.READY)
         const [statusMessage, setStatusMessage] = useState('')
-
+        const [genMessage, setGenMessage] = useState('')
 
         const calculate = async (taskId, taskPath, groupId) => {
             console.log("before calculate " + taskId + " " + groupId);
@@ -69,7 +69,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 setJobId(response.data.job_id);
                 setRequestId(response.data.request_id);
                 setCalState(CAL_STATE.START);
-                const strmsg = `Send Request Calculate. Job id ${response.data.job_id}`
+                const strmsg = `Request Calculate. Job id ${response.data.job_id}`
                 setStatusMessage(strmsg);
                 console.log("send calculate. job id : ", response.data.job_id);
                 changeTableData(group.no, response.data.job_id);
@@ -127,7 +127,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
 
         const TaskRowRequest = ({ group }) => {
-            console.log("taskrow request recieve : ", group);
+            // console.log("taskrow request recieve : ", group);
 
             const onCalculateClick = () => {
                 calculate(taskId, taskPath, group.group_id);
@@ -179,7 +179,30 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
 
         const TaskRowStatus = ({ group }) => {
-            console.log("taskrow status recieve : ", group);
+            // console.log("taskrow status recieve : ", group);
+
+            const onGetStatus = () => {
+                getStatusSend();
+            }
+
+            return (
+                <>
+                    <Button size="sm"
+                        as="input"
+                        type='button'
+                        value="Status"
+                        onClick={onGetStatus}
+                        hidden={group.cam_count < 5}
+                        disabled={calState === CAL_STATE.READY || calState === CAL_STATE.CANCEL}>
+                    </Button>{' '}
+                    <span id="span-msg">
+                        {statusMessage}
+                    </span>
+                </>
+            )
+        }
+
+        const TaskRowGenerate = ({ group }) => {
 
             const onGetStatus = () => {
                 getStatusSend();
@@ -220,24 +243,16 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     <Button size="sm"
                         as="input"
                         type='button'
-                        value="Status"
-                        onClick={onGetStatus}
-                        hidden={group.cam_count < 5}
-                        disabled={calState === CAL_STATE.READY || calState === CAL_STATE.CANCEL}>
-                    </Button>{' '}
-                    <span className="label label-md label-default">
-                        {statusMessage}
-                    </span>
-                    <Button size="sm"
-                        as="input"
-                        type='button'
                         variant="success"
                         value="Pick Point"
                         onClick={onGetPairClick}
                         hidden={group.cam_count < 5}
                     // disabled={calState !== CAL_STATE.COMPLETE && calState !== CAL_STATE.PAIR_COMPLETE}
                     >
-                    </Button>
+                    </Button>{'  '}
+                    <span id="span-msg">
+                        {genMessage}
+                    </span>
                 </>
             )
         }
@@ -257,6 +272,9 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 </td>
                 <td id="td-status">
                     <TaskRowStatus group={group}></TaskRowStatus>
+                </td>
+                <td id="td-generate">
+                    <TaskRowGenerate group={group}></TaskRowGenerate>
                 </td>
                 <td id="td-result">
                     <TaskRowResult group={group}></TaskRowResult>
@@ -301,6 +319,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                                 <th id="th-count">Camera Count</th>
                                 <th id="th-request">Request</th>
                                 <th id="th-status">Status</th>
+                                <th id="th-generate">Generate</th>
                                 <th id="th-result">Result</th>
                             </tr>
                         </thead>

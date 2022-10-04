@@ -11,19 +11,14 @@ body {
     text-align: center;
 }
 
-.container {
+/* .container {
     padding-left: 0 !important;
     padding-right: 0 !important;
-}
+} */
 
-#upper-row1 {
-    margin: 15px;
-}
-
-#upper-row2 {
-    margin: 15px;
-}
-
-#body-row {
-    margin: 15px;
+hr {
+    margin-top: 2rem;
+    margin-bottom: 2rem;
+    border: 0;
+    border-top: 2px solid rgba(252, 252, 252, 0.5);
 }

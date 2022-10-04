@@ -45,24 +45,24 @@ function App(props) {
   return (
     <div className="App">
       <nav className="navbar navbar-dark bg-dark py-3"
-        style={{ height: "40px" }}>
+        style={{ height: "30px" }}>
       </nav>
       <Container>
         <Row>
           <Row id="upper-row1">
+            <p></p>
             <Col xs lg="2">
               <img
-                className="mobile"
                 src="https://4dreplay.com/4d/wp-content/uploads/2021/10/logo_white-2.png"
                 alt="Logo"
-                style={{ height: '80%', width: '240px' }}
+                style={{ height: '70%', width: '240px' }}
               /> </Col>
-            <Col xs lg="3"><h3>Auto Calibration</h3> </Col>
+            <Col xs lg="3"><h3>Auto-Calibration</h3> </Col>
           </Row>
+          <hr />
           <Row className="justify-content-md-center">
-            <p></p>
             <Col xs lg='2'>
-              <Button variant={state === "create" ? "primary" : "seconday"}
+              <Button className="rounded" variant={state === "create" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
                 onClick={onHandleCreateTask}><img src={plus} width="80px" alt="" /><p></p>
                 Create Task</Button> </Col>
@@ -77,6 +77,8 @@ function App(props) {
                 onClick={onHandleGuide}><img src={help} width="80px" alt="" /> <p></p>
                 Guide</Button></Col>
           </Row>
+          <p></p>
+          <hr />
           <MainContent />
           {/* <AutoCalib disabled={state === 'search'} /> */}
         </Row>

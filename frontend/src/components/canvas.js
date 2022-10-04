@@ -4,7 +4,7 @@ import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import '../css/canvas.css';
-
+import { TableDataContext } from './auto_calib.js';
 
 export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) => {
     const canvasLeftRef = useRef(null);

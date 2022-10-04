@@ -21,24 +21,28 @@
 }
 
 #th-name {
-    width: 15%;
+    width: 7%;
 }
 
 #th-count {
-    width: 10%;
+    width: 9%;
 }
 
 #th-request {
-    width: 15%;
+    width: 10%;
     text-align: center;
 }
 
 #th-status {
-    width: 45%;
+    width: 20%;
+}
+
+#th-generate {
+    width: 20%;
 }
 
 #th-result {
-    width: 6%;
+    width: 3%;
 }
 
 #td-request {
@@ -47,6 +51,11 @@
 }
 
 #td-status {
+    padding: 6px;
+    text-align: left;
+}
+
+#td-generate {
     padding: 6px;
     text-align: left;
 }
@@ -60,4 +69,8 @@
     margin: 0 10px 10px 0;
     min-width: 24rem;
     display: inline-block;
+}
+
+#span-msg {
+    width: '120px';
 }
