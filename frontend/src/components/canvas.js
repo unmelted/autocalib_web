@@ -1,5 +1,5 @@
 
-import React, { useEffect, useState, useRef } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
@@ -23,8 +23,6 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
     const [isAllTarget, setIsAllTarget] = useState(false);
-    const [leftctx, setLeftCtx] = useState('')
-    const [rightctx, setRightCtx] = useState('')
     const canvasWidth = parseInt(process.env.REACT_APP_CANVAS_WIDTH, 10);
     const canvasHeight = parseInt(process.env.REACT_APP_CANVAS_HEIGHT, 10);
     const imageWidth = parseInt(process.env.REACT_APP_IMAGE_WIDTH, 10);
@@ -407,7 +405,6 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
 
     const getTransformedPoint = (x, y, type, context) => {
         console.log("getTransform context : ", context)
-        console.log("getTransform ctx : ", leftctx, rightctx)
 
         const transform = context[type].getTransform();
         const inverseZoom = 1 / transform.a;
@@ -420,7 +417,6 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
 
     const drawCircle = (x, y, radius, color, type) => {
         console.log("drawCircle is called context : " + context)
-        console.log("drawCircle is called ctx : " + leftctx, rightctx)
 
         context[type].beginPath();
         context[type].arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -450,8 +446,6 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
             return;
         }
         console.log("drawTarget context: ", context)
-        console.log("drawTarget : ", leftctx)
-        console.log("drawTarget : ", rightctx)
         //targetInfo[type].innerText = `X: ${currentTransformedCursor[type].x}, Y: ${currentTransformedCursor[type].y}`;
         targetInfo[type].current.style.fontSize = '12px';
         targetInfo[type].current.innerText = "Target Points: ";
@@ -497,7 +491,6 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
         e.stopImmediatePropagation();
 
         console.log("onRightClick context ", context);
-        console.log("onRightClick context ", leftctx, rightctx);
 
         if (calibMode.current == null) {
             seteMessage("Please select calibration mode FIRST!")

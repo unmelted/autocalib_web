@@ -1,11 +1,9 @@
-import React, { useState, useRef, Fragment, useContext, useEffect } from 'react';
+import React, { useState, Fragment, useContext } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import Modal from 'react-bootstrap/Modal';
 import '../css/task.css';
-import { saveAs } from 'file-saver';
 import { PairCanvas } from './canvas.js'
 import { TableDataContext } from './auto_calib.js';
 
@@ -21,7 +19,6 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     }
 
     const { groupInfo, changeTableData } = useContext(TableDataContext);
-    const [show, setShow] = useState(false);
     const [downloadInfo, setDownloadInfo] = useState({});
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
@@ -311,7 +308,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                             <GroupTable groups={groupInfo}></GroupTable>
                         </tbody>
                     </Table>
-                    <Button
+                    {/* <Button
                         size="sm"
                         variant="primary"
                         className="item-btn-wrapper"
@@ -322,7 +319,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         onClick={downloadResult}
                         style={{ float: 'right' }}
                     >
-                    </Button>
+                    </Button> */}
                 </div>
                 <div className='canvas-containe'>
                     <Canvas></Canvas>
