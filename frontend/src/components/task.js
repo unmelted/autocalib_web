@@ -260,7 +260,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         const TaskRowResult = ({ group }) => {
             return (
                 <div>
-                    <InputGroup.Checkbox aria-label="check boc" disabled={group.cam_count < 5} />
+                    <InputGroup.Checkbox aria-label="check boc" hidden={group.cam_count < 5} />
                 </div >
             )
         }

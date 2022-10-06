@@ -16,14 +16,16 @@ const initial =
             "cam_count": 0,
             "no": 102,
             "status": "None",
-            "job_id": 2067
+            "job_id": 2067,
+            "gen_job_id": 2030
         },
         {
             "group_id": "Group2",
             "cam_count": 0,
             "no": 103,
             "status": "None",
-            "job_id": 2068
+            "job_id": 2068,
+            "gen_job_id": 2030
         }
     ]
 

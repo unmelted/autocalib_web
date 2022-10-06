@@ -5,7 +5,7 @@ const express = require('express'),
   multer = require('multer'),
   router = express.Router();
 
-const taskManager = require('./task.js')
+const taskManager = require('../control/task.js')
 
 const upload_images = (destPath) => {
   const storage = multer.diskStorage({

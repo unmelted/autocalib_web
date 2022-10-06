@@ -404,7 +404,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
     }
 
     const getTransformedPoint = (x, y, type, context) => {
-        console.log("getTransform context : ", context)
+        // console.log("getTransform context : ", context)
 
         const transform = context[type].getTransform();
         const inverseZoom = 1 / transform.a;
@@ -416,7 +416,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
     }
 
     const drawCircle = (x, y, radius, color, type) => {
-        console.log("drawCircle is called context : " + context)
+        // console.log("drawCircle is called context : " + context)
 
         context[type].beginPath();
         context[type].arc(x, y, radius, 0, 2 * Math.PI, false);
@@ -445,7 +445,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
         if (targetPointRef.current[type].length > maxTargetNum.current) {
             return;
         }
-        console.log("drawTarget context: ", context)
+        // console.log("drawTarget context: ", context)
         //targetInfo[type].innerText = `X: ${currentTransformedCursor[type].x}, Y: ${currentTransformedCursor[type].y}`;
         targetInfo[type].current.style.fontSize = '12px';
         targetInfo[type].current.innerText = "Target Points: ";
@@ -569,14 +569,10 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                     </Form.Group>
                 </div>
             </div>
-            <div className="row">
+            <div>
                 <div style={{ display: 'flex' }} >
 
-                    <Form.Group className='item-wrapper'
-                        style={{
-                            marginLeft: '23px'
-                        }}
-                    >
+                    <Form.Group className='canvas-wrapper' s>
                         <img
                             id='left-image'
                             ref={leftImageRef}
@@ -603,11 +599,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                             ref={targetInfoLeftRef}
                         />
                     </Form.Group>
-                    <Form.Group className='item-wrapper'
-                        style={{
-                            marginLeft: '23px'
-                        }}
-                    >
+                    <Form.Group className='canvas-wrapper'>
                         <img
                             id='right-image'
                             ref={rightImageRef}

@@ -201,3 +201,58 @@ exports.getGroupInfo = function (taskId) {
         });
     });
 }
+
+exports.selectDatewithinMonth = function () {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                resolve(-1);
+            }
+
+            db.query("SELECT task_no, task_id, createdate FROM task WHERE createdate < (SELECT current_date) and createdate > (SELECT current_date - 7);", (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    resolve(-1)
+                }
+                else {
+                    console.log('select Date within month  query success');
+                    resolve(res.rows)
+                }
+            }, client);
+        });
+    });
+};
+
+
+exports.selectRequestbyTaskId = function (taskId) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+
+            db.queryParams("SELECT request_id, request_category  group_id, createdate, job_id, job_status, job_result, job_message FROM task_request WHERE task_id = $1; ", [taskId], (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    reject(-1);
+                }
+                else {
+                    if (res.rows.length > 0) {
+                        console.log('get GroupInfo query success ' + res.rows[0].group_id);
+                        resolve(res.rows)
+                    }
+                    else {
+                        console.log("get Groupinfo query no rows ")
+                        reject(-10)
+                    }
+                }
+
+            }, client);
+
+        });
+    });
+}
