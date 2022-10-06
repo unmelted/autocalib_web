@@ -6,12 +6,15 @@ import Button from 'react-bootstrap/Button'
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './css/App.css';
 import AutoCalib from './components/auto_calib';
+import TaskLibrary from './components/task_library';
 import plus from './asset/plus.png';
 import search from './asset/search.png';
 import help from './asset/help.png';
+import alien from './asset/alien.png';
 
 function App(props) {
   const [state, setState] = useState('')
+  const [isHover, setIsHover] = useState('')
 
   const onHandleCreateTask = () => {
     setState('create')
@@ -25,11 +28,33 @@ function App(props) {
     setState('guide')
   };
 
+  const onHandleAlien = () => {
+    setState('alien')
+  };
+
+  const onHandleHome = () => {
+    setState('')
+  }
+
+  const handleMouseEnter = () => {
+    setIsHover(true)
+  }
+  const handleMouseLeave = () => {
+    setIsHover(false)
+  }
+
   const MainContent = () => {
     if (state === 'create') {
       return (
         <>
           <AutoCalib />
+        </>
+      )
+    }
+    else if (state === 'search') {
+      return (
+        <>
+          <TaskLibrary />
         </>
       )
     }
@@ -55,7 +80,10 @@ function App(props) {
               <img
                 src="https://4dreplay.com/4d/wp-content/uploads/2021/10/logo_white-2.png"
                 alt="Logo"
-                style={{ height: '70%', width: '240px' }}
+                onClick={onHandleHome}
+                onMouseEnter={handleMouseEnter}
+                onMouseLeave={handleMouseLeave}
+                style={{ height: '70%', width: '240px', cursor: isHover ? 'pointer' : 'hand' }}
               /> </Col>
             <Col xs lg="3"><h3>Auto-Calibration</h3> </Col>
           </Row>
@@ -76,6 +104,12 @@ function App(props) {
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
                 onClick={onHandleGuide}><img src={help} width="80px" alt="" /> <p></p>
                 Guide</Button></Col>
+            <Col xs lg='2'>
+              <Button variant={state === "alien" ? "primary" : "seconday"}
+                style={{ width: '140px', color: '#FF0000', float: 'center' }}
+                onClick={onHandleAlien}><img src={alien} width="80px" alt="" /> <p></p>
+                BackDoor</Button></Col>
+
           </Row>
           <p></p>
           <hr />
