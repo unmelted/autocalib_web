@@ -7,12 +7,29 @@ const path = require("path");
 var handler = require('../db/handler.js')
 
 
+router.post('/addalias', async (req, res) => {
+
+    console.log("add alias is called ");
+
+    try {
+        result = await handler.updateTask([req.body.task_alias, req.body.task_id]);
+        res.status(200).json({
+            message: 'success',
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+})
+
+
 router.get('/gettask', async (req, res) => {
 
     console.log("gettask is called ");
 
     try {
-        result = await handler.selectDatewithinMonth();
+        result = await handler.selectDatewithinRange();
         res.status(200).json({
             message: 'success',
             task_array: result,

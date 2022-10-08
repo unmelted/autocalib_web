@@ -529,14 +529,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
 
     return (
         <>
-            <div
-                className="container"
-                style={{
-                    border: '1px solid gray',
-                    marginTop: '15px',
-                    height: '65px'
-                }}
-            >
+            <div className="modebtn-wrapper">
                 <div>
                     <Form.Group className="modeButton">
                         <ModeButton2D id='2d-mode' label='2D' ></ModeButton2D>
@@ -551,7 +544,8 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                             type='button'
                             value="Submit"
                             onClick={submitPoints}
-                            style={{ float: 'right', width: '160px', marginRight: '10px' }}
+                            style={{ float: 'right', width: '120px', marginRight: '10px' }}
+                            disabled={isSubmitCompleted === true}
                         >
                         </Button>
                         <Button
@@ -562,7 +556,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                             type='button'
                             value="Clear Points"
                             onClick={clearPoints}
-                            style={{ float: 'right', width: '160px', marginRight: '10px' }}
+                            style={{ float: 'right', width: '120px', marginRight: '10px' }}
                         >
                         </Button>
 
@@ -570,9 +564,8 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                 </div>
             </div>
             <div>
-                <div style={{ display: 'flex' }} >
-
-                    <Form.Group className='canvas-wrapper' s>
+                <div className='canvas-wrapper'>
+                    <Form.Group>
                         <img
                             id='left-image'
                             ref={leftImageRef}
@@ -583,9 +576,6 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                         <canvas
                             id='canvas-left'
                             ref={canvasLeftRef}
-                            style={{
-                                border: '1px solid gray',
-                            }}
                             width={canvasWidth}
                             height={canvasHeight}
                         >
@@ -599,7 +589,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                             ref={targetInfoLeftRef}
                         />
                     </Form.Group>
-                    <Form.Group className='canvas-wrapper'>
+                    <Form.Group>
                         <img
                             id='right-image'
                             ref={rightImageRef}
@@ -610,9 +600,6 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                         <canvas
                             id='canvas-right'
                             ref={canvasRightRef}
-                            style={{
-                                border: '1px solid gray'
-                            }}
                             width={canvasWidth}
                             height={canvasHeight}
                         >

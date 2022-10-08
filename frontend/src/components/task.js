@@ -92,39 +92,16 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             if (response && response.data.percent) {
                 if (parseInt(response.data.percent) === 100) {
                     setCalState(CAL_STATE.COMPLETE);
-                    setStatusMessage(` ${jobId} Done. ${response.data.percent}%`);
+                    if (response.data.result >= 0) {
+                        setStatusMessage(` ${jobId} Done. ${response.data.percent}%`);
+                    } else {
+                        setStatusMessage(` ${jobId} Err: ${response.data.result} ${response.data.message}`);
+                    }
                 } else {
                     setStatusMessage(` ${jobId} Processing .. ${response.data.percent}%`);
                 }
             }
         }
-
-        // const ShowModal = ({ group }) => {
-        //     if (show === false) {
-        //         return;
-        //     } else {
-        //         console.log("showmodal group ", group)
-        //         console.log("showmodal group ", cancelJob)
-
-        //         return (
-        //             <Modal className="mymodal" show={show}>
-        //                 <Modal.Header closeButton>
-        //                     <Modal.Title>CANCEL WARN! </Modal.Title>
-        //                 </Modal.Header>
-        //                 <Modal.Body>Are you sure that cancel this calculation? <br></br><b> can't revert after cancel. </b></Modal.Body>
-        //                 <Modal.Footer>
-        //                     <Button variant="primary" onClick={handleModalClose}>
-        //                         No, won't cancel.
-        //                     </Button>
-        //                     <Button variant="danger" onClick={handleModalCancel}>
-        //                         Sure. want to Cancel.
-        //                     </Button>
-        //                 </Modal.Footer>
-        //             </Modal>
-        //         );
-        //     }
-        // }
-
 
         const TaskRowRequest = ({ group }) => {
             // console.log("taskrow request recieve : ", group);
@@ -340,7 +317,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     >
                     </Button> */}
                 </div>
-                <div className='canvas-containe'>
+                <div className='canvas-container'>
                     <Canvas></Canvas>
                 </div>
             </Fragment >

@@ -30,7 +30,7 @@ router.post('/calculate', async (req, res, next) => {
   request.post(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
-      result = await handler.insertNewTaskRequest(['CALCULATE', req.body.task_id, req.body.group_id, body.job_id])
+      result = await handler.insertNewTaskRequest('cal', ['CALCULATE', req.body.task_id, req.body.group_id, body.job_id])
       console.log("insert task request , return : " + result);
 
       res.status(200).json({
@@ -60,13 +60,13 @@ router.get('/calculate/status/:job_id', (req, res) => {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
       res.status(200).json({
-        status: body.result,
+        result: body.result,
         percent: body.status,
         job_id: body.job_id,
-        message: "success"
+        message: body.messae
       });
 
-      result = await handler.updateTaskRequest([body.status, '', body.message, req.params.job_id], false);
+      result = await handler.updateTaskRequest([body.status, body.result !== null ? body.result : '', body.message, req.params.job_id], false);
       console.log("updateTask for status is done ");
 
     } else {
@@ -169,13 +169,14 @@ router.post('/generate/:job_id', (req, res, next) => {
   request.post(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
-      result = await handler.insertNewTaskRequest(['GENERATE', req.body.task_id, req.body.group_id, body.job_id])
+      result = await handler.insertNewTaskRequest('gen', ['GENERATE', req.body.task_id, req.body.group_id, body.job_id, req.body.pts_2d, req.body.pts_3d])
       console.log("insert task request(generate) , return : " + result);
 
       res.status(200).json({
         status: 0,
         job_id: body.job_id,
-        result: "success"
+        result: "success",
+        request_id: result,
       });
     } else {
       console.log(err)

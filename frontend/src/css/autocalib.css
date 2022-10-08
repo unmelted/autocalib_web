@@ -15,12 +15,6 @@
   margin: 15px 10px 15px 10px
 }
 
-.modeButton {
-  text-align: left;
-  margin: 15px 5px 15px 5px;
-  color: yellowgreen;
-}
-
 .mymodal .modal-content {
   color: black;
 }
@@ -41,19 +35,14 @@
   display: block;
 }
 
-#calculate-btn {
-  margin: 0 5px 0 5px;
-  float: right;
-  display: block;
-}
-
-#cancel-btn {
-  margin: 0 5px 0 5px;
-  float: right;
-  display: block;
-}
-
 #div-task-table {
   margin: 10px;
   border: 2px solid rgb(99, 99, 99);
+}
+
+#filealias-input {
+  float: left;
+  width: 540px;
+  /* height: 80px; */
+  margin-bottom: 20px;
 }

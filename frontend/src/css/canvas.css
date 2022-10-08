@@ -1,3 +1,20 @@
+.modebtn-wrapper {
+    width: 100%;
+    border: 2px solid gray;
+    margin: 15px 0 15px 30px;
+    height: 70px;
+    /* align-items: center; */
+}
+
 .canvas-wrapper {
-    margin: 0px 5px 5px 5px;
+    /* margin: 20px 5px 5px 5px; */
+    margin-left: 70px;
+    justify-content: center;
+    display: flex;
+}
+
+.modeButton {
+    text-align: left;
+    margin: 15px 5px 15px 5px;
+    color: yellowgreen;
 }

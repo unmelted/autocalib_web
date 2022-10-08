@@ -1,9 +1,10 @@
-import React, { useEffect, useState, createContext } from 'react';
+import React, { useEffect, useState, useRef, createContext } from 'react';
 import axios from 'axios';
 import '../css/autocalib.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
+import InputGroup from 'react-bootstrap/InputGroup';
 
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage, getGroupInfo } from './util.js'
 import { TaskGroupTable } from './task.js'
@@ -30,6 +31,7 @@ const initial =
     ]
 
 function AutoCalib(props) {
+    const taskAlias = useRef(null);
 
     const [statusMessage, setStatusMessage] = useState("");
     const [isUploaded, setIsUploaded] = useState(false)
@@ -97,6 +99,7 @@ function AutoCalib(props) {
             setStatusMessage("Upload Completed!");
             setTaskId(response.data.taskId);
             setTaskPath(response.data.taskPath);
+            await addFileAlias();
         }
     }
 
@@ -113,6 +116,27 @@ function AutoCalib(props) {
     //     initContext();
     //     console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
     // }, [canvas]);
+    const addFileAlias = async () => {
+        let response = null;
+        const task_alias = taskAlias.current.value;
+        console.log("addFileAlias function : ", task_alias)
+
+        const data = {
+            task_id: taskId,
+            task_alias: task_alias,
+        }
+
+        try {
+            response = await axios.post(process.env.REACT_APP_SERVER_URL + "/control/addalias", data)
+        } catch (err) {
+            console.log(err);
+            return;
+        }
+
+        if (response && response.data) {
+
+        }
+    }
 
     const changeTableData = (groupNo, jobid) => {
         console.log(`changeTableData is called with ${groupNo}, ${jobid}`)
@@ -121,6 +145,7 @@ function AutoCalib(props) {
             if (group.no === groupNo) {
                 group["job_id"] = jobid;
                 console.log("changeTableData modify the jobid of group.. " + jobid)
+                break;
             }
         }
 
@@ -189,6 +214,17 @@ function AutoCalib(props) {
     return (
         <>
             <div className="form-group">
+                <InputGroup size="sm" className="mb-3" id="filealias-input">
+                    <InputGroup.Text id="basic-addon1">
+                        Create Task with Alias
+                    </InputGroup.Text>
+                    <Form.Control
+                        placeholder=""
+                        aria-label="filealias"
+                        aria-describedby="basic-addon1"
+                        ref={taskAlias}
+                    />
+                </InputGroup>
                 <Form.Group className='item-wrapper'>
                     <Form.Control size="sm"
                         type='file'
@@ -214,7 +250,6 @@ function AutoCalib(props) {
                         readOnly={true}
                     />
                 </Form.Group>
-                {/* <div className="row"> */}
                 <div>
                     <Form.Group className='item-btn-wrppter'>
                         <Button size="md"
