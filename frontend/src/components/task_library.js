@@ -7,15 +7,18 @@ import '../css/task_library.css';
 import { PairCanvas } from './canvas.js'
 import pin from '../asset/pin.png';
 // import { TableDataContext } from './auto_calib.js';
-
+import { TaskGroupTable } from './task.js'
 
 export const TaskLibrary = (props) => {
 
     const [tasks, setTasks] = useState('')
     const [loaded, setLoaded] = useState(false)
     const [requestTaskIdMessage, setRequestTaskIdMessage] = useState('')
-    const [requestloaded, setRequestLoaded] = useState(false)
+    const [requestHistoryloaded, setRequestHistoryLoaded] = useState(false)
+    const [requestGrouploaded, setRequestGroupLoaded] = useState(false)
+
     const [requestHistory, setRequestHistory] = useState('')
+    const [requestGroup, setRequestGroup] = useState('')
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
@@ -33,6 +36,10 @@ export const TaskLibrary = (props) => {
         else {
             return <></>
         }
+
+    }
+
+    const RequestGroupTable = () => {
 
     }
 
@@ -64,7 +71,7 @@ export const TaskLibrary = (props) => {
 
         }
 
-        if (requestloaded == true) {
+        if (requestHistoryloaded == true) {
             return (
                 requestHistory.map((req =>
                     <tr key={req.request_id} >
@@ -95,7 +102,7 @@ export const TaskLibrary = (props) => {
     }
 
     const TaskHistoryTable = ({ tasks }) => {
-        const onHandleRequestClick = async (taskId) => {
+        const onHandleHistoryClick = async (taskId) => {
             console.log("onHandleRequest buttoin click", taskId);
             let response = null;
 
@@ -105,19 +112,24 @@ export const TaskLibrary = (props) => {
                 console.log(err);
                 const strmsg = `${taskId}, No request.`
                 setRequestTaskIdMessage(strmsg)
-                setRequestLoaded(false)
+                setRequestHistoryLoaded(false)
 
                 return
             }
 
             if (response && response.data.request_array) {
                 setRequestHistory(response.data.request_array)
-                setRequestLoaded(true)
+                setRequestHistoryLoaded(true)
                 const count = response.data.request_array.length
                 const strmsg = `${taskId}, ${count} request.`
                 setRequestTaskIdMessage(strmsg)
 
             }
+        }
+
+        const onHandleRequestClick = async (taskId) => {
+            console.log("onHandleCalClck !! ")
+
         }
 
         if (loaded == true) {
@@ -128,12 +140,23 @@ export const TaskLibrary = (props) => {
                         <td> {task.task_id}</td>
                         <td>{task.createdate}</td>
                         <td>{task.alias}</td>
-                        <td><Button size="sm"
-                            as="input"
+                        <td align='left'><Button size='sm'
+                            as='input'
                             type='button'
-                            value=" .. "
-                            onClick={() => onHandleRequestClick(task.task_id)}>
-                        </Button>
+                            variant='warning'
+                            value='History'
+                            onClick={() => onHandleHistoryClick(task.task_id)}
+                            style={{ width: '80px' }}
+                            hidden={task.count == 0}>
+                        </Button>{' '}
+                            <Button size='sm'
+                                as='input'
+                                type='button'
+                                value='Calculate'
+                                onClick={() => onHandleRequestClick(task.task_id)}
+                                style={{ width: '80px' }}
+                                hidden={task.count > 0}>
+                            </Button>{' '}
                         </td>
                     </tr >
                 )
@@ -148,7 +171,7 @@ export const TaskLibrary = (props) => {
     const getTasks = async () => {
         let response = null;
         try {
-            console.log("send gettasks");
+            console.log('send gettasks');
             response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/gettask`);
         }
         catch (err) {
@@ -191,7 +214,7 @@ export const TaskLibrary = (props) => {
                     </tbody>
                 </Table>
             </div>
-            <div className='table-container2' hidden={!requestloaded}>
+            <div className='table-container2' hidden={!requestHistoryloaded}>
                 <p id="task-title"><img src={pin} width="20px" alt="" /> Task ID : {requestTaskIdMessage}</p>
                 <Table trsipped boardered variant="dark" >
                     <thead>
@@ -211,6 +234,9 @@ export const TaskLibrary = (props) => {
                     </tbody>
                 </Table>
             </div>
+            {/* <div className='table-container3' hidden={ }>
+ */}
+            {/* </div> */}
             <div className='canvas-container'>
                 <Canvas></Canvas>
             </div>

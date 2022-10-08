@@ -9,6 +9,8 @@
 .table-container2 {
     margin: 3rem 0 0 0;
     width: 95%;
+    max-height: 25vh;
+    overflow-y: auto;
 }
 
 Table thead {
@@ -35,24 +37,24 @@ Table thead {
 }
 
 #th-no {
-    width: 10%;
+    width: 6%;
 }
 
 #th-id {
-    width: 20%;
+    width: 12%;
 }
 
 #th-date {
-    width: 25%;
+    width: 20%;
     text-align: center;
 }
 
 #th-alias {
-    width: 25%;
+    width: 15%;
 }
 
 #th-reqwuest {
-    width: 20%;
+    width: 40%;
 }
 
 .canvas-container {

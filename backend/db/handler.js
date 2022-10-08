@@ -42,7 +42,7 @@ exports.insertNewTask = function (taskNo, taskPath, fullPath) {
                 resolve(-1)
             }
 
-            db.queryParams("INSERT INTO task (task_no, task_id, task_path) VALUES ($1, $2, $3)", [taskNo, taskPath, fullPath], (err) => {
+            db.queryParams("INSERT INTO task (task_no, task_id, task_path) VALUES ($1, $2, $3);", [taskNo, taskPath, fullPath], (err) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
@@ -63,7 +63,7 @@ exports.updateTask = function (params) {
                 resolve(-1)
             }
             console.log(" update task param : ", params[0])
-            db.queryParams("UPDATE task SET alias = $1 WHERE task_id = $2", params, (err) => {
+            db.queryParams("UPDATE task SET alias = $1 WHERE task_id = $2;", params, (err) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
@@ -85,7 +85,7 @@ exports.insertNewGroupInfo = function (params) {
                 resolve(-1);
             }
 
-            db.queryParams("INSERT INTO group_info (task_id, group_id, cam_count ) VALUES ($1, $2, $3)", params, (err) => {
+            db.queryParams("INSERT INTO group_info (task_id, group_id, cam_count ) VALUES ($1, $2, $3);", params, (err) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
@@ -100,6 +100,7 @@ exports.insertNewGroupInfo = function (params) {
 
 
 exports.insertNewTaskRequest = function (mode, params) {
+    console.log("insert new task request ", params)
     return new Promise((resolve, reject) => {
         db.getClient((errClient, client) => {
             if (errClient) {
@@ -108,53 +109,71 @@ exports.insertNewTaskRequest = function (mode, params) {
             }
 
             if (mode === 'cal') {
-                db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id ) VALUES ($1, $2, $3, $4)", params, (err) => {
-                    // client.release(true);
+                db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id ) VALUES ($1, $2, $3, $4) RETURNING request_id;", params, (err, res) => {
                     if (err) {
                         console.log(err)
+                        client.release(true);
                         resolve(-1)
                     }
                     console.log('insertNewTaskRequest cal query success');
 
-                    db.queryParams("SELECT request_id FROM  task_request WHERE request_category = $1 and task_id = $2 and group_id = $3 and job_id = $4", params, (err, res) => {
-                        client.release(true);
-                        if (err) {
-                            console.log(err)
-                            resolve(-1)
-                        }
-                        if (res.rows.length > 0) {
-                            console.log('select current request_id ' + res.rows[0]['request_id']);
-                            resolve(res.rows[0]['request_id'])
-                        }
-                        else {
-                            resolve(-10)
-                        }
-                    }, client)
+                    if (res.rows.length > 0) {
+                        console.log('current request_id ' + res.rows[0]['request_id']);
+                        resolve(res.rows[0]['request_id'])
+                    }
+                    else {
+                        resolve(-10)
+                    }
+
+
+                    // db.queryParams("SELECT request_id FROM task_request WHERE request_category = $1 and task_id = $2 and group_id = $3 and job_id = $4;", params, (err, res) => {
+                    //     client.release(true);
+                    //     if (err) {
+                    //         console.log(err)
+                    //         resolve(-1)
+                    //     }
+                    //     if (res.rows.length > 0) {
+                    //         console.log('select current request_id ' + res.rows[0]['request_id']);
+                    //         resolve(res.rows[0]['request_id'])
+                    //     }
+                    //     else {
+                    //         resolve(-10)
+                    //     }
+                    // }, client)
 
                 }, client);
             } else if (mode === 'gen') {
-                db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id, pts_2d, pts_3d ) VALUES ($1, $2, $3, $4, $5, $6)", params, (err) => {
-                    // client.release(true);
+                console.log("insert request ", params[3])
+                db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id, pts_2d, pts_3d ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING request_id;", params, (err, res) => {
                     if (err) {
                         console.log(err)
+                        client.release(true);
                         resolve(-1)
                     }
                     console.log('insertNewTaskRequest gen query success');
+                    if (res.rows.length > 0) {
+                        console.log('current request_id ' + res.rows[0]['request_id']);
+                        resolve(res.rows[0]['request_id'])
+                    }
+                    else {
+                        resolve(-10)
+                    }
 
-                    db.queryParams("SELECT request_id FROM  task_request WHERE request_category = $1 and task_id = $2 and group_id = $3 and job_id = $4", params, (err, res) => {
-                        client.release(true);
-                        if (err) {
-                            console.log(err)
-                            resolve(-1)
-                        }
-                        if (res.rows.length > 0) {
-                            console.log('select current request_id ' + res.rows[0]['request_id']);
-                            resolve(res.rows[0]['request_id'])
-                        }
-                        else {
-                            resolve(-10)
-                        }
-                    }, client)
+                    // console.log("select request ", params[3])
+                    // db.queryParams("SELECT request_id FROM task_request WHERE request_category = $1 and task_id = $2 and group_id = $3 and job_id = $4 and pts_2d = $5 and pts_3d = $6;", params, (err, res) => {
+                    //     client.release(true);
+                    //     if (err) {
+                    //         console.log(err)
+                    //         resolve(-1)
+                    //     }
+                    //     if (res.rows.length > 0) {
+                    //         console.log('select current request_id ' + res.rows[0]['request_id']);
+                    //         resolve(res.rows[0]['request_id'])
+                    //     }
+                    //     else {
+                    //         resolve(-10)
+                    //     }
+                    // }, client)
 
                 }, client);
 
@@ -238,7 +257,11 @@ exports.selectDatewithinRange = function () {
                 resolve(-1);
             }
 
-            db.query("SELECT task_no, task_id, createdate, alias FROM task WHERE createdate > (SELECT current_date - 7) and task_id != '-1' ORDER BY task_no DESC;", (err, res) => {
+            db.query("SELECT a.task_no, a.task_id, a.createdate, a.alias, a.task_path, count(distinct b.request_id)\
+            FROM task as a LEFT OUTER JOIN task_request as b \
+            ON a.task_id = b.task_id \
+            WHERE a.createdate > (SELECT current_date - 7) and a.task_id != '-1' \
+            GROUP BY a.task_id ORDER BY a.task_no DESC;", (err, res) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
@@ -262,7 +285,7 @@ exports.selectRequestbyTaskId = function (taskId) {
                 reject(-1)
             }
 
-            db.queryParams("SELECT task_id, request_id, request_category, group_id, createdate, job_id, job_status, job_result, job_message FROM task_request WHERE task_id = $1; ", [taskId], (err, res) => {
+            db.queryParams("SELECT task_id, request_id, request_category, group_id, createdate, job_id, job_status, job_result, job_message FROM task_request WHERE task_id = $1 ORDER BY request_id DESC; ", [taskId], (err, res) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
