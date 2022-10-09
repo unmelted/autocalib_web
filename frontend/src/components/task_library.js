@@ -6,13 +6,18 @@ import Table from 'react-bootstrap/Table';
 import '../css/task_library.css';
 import { PairCanvas } from './canvas.js'
 import pin from '../asset/pin.png';
-// import { TableDataContext } from './auto_calib.js';
+import { TableDataContext } from './auto_calib.js';
 import { TaskGroupTable } from './task.js'
+import { getGroupInfo } from './util.js'
 
 export const TaskLibrary = (props) => {
+    // const { groupInfo, changeTableData } = useContext(TableDataContext);
 
     const [tasks, setTasks] = useState('')
     const [loaded, setLoaded] = useState(false)
+
+    const [taskId, setTaskId] = useState('');
+    const [taskPath, setTaskPath] = useState('');
     const [requestTaskIdMessage, setRequestTaskIdMessage] = useState('')
     const [requestHistoryloaded, setRequestHistoryLoaded] = useState(false)
     const [requestGrouploaded, setRequestGroupLoaded] = useState(false)
@@ -39,7 +44,7 @@ export const TaskLibrary = (props) => {
 
     }
 
-    const RequestGroupTable = () => {
+    const RequestGroupTable = (taskId, taskPath) => {
 
     }
 
@@ -127,9 +132,22 @@ export const TaskLibrary = (props) => {
             }
         }
 
-        const onHandleRequestClick = async (taskId) => {
+        const onHandleRequestClick = async (taskId, task_path) => {
             console.log("onHandleCalClck !! ")
-
+            let gr = ''
+            try {
+                const gr = await getGroupInfo(taskId);
+                for (const g of gr) {
+                    g["status"] = '';
+                }
+            } catch (err) {
+                console.log("get group err")
+                return;
+            }
+            // changeTableData('reset', [gr])
+            setTaskId(taskId);
+            setTaskPath(task_path);
+            setRequestGroupLoaded(true)
         }
 
         if (loaded == true) {
@@ -153,7 +171,7 @@ export const TaskLibrary = (props) => {
                                 as='input'
                                 type='button'
                                 value='Calculate'
-                                onClick={() => onHandleRequestClick(task.task_id)}
+                                onClick={() => onHandleRequestClick(task.task_id, task.task_path)}
                                 style={{ width: '80px' }}
                                 hidden={task.count > 0}>
                             </Button>{' '}
@@ -234,9 +252,9 @@ export const TaskLibrary = (props) => {
                     </tbody>
                 </Table>
             </div>
-            {/* <div className='table-container3' hidden={ }>
- */}
-            {/* </div> */}
+            {/* <div className='table-container3' hidden={requestGrouploaded === false}>
+                <TaskGroupTable taskId={taskId} taskPath={taskPath} />
+            </div> */}
             <div className='canvas-container'>
                 <Canvas></Canvas>
             </div>

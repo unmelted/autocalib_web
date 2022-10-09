@@ -72,7 +72,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 const strmsg = `Request Calculate. Job id ${response.data.job_id}`
                 setStatusMessage(strmsg);
                 console.log("send calculate. job id : ", response.data.job_id);
-                changeTableData(group.no, response.data.job_id);
+                changeTableData('addJobid', [group.no, response.data.job_id]);
             }
         }
 

@@ -99,7 +99,7 @@ function AutoCalib(props) {
             setStatusMessage("Upload Completed!");
             setTaskId(response.data.taskId);
             setTaskPath(response.data.taskPath);
-            await addFileAlias();
+            await addFileAlias(response.data.taskId);
         }
     }
 
@@ -116,14 +116,14 @@ function AutoCalib(props) {
     //     initContext();
     //     console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
     // }, [canvas]);
-    const addFileAlias = async () => {
+    const addFileAlias = async (taskId) => {
         let response = null;
         const task_alias = taskAlias.current.value;
-        console.log("addFileAlias function : ", task_alias)
+        console.log("addFileAlias function : ", task_alias, taskId)
 
         const data = {
-            task_id: taskId,
             task_alias: task_alias,
+            task_id: taskId,
         }
 
         try {
@@ -138,18 +138,36 @@ function AutoCalib(props) {
         }
     }
 
-    const changeTableData = (groupNo, jobid) => {
-        console.log(`changeTableData is called with ${groupNo}, ${jobid}`)
+    const changeTableData = async (type, params) => {
 
-        for (const group of groupInfo) {
-            if (group.no === groupNo) {
-                group["job_id"] = jobid;
-                console.log("changeTableData modify the jobid of group.. " + jobid)
-                break;
+        if (type === 'addJobid') {
+            const groupNo = params[0]
+            const jobid = params[1]
+            console.log(`changeTableData is called with ${groupNo}, ${jobid}`)
+            for (const group of groupInfo) {
+                if (group.no === groupNo) {
+                    group["job_id"] = jobid;
+                    console.log("changeTableData modify the jobid of group.. " + jobid)
+                    break;
+                }
             }
-        }
+        } else if (type === 'clear') {
+            setGroupInfo('')
 
-        console.log(groupInfo);
+        } else if (type === 'reset') {
+            // const taskId = params[0]
+            // try {
+            //     const group = await getGroupInfo(taskId);
+            //     for (const g of group) {
+            //         g["status"] = '';
+            //     }
+            //     setGroupInfo(group);
+            // } catch (err) {
+            //     console.log("change Table  data reset err ", err);
+            // }
+            setGroupInfo(params[0])
+            console.log(groupInfo);
+        }
     }
 
     useEffect(() => {

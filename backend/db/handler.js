@@ -62,7 +62,7 @@ exports.updateTask = function (params) {
                 console.log("client connect err " + err)
                 resolve(-1)
             }
-            console.log(" update task param : ", params[0])
+            console.log(" update task param : ", params)
             db.queryParams("UPDATE task SET alias = $1 WHERE task_id = $2;", params, (err) => {
                 client.release(true);
                 if (err) {
