@@ -23,6 +23,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
+    const [checkedList, setCheckedList] = useState([])
 
     const Canvas = () => {
         if (rightImage !== '' && leftImage !== '') {
@@ -224,7 +225,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         value="Pick Point"
                         onClick={onGetPairClick}
                         hidden={group.cam_count < 5}
-                    // disabled={calState !== CAL_STATE.COMPLETE && calState !== CAL_STATE.PAIR_COMPLETE}
+                        disabled={calState !== CAL_STATE.COMPLETE && calState !== CAL_STATE.PAIR_COMPLETE}
                     >
                     </Button>{'  '}
                     <span id="span-msg">
@@ -235,9 +236,21 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
 
         const TaskRowResult = ({ group }) => {
+            const onCheckedElement = (checked, item) => {
+                console.log("onchekced element ", checked);
+                if (checked) {
+                    setCheckedList([...checkedList, item]);
+                } else if (!checked) {
+                    setCheckedList(checkedList.filter(el => el !== item));
+                }
+                console.log("onChecked Element : ", checkedList);
+            }
+
             return (
                 <div>
-                    <InputGroup.Checkbox aria-label="check boc" hidden={group.cam_count < 5} />
+                    <InputGroup.Checkbox hidden={group.cam_count < 5}
+                        onChange={(e) => onCheckedElement(e.target.checked, group.group_id)}
+                        checked={checkedList.includes(group.group_id) ? true : false} />
                 </div >
             )
         }
@@ -276,7 +289,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     const downloadResult = () => {
         // saveAs(downloadInfo.url, downloadInfo.name);
         // setIsSubmitted(false)
-        console.log("download result");
+        console.log("download result clicked ", checkedList);
     }
 
     // task main retrun 
@@ -304,7 +317,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                             <GroupTable groups={groupInfo}></GroupTable>
                         </tbody>
                     </Table>
-                    {/* <Button
+                    <Button
                         size="sm"
                         variant="primary"
                         className="item-btn-wrapper"
@@ -313,9 +326,9 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         type='button'
                         value="DownLoad"
                         onClick={downloadResult}
-                        style={{ float: 'right' }}
+                        style={{ float: 'right', marginBottom: '20px' }}
                     >
-                    </Button> */}
+                    </Button>
                 </div>
                 <div className='canvas-container'>
                     <Canvas></Canvas>
