@@ -7,10 +7,16 @@
 }
 
 .table-container2 {
-    margin: 3rem 0 0 0;
+    margin: 10px 0 0 0;
     width: 95%;
     max-height: 25vh;
     overflow-y: auto;
+}
+
+#table-container3 {
+    margin: 3rem 0 0 0;
+    width: 95%;
+    border: 2px solid rgb(99, 99, 99);
 }
 
 Table thead {
@@ -27,6 +33,13 @@ Table thead {
     display: block;
 }
 
+#task-title2 {
+    margin: 3rem 0 0 0;
+    font-size: 18px;
+    font-weight: bold;
+    text-align: left;
+    display: block;
+}
 
 #table-body {
     width: 100%;
@@ -55,10 +68,4 @@ Table thead {
 
 #th-reqwuest {
     width: 40%;
-}
-
-.canvas-container {
-    /* margin: 0 5px 0 5px; */
-    width: 95%;
-    border: '1px solid gray';
 }

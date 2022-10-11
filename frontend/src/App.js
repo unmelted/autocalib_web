@@ -38,34 +38,34 @@ function App(props) {
   const [isHover, setIsHover] = useState('')
   const [groupInfo, setGroupInfo] = useState(initial);
 
-  const changeTableData = async (type, params) => {
-    console.log('chage table data : ', type, params)
-    if (type === 'addJobid') {
-      const groupNo = params[0]
-      const jobid = params[1]
-      console.log(`changeTableData is called with ${groupNo}, ${jobid}`)
-      for (const group of groupInfo.groups) {
-        if (group.no === groupNo) {
-          group["job_id"] = jobid;
-          console.log("changeTableData modify the jobid of group.. " + jobid)
-          break;
-        }
-      }
-    } else if (type === 'reset') {
-      console.log('reset called task_id:', params[0]);
-      // const taskId = params[0]
-      // try {
-      //     const group = await getGroupInfo(taskId);
-      //     for (const g of group) {
-      //         g["status"] = '';
-      //     }
-      //     setGroupInfo(group);
-      // } catch (err) {
-      //     console.log("change Table  data reset err ", err);
-      // }
-      setGroupInfo(params[0])
-    }
-  }
+  // const changeTableData = async (type, params) => {
+  //   console.log('chage table data : ', type, params)
+  //   if (type === 'addJobid') {
+  //     const groupNo = params[0]
+  //     const jobid = params[1]
+  //     console.log(`changeTableData is called with ${groupNo}, ${jobid}`)
+  //     for (const group of groupInfo.groups) {
+  //       if (group.no === groupNo) {
+  //         group["job_id"] = jobid;
+  //         console.log("changeTableData modify the jobid of group.. " + jobid)
+  //         break;
+  //       }
+  //     }
+  //   } else if (type === 'reset') {
+  //     console.log('reset called task_id:', params[0]);
+  //     // const taskId = params[0]
+  //     // try {
+  //     //     const group = await getGroupInfo(taskId);
+  //     //     for (const g of group) {
+  //     //         g["status"] = '';
+  //     //     }
+  //     //     setGroupInfo(group);
+  //     // } catch (err) {
+  //     //     console.log("change Table  data reset err ", err);
+  //     // }
+  //     setGroupInfo(params[0])
+  //   }
+  // }
 
   const onHandleCreateTask = () => {
     setState('create')
@@ -132,8 +132,6 @@ function App(props) {
                 src="https://4dreplay.com/4d/wp-content/uploads/2021/10/logo_white-2.png"
                 alt="Logo"
                 onClick={onHandleHome}
-                onMouseEnter={handleMouseEnter}
-                onMouseLeave={handleMouseLeave}
                 style={{ height: '70%', width: '240px', cursor: isHover ? 'pointer' : 'hand' }}
               /> </Col>
             <Col xs lg="3"><h3>Auto-Calibration</h3> </Col>
@@ -143,29 +141,28 @@ function App(props) {
             <Col xs lg='2'>
               <Button className="rounded" variant={state === "create" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleCreateTask}><img src={plus} width="80px" alt="" /><p></p>
+                onClick={onHandleCreateTask}><img src={plus} width="60px" alt="" /><p></p>
                 Create Task</Button> </Col>
             <Col xs lg='2'>
               <Button variant={state === "search" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleSearchTask}><img src={search} width="80px" alt="" /> <p></p>
+                onClick={onHandleSearchTask}><img src={search} width="60px" alt="" /> <p></p>
                 Search Task</Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "guide" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleGuide}><img src={help} width="80px" alt="" /> <p></p>
+                onClick={onHandleGuide}><img src={help} width="60px" alt="" /> <p></p>
                 Guide</Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "alien" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FF0000', float: 'center' }}
-                onClick={onHandleAlien}><img src={alien} width="80px" alt="" /> <p></p>
+                onClick={onHandleAlien}><img src={alien} width="60px" alt="" /> <p></p>
                 BackDoor</Button></Col>
 
           </Row>
           <p></p>
           <hr />
-          <TableDataContext.Provider value={{ groupInfo, changeTableData }}>
-            <MainContent /></TableDataContext.Provider>
+          <MainContent />
           {/* <AutoCalib disabled={state === 'search'} /> */}
         </Row>
       </Container>

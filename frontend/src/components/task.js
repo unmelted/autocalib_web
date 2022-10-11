@@ -1,11 +1,12 @@
-import React, { useState, Fragment, useContext } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
+import { getGroupInfo } from './util.js'
 import Table from 'react-bootstrap/Table';
 import '../css/task.css';
 import { PairCanvas } from './canvas.js'
-import { TableDataContext } from '../App.js';
+// import { TableDataContext } from '../App.js';
 
 
 export const TaskGroupTable = ({ taskId, taskPath }) => {
@@ -18,7 +19,10 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         PAIR_COMPLETE: 4,
     }
 
-    const { groupInfo, changeTableData } = useContext(TableDataContext);
+    const [tableLoad, setTableLoad] = useState(false);
+    const [groupInfo, setGroupInfo] = useState('');
+    const [groupTable, setGroupTable] = useState('');
+    // const { groupInfo, changeTableData } = useContext(TableDataContext);
     const [downloadInfo, setDownloadInfo] = useState({});
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
@@ -72,8 +76,10 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 setCalState(CAL_STATE.START);
                 const strmsg = `Request Calculate. Job id ${response.data.job_id}`
                 setStatusMessage(strmsg);
-                console.log("send calculate. job id : ", response.data.job_id);
-                changeTableData('addJobid', [group.no, response.data.job_id]);
+                // changeTableData('addJobid', [group.no, response.data.job_id]);
+                console.log(" check .. ", groupTable);
+                groupTable[groupId].job_id = response.data.job_id;
+                console.log("send calculate. job id (modify ..): ", response.data.job_id, groupTable);
             }
         }
 
@@ -292,9 +298,36 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         console.log("download result clicked ", checkedList);
     }
 
+    const getGroup = async (taskId) => {
+        console.log("set task load true ", taskId);
+        let modify_group = {};
+        if (taskId !== '') {
+            console.log("get group call..  ");
+            try {
+                const group = await getGroupInfo(taskId);
+                for (const g of group) {
+                    g['status'] = '';
+                    g['job_id'] = '';
+                    modify_group[g.group_id] = g
+                }
+                setGroupInfo(group)
+                setGroupTable(modify_group)
+                setTableLoad(true)
+                console.log("modify data structure save : ", groupTable)
+
+            } catch (err) {
+                console.log("getGroup info error : ", err);
+            }
+        }
+    }
+
+    useEffect(() => {
+        console.log('start .. :', taskId);
+        getGroup(taskId);
+    }, [taskId]);
+
     // task main retrun 
-    if (groupInfo.length === 0) {
-        console.log("groupInfo length is 0! ");
+    if (tableLoad === false) {
         return (<div />)
     }
     else {

@@ -16,7 +16,7 @@ function AutoCalib() {
     const [taskPath, setTaskPath] = useState('');
     const [taskLoad, setTaskLoad] = useState(false);
 
-    const { groupInfo, changeTableData } = useContext(TableDataContext);
+    // const { groupInfo, changeTableData } = useContext(TableDataContext);
     const taskAlias = useRef(null);
     const [statusMessage, setStatusMessage] = useState("");
     const [isUploaded, setIsUploaded] = useState(false)
@@ -80,7 +80,7 @@ function AutoCalib() {
             setStatusMessage("Upload Completed!");
             await addFileAlias(response.data.taskId);
             console.log("add file alias  call");
-            await getGroup(response.data.taskId)
+            // await getGroup(response.data.taskId)
             console.log("get group  call");
             setTaskPath(response.data.taskPath);
             setTaskId(response.data.taskId);
@@ -133,7 +133,7 @@ function AutoCalib() {
                     g["status"] = '';
                 }
                 console.log("set task load true ", task_id);
-                changeTableData('reset', [group]); //// 문제가 되는 부분
+                // changeTableData('reset', [group]); //// 문제가 되는 부분
                 console.log("chnage table data, set again ");
             } catch (err) {
                 console.log("getGroup info error : ", err);

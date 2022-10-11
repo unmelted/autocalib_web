@@ -4,11 +4,8 @@ import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
 import '../css/task_library.css';
-import { PairCanvas } from './canvas.js'
 import pin from '../asset/pin.png';
-import { TableDataContext } from './auto_calib.js';
 import { TaskGroupTable } from './task.js'
-import { getGroupInfo } from './util.js'
 
 export const TaskLibrary = (props) => {
     // const { groupInfo, changeTableData } = useContext(TableDataContext);
@@ -27,26 +24,6 @@ export const TaskLibrary = (props) => {
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
-
-    const Canvas = () => {
-        if (rightImage !== '' && leftImage !== '') {
-            console.log("Canvas is called 1 : " + rightImage)
-            console.log("Canvas is called 2 : " + canvasJob)
-            return (
-                <>
-                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
-                </>)
-
-        }
-        else {
-            return <></>
-        }
-
-    }
-
-    const RequestGroupTable = (taskId, taskPath) => {
-
-    }
 
     const RequstHistoryTable = () => {
         const onHandleGetPairClick = async (taskId, groupId, jobId) => {
@@ -125,6 +102,7 @@ export const TaskLibrary = (props) => {
             if (response && response.data.request_array) {
                 setRequestHistory(response.data.request_array)
                 setRequestHistoryLoaded(true)
+                setRequestGroupLoaded(false)
                 const count = response.data.request_array.length
                 const strmsg = `${taskId}, ${count} request.`
                 setRequestTaskIdMessage(strmsg)
@@ -133,21 +111,11 @@ export const TaskLibrary = (props) => {
         }
 
         const onHandleRequestClick = async (taskId, task_path) => {
-            console.log("onHandleCalClck !! ")
-            let gr = ''
-            try {
-                const gr = await getGroupInfo(taskId);
-                for (const g of gr) {
-                    g["status"] = '';
-                }
-            } catch (err) {
-                console.log("get group err")
-                return;
-            }
-            // changeTableData('reset', [gr])
+            console.log("onHandleRequestClck !! ")
             setTaskId(taskId);
             setTaskPath(task_path);
             setRequestGroupLoaded(true)
+            setRequestHistoryLoaded(false)
         }
 
         if (loaded == true) {
@@ -170,7 +138,7 @@ export const TaskLibrary = (props) => {
                             <Button size='sm'
                                 as='input'
                                 type='button'
-                                value='Calculate'
+                                value='Request'
                                 onClick={() => onHandleRequestClick(task.task_id, task.task_path)}
                                 style={{ width: '80px' }}
                                 hidden={task.count > 0}>
@@ -232,8 +200,9 @@ export const TaskLibrary = (props) => {
                     </tbody>
                 </Table>
             </div>
+            <p id="task-title2" hidden={!requestHistoryloaded}>
+                <img src={pin} width="20px" alt="" /> Task ID : {requestTaskIdMessage}</p>
             <div className='table-container2' hidden={!requestHistoryloaded}>
-                <p id="task-title"><img src={pin} width="20px" alt="" /> Task ID : {requestTaskIdMessage}</p>
                 <Table trsipped boardered variant="dark" >
                     <thead>
                         <tr>
@@ -252,11 +221,9 @@ export const TaskLibrary = (props) => {
                     </tbody>
                 </Table>
             </div>
-            {/* <div className='table-container3' hidden={requestGrouploaded === false}>
+            <div id='table-container3'
+                hidden={requestGrouploaded === false}>
                 <TaskGroupTable taskId={taskId} taskPath={taskPath} />
-            </div> */}
-            <div className='canvas-container'>
-                <Canvas></Canvas>
             </div>
         </>
     )
