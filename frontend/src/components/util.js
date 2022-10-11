@@ -35,6 +35,7 @@ export const getGroupInfo = async function (taskId) {
     } catch (err) {
         console.log("get groupinfo error")
     }
+
     if (response && response.data) {
         console.log("get group info ", response.data.group)
         return response.data.group;

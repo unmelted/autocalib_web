@@ -1,46 +1,27 @@
-import React, { useEffect, useState, useRef, createContext } from 'react';
+import React, { useEffect, useState, useRef, useContext } from 'react';
 import axios from 'axios';
 import '../css/autocalib.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
-
+import { TableDataContext } from '../App.js';
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage, getGroupInfo } from './util.js'
 import { TaskGroupTable } from './task.js'
 
-export const TableDataContext = createContext();
-const initial =
-    [
-        {
-            "group_id": "Group1",
-            "cam_count": 0,
-            "no": 102,
-            "status": "None",
-            "job_id": 2067,
-            "gen_job_id": 2030
-        },
-        {
-            "group_id": "Group2",
-            "cam_count": 0,
-            "no": 103,
-            "status": "None",
-            "job_id": 2068,
-            "gen_job_id": 2030
-        }
-    ]
 
-function AutoCalib(props) {
+
+function AutoCalib() {
+    const [taskId, setTaskId] = useState('');
+    const [taskPath, setTaskPath] = useState('');
+    const [taskLoad, setTaskLoad] = useState(false);
+
+    const { groupInfo, changeTableData } = useContext(TableDataContext);
     const taskAlias = useRef(null);
-
     const [statusMessage, setStatusMessage] = useState("");
     const [isUploaded, setIsUploaded] = useState(false)
 
     const [percent, setPercent] = useState(0);
-    const [taskId, setTaskId] = useState('');
-    const [taskPath, setTaskPath] = useState('');
-    const [groupInfo, setGroupInfo] = useState(initial);
-    const [taskLoad, setTaskLoad] = useState(false);
 
     const uploadFiles = async (e) => {
         e.preventDefault();
@@ -97,9 +78,14 @@ function AutoCalib(props) {
         if (response && response.data && response.data.status === 0) {
             setIsUploaded(true);
             setStatusMessage("Upload Completed!");
-            setTaskId(response.data.taskId);
-            setTaskPath(response.data.taskPath);
             await addFileAlias(response.data.taskId);
+            console.log("add file alias  call");
+            await getGroup(response.data.taskId)
+            console.log("get group  call");
+            setTaskPath(response.data.taskPath);
+            setTaskId(response.data.taskId);
+            setTaskLoad(true);
+
         }
     }
 
@@ -138,58 +124,49 @@ function AutoCalib(props) {
         }
     }
 
-    const changeTableData = async (type, params) => {
-
-        if (type === 'addJobid') {
-            const groupNo = params[0]
-            const jobid = params[1]
-            console.log(`changeTableData is called with ${groupNo}, ${jobid}`)
-            for (const group of groupInfo) {
-                if (group.no === groupNo) {
-                    group["job_id"] = jobid;
-                    console.log("changeTableData modify the jobid of group.. " + jobid)
-                    break;
+    const getGroup = async (task_id) => {
+        if (task_id !== '') {
+            console.log("get group call..  ");
+            try {
+                const group = await getGroupInfo(task_id);
+                for (const g of group) {
+                    g["status"] = '';
                 }
+                console.log("set task load true ", task_id);
+                changeTableData('reset', [group]); //// 문제가 되는 부분
+                console.log("chnage table data, set again ");
+            } catch (err) {
+                console.log("getGroup info error : ", err);
             }
-        } else if (type === 'clear') {
-            setGroupInfo('')
-
-        } else if (type === 'reset') {
-            // const taskId = params[0]
-            // try {
-            //     const group = await getGroupInfo(taskId);
-            //     for (const g of group) {
-            //         g["status"] = '';
-            //     }
-            //     setGroupInfo(group);
-            // } catch (err) {
-            //     console.log("change Table  data reset err ", err);
-            // }
-            setGroupInfo(params[0])
-            console.log(groupInfo);
         }
     }
 
+    // useEffect(() => {
+
+    //     async function getGroup() {
+    //         if (taskId !== '') {
+    //             console.log("task id useEffect ");
+    //             try {
+    //                 const group = await getGroupInfo(taskId);
+    //                 for (const g of group) {
+    //                     g["status"] = '';
+    //                 }
+    //                 setTaskLoad(true);
+    //                 changeTableData('reset', [group]);
+    //                 console.log("set task load true ", taskId);
+    //             } catch (err) {
+    //                 console.log("getGroup info error : ", err);
+    //             }
+    //         }
+    //     }
+    //     getGroup();
+    // }, [taskId]);
+
     useEffect(() => {
+        console.log("task load use effect ", taskLoad);
+        console.log("taskId : ", taskId);
+    }, [taskId, taskLoad])
 
-        async function getGroup() {
-            if (taskId !== '') {
-                console.log("task id useEffect ");
-                try {
-                    const group = await getGroupInfo(taskId);
-                    for (const g of group) {
-                        g["status"] = '';
-                    }
-
-                    setGroupInfo(group);
-                    setTaskLoad(true)
-                } catch (err) {
-                    console.log("getGroup info error : ", err);
-                }
-            }
-        }
-        getGroup();
-    }, [taskId]);
 
     // useEffect(() => {
     //     if (isUploaded && calculateState === CALC_STATE.START) {
@@ -286,10 +263,8 @@ function AutoCalib(props) {
                 </div>
                 <div className="item-wrapper"
                     id="div-task-table"
-                    hidden={!taskLoad}>
-                    <TableDataContext.Provider value={{ groupInfo, changeTableData }}>
-                        <TaskGroupTable taskId={taskId} taskPath={taskPath} />
-                    </TableDataContext.Provider>
+                    hidden={taskLoad === false}>
+                    <TaskGroupTable taskId={taskId} taskPath={taskPath} />
                 </div>
             </div>
         </>

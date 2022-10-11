@@ -5,11 +5,11 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
 import '../css/task.css';
 import { PairCanvas } from './canvas.js'
-import { TableDataContext } from './auto_calib.js';
+import { TableDataContext } from '../App.js';
 
 
 export const TaskGroupTable = ({ taskId, taskPath }) => {
-
+    console.log("Task Group Table ", taskId, taskPath);
     const CAL_STATE = {
         READY: 0,
         START: 1,
@@ -298,6 +298,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         return (<div />)
     }
     else {
+        console.log("grouptabe start .. :", groupInfo);
         return (
             <Fragment >
                 <div className='table-container'>
