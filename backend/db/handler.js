@@ -110,9 +110,9 @@ exports.insertNewTaskRequest = function (mode, params) {
 
             if (mode === 'cal') {
                 db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id ) VALUES ($1, $2, $3, $4) RETURNING request_id;", params, (err, res) => {
+                    client.release(true);
                     if (err) {
                         console.log(err)
-                        client.release(true);
                         resolve(-1)
                     }
                     console.log('insertNewTaskRequest cal query success');
@@ -145,9 +145,9 @@ exports.insertNewTaskRequest = function (mode, params) {
             } else if (mode === 'gen') {
                 console.log("insert request ", params[3])
                 db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id, pts_2d, pts_3d ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING request_id;", params, (err, res) => {
+                    client.release(true);
                     if (err) {
                         console.log(err)
-                        client.release(true);
                         resolve(-1)
                     }
                     console.log('insertNewTaskRequest gen query success');
