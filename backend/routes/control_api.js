@@ -59,4 +59,24 @@ router.get('/getrequest/:task_id', async (req, res) => {
     }
 })
 
+
+router.get('/groupinfo/:task_id', async (req, res) => {
+
+    console.log("router groupinfo task id : ", req.params.task_id)
+
+    try {
+        result = await handler.getGroupInfo(req.params.task_id)
+        console.log("get group info end  : " + result[0].group_id)
+        res.status(200).json({
+            message: 'success',
+            group: result,
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+});
+
+
 module.exports = router;

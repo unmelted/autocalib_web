@@ -1,14 +1,16 @@
 .modebtn-wrapper {
-    width: 100%;
+    width: 95%;
     border: 2px solid gray;
-    margin: 15px 0 15px 30px;
+    /* margin: 15px 0 15px 30px; */
     height: 70px;
     /* align-items: center; */
 }
 
 .canvas-wrapper {
     /* margin: 20px 5px 5px 5px; */
-    margin-left: 70px;
+    /* margin-left: 70px; */
+    width: 95%;
+    margin-top: 20px;
     justify-content: center;
     display: flex;
 }

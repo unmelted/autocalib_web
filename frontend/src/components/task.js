@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useEffect } from 'react';
+import React, { useState, Fragment, useEffect, createContext } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -6,8 +6,20 @@ import { getGroupInfo } from './util.js'
 import Table from 'react-bootstrap/Table';
 import '../css/task.css';
 import { PairCanvas } from './canvas.js'
-// import { TableDataContext } from '../App.js';
 
+export const TableDataContext = createContext();
+const initItems = {
+    'Group1': {
+        no: 0,
+        name: '',
+        cam_count: 0,
+        status: '',
+        job_id: 0,
+        status_msg: '',
+        gen_id: 0,
+        gen_msg: '',
+    },
+}
 
 export const TaskGroupTable = ({ taskId, taskPath }) => {
     console.log("Task Group Table ", taskId, taskPath);
@@ -17,18 +29,49 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         COMPLETE: 2,
         CANCEL: 3,
         PAIR_COMPLETE: 4,
+        SUBMIT: 5,
     }
 
-    const [tableLoad, setTableLoad] = useState(false);
+    const [refresh, setRefresh] = useState(0)
     const [groupInfo, setGroupInfo] = useState('');
-    const [groupTable, setGroupTable] = useState('');
-    // const { groupInfo, changeTableData } = useContext(TableDataContext);
+    const [groupTable, setGroupTable] = useState(initItems);
+
+    const [tableLoad, setTableLoad] = useState(false);
     const [downloadInfo, setDownloadInfo] = useState({});
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
     const [checkedList, setCheckedList] = useState([])
 
+    const changeTableDataContext = (type, param) => {
+        console.log("changeTableContext", type, param);
+        if (type === 'init') {
+            for (const g of param[0]) {
+                groupTable[g.group_id].name = g.group_id;
+                groupTable[g.group_id].no = g.no;
+                groupTable[g.group_id].cam_count = g.cam_count;
+                groupTable[g.group_id].status = CAL_STATE.READY;
+                groupTable[g.group_id].job_id = 0;
+                groupTable[g.group_id].status_msg = '';
+                groupTable[g.group_id].gen_id = 0;
+                groupTable[g.group_id].gen_msg = '';
+            }
+        } else if (type === 'changestatus') {
+            groupTable[param[0]].status = param[1]
+        } else if (type === 'changestatusmsg') {
+            groupTable[param[0]].status_msg = param[1]
+        }
+        else if (type === 'addjobid') {
+            groupTable[param[0]].job_id = param[1]
+        } else if (type === 'addgenid') {
+            groupTable[param[0]].gen_id = param[1]
+            groupTable[param[0]].status = CAL_STATE.SUBMIT
+        } else if (type === 'changegenmsg') {
+            groupTable[param[0]].gen_msg = param[1]
+            setRefresh(refresh + 1)
+        }
+
+    }
     const Canvas = () => {
         if (rightImage !== '' && leftImage !== '') {
             console.log("Canvas is called 1 : " + rightImage)
@@ -44,7 +87,8 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
 
     }
-    const TaskRow = ({ group }) => {
+    const TaskRow = ({ keyindex }) => {
+        console.log("taskRow start.. ", keyindex)
         const [jobId, setJobId] = useState('')
         const [requestId, setRequestId] = useState('')
         const [calState, setCalState] = useState(CAL_STATE.READY)
@@ -76,10 +120,9 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 setCalState(CAL_STATE.START);
                 const strmsg = `Request Calculate. Job id ${response.data.job_id}`
                 setStatusMessage(strmsg);
-                // changeTableData('addJobid', [group.no, response.data.job_id]);
+                changeTableDataContext('changestatusmsg', [keyindex, strmsg]);
+                changeTableDataContext('addjobid', [keyindex, response.data.job_id]);
                 console.log(" check .. ", groupTable);
-                groupTable[groupId].job_id = response.data.job_id;
-                console.log("send calculate. job id (modify ..): ", response.data.job_id, groupTable);
             }
         }
 
@@ -97,34 +140,39 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             }
 
             if (response && response.data.percent) {
+                let strmsg = ''
                 if (parseInt(response.data.percent) === 100) {
                     setCalState(CAL_STATE.COMPLETE);
                     if (response.data.result >= 0) {
-                        setStatusMessage(` ${jobId} Done. ${response.data.percent}%`);
+                        strmsg = ` ${jobId} Done. ${response.data.percent}%`;
                     } else {
-                        setStatusMessage(` ${jobId} Err: ${response.data.result} ${response.data.message}`);
+                        strmsg = ` ${jobId} Err: ${response.data.result} ${response.data.message}`;
                     }
                 } else {
-                    setStatusMessage(` ${jobId} Processing .. ${response.data.percent}%`);
+                    strmsg = ` ${jobId} Processing .. ${response.data.percent}%`;
                 }
+
+                setStatusMessage(strmsg)
+                changeTableDataContext('changestatusmsg', [keyindex, strmsg]);
             }
         }
 
-        const TaskRowRequest = ({ group }) => {
-            // console.log("taskrow request recieve : ", group);
+        const TaskRowRequest = ({ keyindex }) => {
+            console.log("taskrow request recieve : ", keyindex);
+            console.log(groupTable)
 
             const onCalculateClick = () => {
-                calculate(taskId, taskPath, group.group_id);
+                calculate(taskId, taskPath, keyindex);
                 setCalState(CAL_STATE.START);
             }
 
             const onCancelClick = async () => {
-                console.log("cancle send datacontext 2 : ", group)
+                console.log("cancle send datacontext 2 : ", keyindex)
 
                 let response = null;
 
                 try {
-                    response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${group['job_id']}`);
+                    response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${groupTable[keyindex].job_id}`);
                 } catch (err) {
                     console.log(err);
                     setStatusMessage('Unable to cancel');
@@ -139,13 +187,12 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
             return (
                 <>
-                    {/* <ShowModal group={group} /> */}
                     <Button size="sm"
                         as="input"
                         type='button'
                         value="Calculate"
                         onClick={onCalculateClick}
-                        hidden={group.cam_count < 5}
+                        hidden={groupTable[keyindex].cam_count < 5}
                         disabled={calState !== CAL_STATE.READY}>
                     </Button>{' '}
                     <Button size="sm"
@@ -154,7 +201,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         className="btn-danger"
                         value="Cancel"
                         onClick={onCancelClick}
-                        hidden={group.cam_count < 5}
+                        hidden={groupTable[keyindex].cam_count < 5}
                         disabled={calState !== CAL_STATE.START}>
                     </Button>{' '}
                 </>
@@ -162,7 +209,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             )
         }
 
-        const TaskRowStatus = ({ group }) => {
+        const TaskRowStatus = ({ keyindex }) => {
             // console.log("taskrow status recieve : ", group);
 
             const onGetStatus = () => {
@@ -176,17 +223,17 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         type='button'
                         value="Status"
                         onClick={onGetStatus}
-                        hidden={group.cam_count < 5}
+                        hidden={groupTable[keyindex].cam_count < 5}
                         disabled={calState === CAL_STATE.READY || calState === CAL_STATE.CANCEL}>
                     </Button>{' '}
                     <span id="span-msg">
-                        {statusMessage}
+                        {groupTable[keyindex].status_msg}
                     </span>
                 </>
             )
         }
 
-        const TaskRowGenerate = ({ group }) => {
+        const TaskRowGenerate = ({ keyindex }) => {
 
             const onGetStatus = () => {
                 getStatusSend();
@@ -196,8 +243,8 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 let response = null;
 
                 try {
-                    console.log(group['job_id'])
-                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${group['job_id']}`);
+                    console.log(groupTable[keyindex].job_id)
+                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${groupTable[keyindex].job_id}`);
                 } catch (err) {
                     console.log(err);
                     setStatusMessage('Unable to get images!');
@@ -214,7 +261,8 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     setLeftImage(imageUrlFirst);
                     setRightImage(imageUrlSecond);
                     setCalState(CAL_STATE.PAIR_COMPLETE);
-                    setCanvasJob([jobId, taskId, group.group_id])
+                    setCanvasJob([jobId, taskId, keyindex])
+                    changeTableDataContext('changegenmsg', [keyindex, `${response.data.first_image}, ${response.data.first_image} is chosen`])
                 } else {
                     return;
                 }
@@ -230,18 +278,18 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         variant="success"
                         value="Pick Point"
                         onClick={onGetPairClick}
-                        hidden={group.cam_count < 5}
+                        hidden={groupTable[keyindex].cam_count < 5}
                         disabled={calState !== CAL_STATE.COMPLETE && calState !== CAL_STATE.PAIR_COMPLETE}
                     >
                     </Button>{'  '}
                     <span id="span-msg">
-                        {genMessage}
+                        {groupTable[keyindex].gen_msg}
                     </span>
                 </>
             )
         }
 
-        const TaskRowResult = ({ group }) => {
+        const TaskRowResult = ({ keyindex }) => {
             const onCheckedElement = (checked, item) => {
                 console.log("onchekced element ", checked);
                 if (checked) {
@@ -254,9 +302,9 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
             return (
                 <div>
-                    <InputGroup.Checkbox hidden={group.cam_count < 5}
-                        onChange={(e) => onCheckedElement(e.target.checked, group.group_id)}
-                        checked={checkedList.includes(group.group_id) ? true : false} />
+                    <InputGroup.Checkbox hidden={groupTable[keyindex].cam_count < 5}
+                        onChange={(e) => onCheckedElement(e.target.checked, keyindex)}
+                        checked={checkedList.includes(keyindex) ? true : false} />
                 </div >
             )
         }
@@ -264,30 +312,33 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         return (
             <>
                 <td id="td-request">
-                    <TaskRowRequest group={group}></TaskRowRequest>
+                    <TaskRowRequest keyindex={keyindex}></TaskRowRequest>
                 </td>
                 <td id="td-status">
-                    <TaskRowStatus group={group}></TaskRowStatus>
+                    <TaskRowStatus keyindex={keyindex}></TaskRowStatus>
                 </td>
                 <td id="td-generate">
-                    <TaskRowGenerate group={group}></TaskRowGenerate>
+                    <TaskRowGenerate keyindex={keyindex}></TaskRowGenerate>
                 </td>
                 <td id="td-result">
-                    <TaskRowResult group={group}></TaskRowResult>
+                    <TaskRowResult keyindex={keyindex}></TaskRowResult>
                 </td>
             </>
         )
 
     }
 
-    const GroupTable = ({ groups }) => {
+    const GroupTable = ({ groupTable }) => {
+        const keys = Object.keys(groupTable)
+        console.log("GroupTable.. ", keys)
+
         return (
-            groups.map((group =>
-                <tr key={group.no} >
-                    <td> {group.group_id}</td>
-                    <td>{group.cam_count}</td>
-                    <TaskRow group={group}></TaskRow>
-                </tr >
+            keys.map((keyindex =>
+                <tr key={groupTable[keyindex].no} >
+                    <td> {groupTable[keyindex].name}</td>
+                    <td> {groupTable[keyindex].cam_count}</td>
+                    <TaskRow keyindex={keyindex}></TaskRow>
+                </tr>
             )
             ));
     };
@@ -305,13 +356,14 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             console.log("get group call..  ");
             try {
                 const group = await getGroupInfo(taskId);
-                for (const g of group) {
-                    g['status'] = '';
-                    g['job_id'] = '';
-                    modify_group[g.group_id] = g
-                }
+                // for (const g of group) {
+                //     g['status'] = '';
+                //     g['job_id'] = '';
+                //     modify_group[g.group_id] = g
+                // }
                 setGroupInfo(group)
-                setGroupTable(modify_group)
+                // setGroupTable(modify_group)
+                changeTableDataContext('init', [group])
                 setTableLoad(true)
                 console.log("modify data structure save : ", groupTable)
 
@@ -326,12 +378,16 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         getGroup(taskId);
     }, [taskId]);
 
+    useEffect(() => {
+        console.log("use effect groupTable ")
+    }, [groupTable])
+
     // task main retrun 
     if (tableLoad === false) {
         return (<div />)
     }
     else {
-        console.log("grouptabe start .. :", groupInfo);
+
         return (
             <Fragment >
                 <div className='table-container'>
@@ -348,24 +404,26 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                             </tr>
                         </thead>
                         <tbody>
-                            <GroupTable groups={groupInfo}></GroupTable>
+                            {/* <GroupTable groups={groupInfo}></GroupTable> */}
+                            <GroupTable groupTable={groupTable}></GroupTable>
                         </tbody>
                     </Table>
-                    <Button
-                        size="sm"
-                        variant="primary"
-                        className="item-btn-wrapper"
-                        id='result'
-                        as="input"
-                        type='button'
-                        value="DownLoad"
-                        onClick={downloadResult}
-                        style={{ float: 'right', marginBottom: '20px' }}
-                    >
-                    </Button>
+                    <div id="button-row-down" >
+                        <Button
+                            size="sm"
+                            variant="primary"
+                            className="item-btn-wrapper"
+                            id='result'
+                            as="input"
+                            type='button'
+                            value="DownLoad"
+                            onClick={downloadResult}>
+                        </Button></div>
                 </div>
                 <div className='canvas-container'>
-                    <Canvas></Canvas>
+                    <TableDataContext.Provider value={{ groupTable, changeTableDataContext }}>
+                        <Canvas></Canvas>
+                    </TableDataContext.Provider>
                 </div>
             </Fragment >
         )

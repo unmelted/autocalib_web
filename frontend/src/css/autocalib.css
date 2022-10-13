@@ -1,23 +1,24 @@
+#form-group {
+  width: 95%;
+  align-items: center;
+}
+
 #uploadProgress {
-  width: 100%;
   background-color: grey;
 }
 
 .item-wrapper {
-  margin: 15px 0 15px 0
+  width: 95%;
+  margin: 15px 0 15px 0;
 }
 
 .item-btn-wrapper {
-  margin: 0 5px 0 5px;
+  margin: 0;
 }
 
-.item-group-wrapper {
+/* .item-group-wrapper {
   margin: 15px 10px 15px 10px
-}
-
-.mymodal .modal-content {
-  color: black;
-}
+} */
 
 .form-container {
   flex-wrap: wrap;
@@ -30,19 +31,36 @@
   border: 0;
 }
 
-#table-form {
+/* #table-form {
   margin: 0 5px 0 5px;
   display: block;
-}
-
+} */
+/*
 #div-task-table {
   margin: 10px 10px 20px 10px;
   border: 2px solid rgb(99, 99, 99);
-}
+} */
 
 #filealias-input {
   float: left;
   width: 540px;
   /* height: 80px; */
   margin-bottom: 20px;
+
 }
+
+
+#button-row-reset {
+  display: flex;
+  justify-content: right;
+  margin-right: 70px;
+  margin-bottom: 20px;
+}
+
+/* .div-task-table { */
+/* margin-left: 70px; */
+/* align-content: center; */
+/* margin: 20px 5px 5px 5px;
+  justify-content: center;
+  display: flex; */
+/* } */

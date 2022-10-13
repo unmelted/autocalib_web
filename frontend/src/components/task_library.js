@@ -6,6 +6,7 @@ import Table from 'react-bootstrap/Table';
 import '../css/task_library.css';
 import pin from '../asset/pin.png';
 import { TaskGroupTable } from './task.js'
+import { PairCanvas } from './canvas.js'
 
 export const TaskLibrary = (props) => {
     // const { groupInfo, changeTableData } = useContext(TableDataContext);
@@ -25,6 +26,21 @@ export const TaskLibrary = (props) => {
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
 
+    const Canvas = () => {
+        if (rightImage !== '' && leftImage !== '') {
+            console.log("Canvas is called 1 : " + rightImage)
+            console.log("Canvas is called 2 : " + canvasJob)
+            return (
+                <>
+                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
+                </>)
+
+        }
+        else {
+            return <></>
+        }
+
+    }
     const RequstHistoryTable = () => {
         const onHandleGetPairClick = async (taskId, groupId, jobId) => {
             console.log("onHandleGetPairClick ", taskId, groupId, jobId)
@@ -224,6 +240,9 @@ export const TaskLibrary = (props) => {
             <div id='table-container3'
                 hidden={requestGrouploaded === false}>
                 <TaskGroupTable taskId={taskId} taskPath={taskPath} />
+            </div>
+            <div>
+                <Canvas></Canvas>
             </div>
         </>
     )

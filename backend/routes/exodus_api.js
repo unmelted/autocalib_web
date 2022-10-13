@@ -77,25 +77,6 @@ router.get('/calculate/status/:job_id', (req, res) => {
 
 });
 
-router.get('/groupinfo/:task_id', async (req, res) => {
-
-  console.log("router groupinfo task id : ", req.params.task_id)
-
-  try {
-    result = await handler.getGroupInfo(req.params.task_id)
-    console.log("get group info end  : " + result[0].group_id)
-    res.status(200).json({
-      message: 'success',
-      group: result,
-    });
-
-  } catch (err) {
-    console.log(err)
-    res.status(500).json({})
-  }
-});
-
-
 router.delete('/cancel/:job_id', (req, res) => {
   // Exodus API: 7.1.2	GET /exodus/autocalib/cancle/{ job_id }
   const options = {
@@ -165,7 +146,7 @@ router.post('/generate/:job_id', (req, res, next) => {
     json: true
   }
 
-  console.log("Call Exodus API: " + options.uri);
+  console.log("Call Exodus API: " + options.uri, req.body.job_id);
   request.post(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
