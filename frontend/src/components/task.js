@@ -418,7 +418,8 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                             type='button'
                             value="DownLoad"
                             onClick={downloadResult}>
-                        </Button></div>
+                        </Button>
+                    </div>
                 </div>
                 <div className='canvas-container'>
                     <TableDataContext.Provider value={{ groupTable, changeTableDataContext }}>

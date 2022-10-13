@@ -25,6 +25,7 @@ export const TaskLibrary = (props) => {
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
+    const [checkedList, setCheckedList] = useState([])
 
     const Canvas = () => {
         if (rightImage !== '' && leftImage !== '') {
@@ -42,31 +43,44 @@ export const TaskLibrary = (props) => {
 
     }
     const RequstHistoryTable = () => {
-        const onHandleGetPairClick = async (taskId, groupId, jobId) => {
-            console.log("onHandleGetPairClick ", taskId, groupId, jobId)
+        const onHandleTryClick = async (category, taskId, groupId, jobId) => {
+            console.log("onHandleGetPairClick ", category, taskId, groupId, jobId)
             let response = null;
 
-            try {
-                response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${jobId}`);
-            } catch (err) {
-                console.log(err);
-                return;
+            if (category === 'CALCULATE') {
+                try {
+                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${jobId}`);
+                } catch (err) {
+                    console.log(err);
+                    return;
+                }
+
+                const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskId + '/';
+
+                if (response && response.data.status === 0) {
+                    const imageUrlFirst = imageUrl + response.data.first_image;
+                    const imageUrlSecond = imageUrl + response.data.second_image;
+                    console.log(imageUrlFirst)
+                    console.log(imageUrlSecond)
+                    setLeftImage(imageUrlFirst);
+                    setRightImage(imageUrlSecond);
+                    setCanvasJob([jobId, taskId, groupId])
+                } else {
+                    return;
+                }
+            } else if (category === 'GENERATE') {
+
             }
+        }
 
-            const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskId + '/';
-
-            if (response && response.data.status === 0) {
-                const imageUrlFirst = imageUrl + response.data.first_image;
-                const imageUrlSecond = imageUrl + response.data.second_image;
-                console.log(imageUrlFirst)
-                console.log(imageUrlSecond)
-                setLeftImage(imageUrlFirst);
-                setRightImage(imageUrlSecond);
-                setCanvasJob([jobId, taskId, groupId])
-            } else {
-                return;
+        const onCheckedElement = (checked, item) => {
+            console.log("onchekced element ", checked);
+            if (checked) {
+                setCheckedList([...checkedList, item]);
+            } else if (!checked) {
+                setCheckedList(checkedList.filter(el => el !== item));
             }
-
+            console.log("onChecked Element : ", checkedList);
         }
 
         if (requestHistoryloaded == true) {
@@ -80,14 +94,22 @@ export const TaskLibrary = (props) => {
                         <td>{req.job_status}</td>
                         <td>{req.job_result}</td>
                         <td>{req.job_message}</td>
-                        <td><Button size="sm"
-                            as="input"
-                            type='button'
-                            value={req.request_category === 'CALCULATE' ? 'Pair' : 'Result'}
-                            onClick={() => onHandleGetPairClick(req.task_id, req.group_id, req.job_id)}
-                            style={{ width: '65px' }}
-                            disabled={req.job_status !== 100 || req.job_result < 0}>
-                        </Button></td>
+                        <td hidden={req.request_category !== 'CALCULATE'}>
+                            <Button size="sm"
+                                as="input"
+                                type='button'
+                                value='Pair'
+                                onClick={() => onHandleTryClick(req.request_category, req.task_id, req.group_id, req.job_id)}
+                                style={{ width: '65px' }}
+                                disabled={req.job_status !== 100 || req.job_result < 0}
+                            >
+                            </Button>
+                        </td>
+                        <td hidden={req.request_category !== 'GENERATE'} >
+                            <InputGroup.Checkbox
+                                onChange={(e) => onCheckedElement(e.target.checked, req.group_id)}
+                                checked={checkedList.includes(req.group_id) ? true : false} />
+                        </td>
                     </tr >
                 )
                 ));
@@ -186,6 +208,11 @@ export const TaskLibrary = (props) => {
         }
     }
 
+    const downloadResult = () => {
+        // saveAs(downloadInfo.url, downloadInfo.name);
+        // setIsSubmitted(false)
+        console.log("download result clicked ", checkedList);
+    }
     const today = new Date();
     let fromdate = new Date()
     fromdate.setDate(today.getDate() - 7);
@@ -236,6 +263,19 @@ export const TaskLibrary = (props) => {
                         <RequstHistoryTable ></RequstHistoryTable>
                     </tbody>
                 </Table>
+                <div id="button-row-down" >
+                    <Button
+                        size="sm"
+                        variant="primary"
+                        className="item-btn-wrapper"
+                        id='result'
+                        as="input"
+                        type='button'
+                        value="DownLoad"
+                        onClick={downloadResult}
+                        disabled={checkedList.length === 0}>
+                    </Button>
+                </div>
             </div>
             <div id='table-container3'
                 hidden={requestGrouploaded === false}>
