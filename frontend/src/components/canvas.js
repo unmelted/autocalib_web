@@ -6,7 +6,7 @@ import Button from 'react-bootstrap/Button'
 import '../css/canvas.css';
 import { TableDataContext } from './task.js';
 
-export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) => {
+export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupId }) => {
     const canvasLeftRef = useRef(null);
     const canvasRightRef = useRef(null);
     const leftImageRef = useRef(null);
@@ -19,7 +19,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
     const targetPoint2D = useRef({ left: [], right: [] })
     const targetPoint3D = useRef({ left: [], right: [] })
 
-    const { groupInfo, changeTableDataContext } = useContext(TableDataContext);
+    const { groupTable, changeTableDataContext } = useContext(TableDataContext);
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
@@ -349,8 +349,10 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId }) =>
                 // const downloadUrl = process.env.REACT_APP_SERVER_IMAGE_URL + taskPath + '/' + fileName;
                 // setDownloadInfo({ url: downloadUrl, name: fileName });
                 setIsSubmitCompleted(true);
-                changeTableDataContext('addgenid', [groupId, response.data.job_id])
-                changeTableDataContext('changegenmsg', [groupId, `Genenerate pts - ${response.data.job_id} is requested.`])
+                if (enter === 'task') {
+                    changeTableDataContext('addgenid', [groupId, response.data.job_id])
+                    changeTableDataContext('changegenmsg', [groupId, `Genenerate pts - ${response.data.job_id} is requested.`])
+                }
             }
         }
     }

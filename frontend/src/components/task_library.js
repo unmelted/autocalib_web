@@ -5,11 +5,13 @@ import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
 import '../css/task_library.css';
 import pin from '../asset/pin.png';
+import refresh from '../asset/refresh.png';
 import { TaskGroupTable } from './task.js'
+import { TableDataContext } from './task.js';
 import { PairCanvas } from './canvas.js'
 
 export const TaskLibrary = (props) => {
-    // const { groupInfo, changeTableData } = useContext(TableDataContext);
+    // const { groupTable, changeTableDataContext } = useContext(TableDataContext);
 
     const [tasks, setTasks] = useState('')
     const [loaded, setLoaded] = useState(false)
@@ -33,7 +35,7 @@ export const TaskLibrary = (props) => {
             console.log("Canvas is called 2 : " + canvasJob)
             return (
                 <>
-                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
+                    <PairCanvas enter={'library'} leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
                 </>)
 
         }
@@ -42,8 +44,34 @@ export const TaskLibrary = (props) => {
         }
 
     }
+
+    const getRequestHistory = async (taskId) => {
+        console.log("onHandleRequest buttoin click", taskId);
+        let response = null;
+
+        try {
+            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getrequest/${taskId}`);
+        } catch (err) {
+            console.log(err);
+            const strmsg = `${taskId}, No request.`
+            setRequestTaskIdMessage(strmsg)
+            setRequestHistoryLoaded(false)
+
+            return
+        }
+
+        if (response && response.data.request_array) {
+            setRequestHistory(response.data.request_array)
+            setRequestHistoryLoaded(true)
+            setRequestGroupLoaded(false)
+            const count = response.data.request_array.length
+            const strmsg = `${taskId}, ${count} request.`
+            setRequestTaskIdMessage(strmsg)
+        }
+    }
+
     const RequstHistoryTable = () => {
-        const onHandleTryClick = async (category, taskId, groupId, jobId) => {
+        const onHandlePairClick = async (category, taskId, groupId, jobId) => {
             console.log("onHandleGetPairClick ", category, taskId, groupId, jobId)
             let response = null;
 
@@ -99,7 +127,7 @@ export const TaskLibrary = (props) => {
                                 as="input"
                                 type='button'
                                 value='Pair'
-                                onClick={() => onHandleTryClick(req.request_category, req.task_id, req.group_id, req.job_id)}
+                                onClick={() => onHandlePairClick(req.request_category, req.task_id, req.group_id, req.job_id)}
                                 style={{ width: '65px' }}
                                 disabled={req.job_status !== 100 || req.job_result < 0}
                             >
@@ -107,8 +135,8 @@ export const TaskLibrary = (props) => {
                         </td>
                         <td hidden={req.request_category !== 'GENERATE'} >
                             <InputGroup.Checkbox
-                                onChange={(e) => onCheckedElement(e.target.checked, req.group_id)}
-                                checked={checkedList.includes(req.group_id) ? true : false} />
+                                onChange={(e) => onCheckedElement(e.target.checked, req.request_id)}
+                                checked={checkedList.includes(req.request_id) ? true : false} />
                         </td>
                     </tr >
                 )
@@ -124,28 +152,31 @@ export const TaskLibrary = (props) => {
     const TaskHistoryTable = ({ tasks }) => {
         const onHandleHistoryClick = async (taskId) => {
             console.log("onHandleRequest buttoin click", taskId);
-            let response = null;
+            setTaskId(taskId);
+            getRequestHistory(taskId);
 
-            try {
-                response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getrequest/${taskId}`);
-            } catch (err) {
-                console.log(err);
-                const strmsg = `${taskId}, No request.`
-                setRequestTaskIdMessage(strmsg)
-                setRequestHistoryLoaded(false)
+            // let response = null;
 
-                return
-            }
+            // try {
+            //     response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getrequest/${taskId}`);
+            // } catch (err) {
+            //     console.log(err);
+            //     const strmsg = `${taskId}, No request.`
+            //     setRequestTaskIdMessage(strmsg)
+            //     setRequestHistoryLoaded(false)
 
-            if (response && response.data.request_array) {
-                setRequestHistory(response.data.request_array)
-                setRequestHistoryLoaded(true)
-                setRequestGroupLoaded(false)
-                const count = response.data.request_array.length
-                const strmsg = `${taskId}, ${count} request.`
-                setRequestTaskIdMessage(strmsg)
+            //     return
+            // }
 
-            }
+            // if (response && response.data.request_array) {
+            //     setRequestHistory(response.data.request_array)
+            //     setRequestHistoryLoaded(true)
+            //     setRequestGroupLoaded(false)
+            //     const count = response.data.request_array.length
+            //     const strmsg = `${taskId}, ${count} request.`
+            //     setRequestTaskIdMessage(strmsg)
+
+            // }
         }
 
         const onHandleRequestClick = async (taskId, task_path) => {
@@ -226,7 +257,7 @@ export const TaskLibrary = (props) => {
 
     return (
         <>
-            <p id="task-title" ><img src={pin} width="20px" alt="" /> Task Lists : {daterange}</p>
+            <p id="task-title" ><img src={pin} width="20px" alt="" />  Task Lists : {daterange}</p>
             <div className='table-container1'>
                 <Table striped bordered variant="dark">
                     <thead>
@@ -244,9 +275,10 @@ export const TaskLibrary = (props) => {
                 </Table>
             </div>
             <p id="task-title2" hidden={!requestHistoryloaded}>
-                <img src={pin} width="20px" alt="" /> Task ID : {requestTaskIdMessage}</p>
+                <img src={pin} width="20px" alt="" />  Task ID : {requestTaskIdMessage} {'   '}
+                <img src={refresh} width="20px" alt="" onClick={() => getRequestHistory(taskId)} /> </p>
             <div className='table-container2' hidden={!requestHistoryloaded}>
-                <Table trsipped boardered variant="dark" >
+                <Table stripped boardered variant="dark" >
                     <thead>
                         <tr>
                             <th>Request Id</th>
@@ -273,6 +305,7 @@ export const TaskLibrary = (props) => {
                         type='button'
                         value="DownLoad"
                         onClick={downloadResult}
+                        hidden={requestHistory.length <= 1}
                         disabled={checkedList.length === 0}>
                     </Button>
                 </div>

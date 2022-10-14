@@ -24,6 +24,7 @@ const initItems = {
 export const TaskGroupTable = ({ taskId, taskPath }) => {
     console.log("Task Group Table ", taskId, taskPath);
     const CAL_STATE = {
+        ERR: -1,
         READY: 0,
         START: 1,
         COMPLETE: 2,
@@ -46,15 +47,28 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     const changeTableDataContext = (type, param) => {
         console.log("changeTableContext", type, param);
         if (type === 'init') {
+            // groupTable = {};
             for (const g of param[0]) {
-                groupTable[g.group_id].name = g.group_id;
-                groupTable[g.group_id].no = g.no;
-                groupTable[g.group_id].cam_count = g.cam_count;
-                groupTable[g.group_id].status = CAL_STATE.READY;
-                groupTable[g.group_id].job_id = 0;
-                groupTable[g.group_id].status_msg = '';
-                groupTable[g.group_id].gen_id = 0;
-                groupTable[g.group_id].gen_msg = '';
+                console.log("inner loop : ", g)
+                let tempval = {}
+                tempval.name = g.group_id;
+                tempval.no = g.no;
+                tempval.cam_count = g.cam_count;
+                tempval.status = CAL_STATE.READY;
+                tempval.job_id = 0;
+                tempval.status_msg = '';
+                tempval.gen_id = 0;
+                tempval.gen_msg = '';
+
+                groupTable[g.group_id] = tempval;
+                // groupTable[g.group_id].name = g.group_id;
+                // groupTable[g.group_id].no = g.no;
+                // groupTable[g.group_id].cam_count = g.cam_count;
+                // groupTable[g.group_id].status = CAL_STATE.READY;
+                // groupTable[g.group_id].job_id = 0;
+                // groupTable[g.group_id].status_msg = '';
+                // groupTable[g.group_id].gen_id = 0;
+                // groupTable[g.group_id].gen_msg = '';
             }
         } else if (type === 'changestatus') {
             groupTable[param[0]].status = param[1]
@@ -78,7 +92,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             console.log("Canvas is called 2 : " + canvasJob)
             return (
                 <>
-                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
+                    <PairCanvas enter={'task'} leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
                 </>)
 
         }
@@ -150,6 +164,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     }
                 } else {
                     strmsg = ` ${jobId} Processing .. ${response.data.percent}%`;
+                    setCalState(CAL_STATE.ERR);
                 }
 
                 setStatusMessage(strmsg)
@@ -270,6 +285,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
             }
 
+            console.log(" moment draw taskrow generate ", calState);
             return (
                 <>
                     <Button size="sm"
@@ -299,12 +315,12 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 }
                 console.log("onChecked Element : ", checkedList);
             }
-
+            console.log(" moment draw taskrow result ", calState);
             return (
                 <div>
-                    <InputGroup.Checkbox hidden={groupTable[keyindex].cam_count < 5}
-                        onChange={(e) => onCheckedElement(e.target.checked, keyindex)}
-                        checked={checkedList.includes(keyindex) ? true : false} />
+                    <InputGroup.Checkbox disabled={groupTable[keyindex].cam_count < 5 || calState !== CAL_STATE.PAIR_COMPLETE}
+                        onChange={(e) => onCheckedElement(e.target.checked, groupTable[keyindex].no)}
+                        checked={checkedList.includes(groupTable[keyindex].no) ? true : false} />
                 </div >
             )
         }
@@ -417,7 +433,8 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                             as="input"
                             type='button'
                             value="DownLoad"
-                            onClick={downloadResult}>
+                            onClick={downloadResult}
+                            disabled={checkedList.length === 0}>
                         </Button>
                     </div>
                 </div>

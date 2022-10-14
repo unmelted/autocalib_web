@@ -47,7 +47,33 @@ router.get('/getrequest/:task_id', async (req, res) => {
 
     try {
         result = await handler.selectRequestbyTaskId(req.params.task_id);
-        console.log("get request  : " + result[0].request_id)
+        console.log("get request  : " + result[0].job_id)
+
+        for (const row of result) {
+            const options = {
+                uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/status/' + row.job_id,
+                method: 'GET',
+                json: true
+            }
+
+            console.log("Call Exodus API // request : " + options.uri);
+            request.get(options, async function (err, response, body) {
+                if (!err) {
+                    console.log("Response: " + JSON.stringify(body));
+                    result2 = await handler.updateTaskRequest([body.status, body.result !== null ? body.result : '', body.message, row.job_id], false);
+                    console.log(" request // updateTask for status is done ");
+
+                } else {
+                    console.log(err)
+                    res.status(500).json({})
+                }
+            });
+
+        }
+
+        result = await handler.selectRequestbyTaskId(req.params.task_id);
+        console.log("get request again : " + result[0].job_id)
+
         res.status(200).json({
             message: 'success',
             request_array: result,

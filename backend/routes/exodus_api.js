@@ -63,7 +63,7 @@ router.get('/calculate/status/:job_id', (req, res) => {
         result: body.result,
         percent: body.status,
         job_id: body.job_id,
-        message: body.messae
+        message: body.message
       });
 
       result = await handler.updateTaskRequest([body.status, body.result !== null ? body.result : '', body.message, req.params.job_id], false);
