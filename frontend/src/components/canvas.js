@@ -4,9 +4,10 @@ import axios from 'axios';
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import '../css/canvas.css';
-import { TableDataContext } from './task.js';
+// import { TableDataContext } from './task.js';
+import { HistoryDataContext } from './task_library.js';
 
-export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupId }) => {
+export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupId, changeHandle }) => {
     const canvasLeftRef = useRef(null);
     const canvasRightRef = useRef(null);
     const leftImageRef = useRef(null);
@@ -19,7 +20,8 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const targetPoint2D = useRef({ left: [], right: [] })
     const targetPoint3D = useRef({ left: [], right: [] })
 
-    const { groupTable, changeTableDataContext } = useContext(TableDataContext);
+    // const { groupTable, changeTableDataContext } = useContext(TableDataContext);
+    // const { historyData, changeHistoryDataContext } = useContext(HistoryDataContext);
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
@@ -349,10 +351,11 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                 // const downloadUrl = process.env.REACT_APP_SERVER_IMAGE_URL + taskPath + '/' + fileName;
                 // setDownloadInfo({ url: downloadUrl, name: fileName });
                 setIsSubmitCompleted(true);
-                if (enter === 'task') {
-                    changeTableDataContext('addgenid', [groupId, response.data.job_id])
-                    changeTableDataContext('changegenmsg', [groupId, `Genenerate pts - ${response.data.job_id} is requested.`])
-                }
+                changeHandle('addgenid', [groupId, response.data.job_id])
+                changeHandle('changegenmsg', [groupId, `Genenerate pts - ${response.data.job_id} is requested.`])
+                // changeTableDataContext('addgenid', [groupId, response.data.job_id])
+                // changeTableDataContext('changegenmsg', [groupId, `Genenerate pts - ${response.data.job_id} is requested.`])
+
             }
         }
     }

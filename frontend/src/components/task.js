@@ -7,7 +7,7 @@ import Table from 'react-bootstrap/Table';
 import '../css/task.css';
 import { PairCanvas } from './canvas.js'
 
-export const TableDataContext = createContext();
+// export const TableDataContext = createContext();
 const initItems = {
     'Group1': {
         no: 0,
@@ -80,19 +80,28 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         } else if (type === 'addgenid') {
             groupTable[param[0]].gen_id = param[1]
             groupTable[param[0]].status = CAL_STATE.SUBMIT
+            setLeftImage('')
+            setRightImage('')
+
         } else if (type === 'changegenmsg') {
             groupTable[param[0]].gen_msg = param[1]
             setRefresh(refresh + 1)
         }
 
     }
+
+    const changeGenData = (type, param) => {
+        console.log('changeGenData', type, param)
+        changeTableDataContext(type, param);
+    }
+
     const Canvas = () => {
         if (rightImage !== '' && leftImage !== '') {
             console.log("Canvas is called 1 : " + rightImage)
             console.log("Canvas is called 2 : " + canvasJob)
             return (
                 <>
-                    <PairCanvas enter={'task'} leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
+                    <PairCanvas enter={'task'} leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]} changeHandle={changeGenData}></PairCanvas>
                 </>)
 
         }
@@ -439,9 +448,9 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     </div>
                 </div>
                 <div className='canvas-container'>
-                    <TableDataContext.Provider value={{ groupTable, changeTableDataContext }}>
-                        <Canvas></Canvas>
-                    </TableDataContext.Provider>
+                    {/* <TableDataContext.Provider value={{ groupTable, changeTableDataContext }}> */}
+                    <Canvas></Canvas>
+                    {/* </TableDataContext.Provider> */}
                 </div>
             </Fragment >
         )

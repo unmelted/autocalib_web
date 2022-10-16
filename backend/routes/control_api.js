@@ -104,5 +104,16 @@ router.get('/groupinfo/:task_id', async (req, res) => {
     }
 });
 
+router.get('/getresult', async (req, res) => {
+
+    console.log('router getresult ', req.body)
+
+    // try {
+
+    // } catch (err) {
+
+    // }
+});
+
 
 module.exports = router;

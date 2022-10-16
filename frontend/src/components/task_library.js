@@ -1,4 +1,4 @@
-import React, { useState, useEffect, Fragment, useContext } from 'react';
+import React, { useState, useEffect, Fragment, createContext } from 'react';
 import axios from 'axios';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
@@ -7,14 +7,27 @@ import '../css/task_library.css';
 import pin from '../asset/pin.png';
 import refresh from '../asset/refresh.png';
 import { TaskGroupTable } from './task.js'
-import { TableDataContext } from './task.js';
 import { PairCanvas } from './canvas.js'
 
-export const TaskLibrary = (props) => {
-    // const { groupTable, changeTableDataContext } = useContext(TableDataContext);
+// export const HistoryDataContext = createContext();
+// const initItems = {
+//     '47': {
+//         category: 'calculate',
+//         group_id: 'Group1',
+//         status: 0,
+//         job_id: 0,
+//         result: 0,
+//         message: '',
+//         gen_id: 0,
+//         gen_msg: '',
+//     }
+// }
 
-    const [tasks, setTasks] = useState('')
-    const [loaded, setLoaded] = useState(false)
+export const TaskLibrary = (props) => {
+    // const [historyData, setHistoryData] = useState(initItems);
+
+    const [tasks, setTasks] = useState('');
+    const [loaded, setLoaded] = useState(false);
 
     const [taskId, setTaskId] = useState('');
     const [taskPath, setTaskPath] = useState('');
@@ -29,13 +42,28 @@ export const TaskLibrary = (props) => {
     const [canvasJob, setCanvasJob] = useState('')
     const [checkedList, setCheckedList] = useState([])
 
+    const changeHandle = (type, param) => {
+        console.log('change handle is called', type, param)
+        if (type === 'init') {
+            console.log('init param ..', param)
+
+        } else if (type === 'addgenid') {
+            console.log('addgen id ', param)
+            setLeftImage('')
+            setRightImage('')
+
+        } else if (type === 'changegenmsg') {
+            console.log('no use.. chagne gen mesage..');
+        }
+    }
+
     const Canvas = () => {
         if (rightImage !== '' && leftImage !== '') {
             console.log("Canvas is called 1 : " + rightImage)
             console.log("Canvas is called 2 : " + canvasJob)
             return (
                 <>
-                    <PairCanvas enter={'library'} leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]}></PairCanvas>
+                    <PairCanvas enter={'library'} leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]} changeHandle={changeHandle}></PairCanvas>
                 </>)
 
         }
@@ -133,7 +161,8 @@ export const TaskLibrary = (props) => {
                             >
                             </Button>
                         </td>
-                        <td hidden={req.request_category !== 'GENERATE'} >
+                        <td hidden={req.request_category !== 'GENERATE'}
+                            disabled={req.job_status !== 100 || req.job_result < 0}>
                             <InputGroup.Checkbox
                                 onChange={(e) => onCheckedElement(e.target.checked, req.request_id)}
                                 checked={checkedList.includes(req.request_id) ? true : false} />
@@ -154,29 +183,6 @@ export const TaskLibrary = (props) => {
             console.log("onHandleRequest buttoin click", taskId);
             setTaskId(taskId);
             getRequestHistory(taskId);
-
-            // let response = null;
-
-            // try {
-            //     response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getrequest/${taskId}`);
-            // } catch (err) {
-            //     console.log(err);
-            //     const strmsg = `${taskId}, No request.`
-            //     setRequestTaskIdMessage(strmsg)
-            //     setRequestHistoryLoaded(false)
-
-            //     return
-            // }
-
-            // if (response && response.data.request_array) {
-            //     setRequestHistory(response.data.request_array)
-            //     setRequestHistoryLoaded(true)
-            //     setRequestGroupLoaded(false)
-            //     const count = response.data.request_array.length
-            //     const strmsg = `${taskId}, ${count} request.`
-            //     setRequestTaskIdMessage(strmsg)
-
-            // }
         }
 
         const onHandleRequestClick = async (taskId, task_path) => {
@@ -239,11 +245,24 @@ export const TaskLibrary = (props) => {
         }
     }
 
-    const downloadResult = () => {
+    const downloadResult = async () => {
         // saveAs(downloadInfo.url, downloadInfo.name);
         // setIsSubmitted(false)
-        console.log("download result clicked ", checkedList);
+        console.log('download result click checked : ', checkedList)
+        const data = {
+            request_ids: checkedList,
+        }
+
+        let response = null;
+        try {
+            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getresult`, data)
+        }
+        catch (err) {
+            console.log('get result err ', err)
+        }
     }
+
+
     const today = new Date();
     let fromdate = new Date()
     fromdate.setDate(today.getDate() - 7);
@@ -275,7 +294,7 @@ export const TaskLibrary = (props) => {
                 </Table>
             </div>
             <p id="task-title2" hidden={!requestHistoryloaded}>
-                <img src={pin} width="20px" alt="" />  Task ID : {requestTaskIdMessage} {'   '}
+                <img src={pin} width="20px" alt="" />  Task ID : {requestTaskIdMessage} {'  '}
                 <img src={refresh} width="20px" alt="" onClick={() => getRequestHistory(taskId)} /> </p>
             <div className='table-container2' hidden={!requestHistoryloaded}>
                 <Table stripped boardered variant="dark" >
