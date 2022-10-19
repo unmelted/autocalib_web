@@ -1,5 +1,6 @@
-import React, { useState, Fragment, useEffect, createContext } from 'react';
+import React, { useState, Fragment, useEffect } from 'react';
 import axios from 'axios';
+import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import { getGroupInfo } from './util.js'
@@ -7,7 +8,6 @@ import Table from 'react-bootstrap/Table';
 import '../css/task.css';
 import { PairCanvas } from './canvas.js'
 
-// export const TableDataContext = createContext();
 const initItems = {
     'Group1': {
         no: 0,
@@ -43,6 +43,8 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
     const [checkedList, setCheckedList] = useState([])
+
+    const [calState, setCalState] = useState(CAL_STATE.READY)
 
     const changeTableDataContext = (type, param) => {
         console.log("changeTableContext", type, param);
@@ -93,6 +95,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     const changeGenData = (type, param) => {
         console.log('changeGenData', type, param)
         changeTableDataContext(type, param);
+        setCalState(CAL_STATE.SUBMIT)
     }
 
     const Canvas = () => {
@@ -114,7 +117,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         console.log("taskRow start.. ", keyindex)
         const [jobId, setJobId] = useState('')
         const [requestId, setRequestId] = useState('')
-        const [calState, setCalState] = useState(CAL_STATE.READY)
+        // const [calState, setCalState] = useState(CAL_STATE.READY)
         const [statusMessage, setStatusMessage] = useState('')
         const [genMessage, setGenMessage] = useState('')
 
@@ -368,10 +371,23 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             ));
     };
 
-    const downloadResult = () => {
-        // saveAs(downloadInfo.url, downloadInfo.name);
-        // setIsSubmitted(false)
-        console.log("download result clicked ", checkedList);
+    const downloadResult = async () => {
+        console.log('download result click checked : ', checkedList)
+        let savefile_name = 'UserPointData_2022_1018_task.pts'
+        const data = {
+            request_ids: checkedList,
+        }
+
+        let response = null;
+        try {
+            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getresult`, data)
+        }
+        catch (err) {
+            console.log('get result err ', err)
+        }
+
+        saveAs(response.data.download_url, savefile_name);
+
     }
 
     const getGroup = async (taskId) => {

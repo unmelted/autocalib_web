@@ -74,7 +74,7 @@ router.post('/upload', async (req, res, next) => {
   result = await taskManager.parsingGroupInfo(taskId, fullPath)
 
   console.log("parsing gourp info result  : ", result);
-  if (result == 0) {
+  if (result === 0) {
     console.log("end parsing groupinfo")
     res.send({
       status: 0,

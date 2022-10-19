@@ -107,8 +107,14 @@ exports.parsingGroupInfo = async function (taskId, fullPath) {
                     resolve(-1)
                 }
 
-                obj = JSON.parse(data)
-                console.log(Object.keys(obj.points).length)
+                try {
+                    obj = JSON.parse(data)
+                    console.log(Object.keys(obj.points).length)
+                } catch (err) {
+                    console.log('parsing json err ', err)
+                    reject(-1)
+                }
+
                 for (let i = 0; i < Object.keys(obj.points).length; i++) {
                     if (Object.keys(group).indexOf(obj.points[i].Group) !== -1) {
                         group[obj.points[i].Group].push(obj.points[i].dsc_id)
@@ -129,4 +135,63 @@ exports.parsingGroupInfo = async function (taskId, fullPath) {
             });
         });
     });
+}
+
+exports.createResultfile = async function (request_ids, result_json) {
+    console.log('create result file ')
+    let content = '';
+    let ptsfile = '';
+    const fullPath = await handler.getFullPath(request_ids[0])
+
+    return new Promise((resolve, reject) => {
+        fs.readdir(fullPath, function (err, filelist) {
+
+            for (const file of filelist) {
+                const ext = file.split('.');
+                if (ext[1].toLowerCase() == 'pts') {
+                    ptsfile = file;
+                    break;
+                }
+            }
+            console.log("selected pts file : " + ptsfile)
+
+            if (ptsfile == '') {
+                reject(-1)
+            }
+
+            pts = fullPath + ptsfile;
+            console.log("parsing  : " + pts)
+            fs.readFile(pts, 'utf-8', function (err, data) {
+                if (err) {
+                    reject(-1)
+                }
+
+                obj = JSON.parse(data)
+                console.log(Object.keys(obj.points).length)
+                content = obj; //copy
+                content.points = []; //init
+                console.log('process check.. contents ', content)
+
+                for (let a = 0; a < request_ids.length; a++) {
+                    for (let i = 0; i < result_json[a].points.length; i++) {
+                        content.points.push(result_json[a].points[i])
+                    }
+                }
+                console.log('assemble contents.. ', content);
+                // const newPath = fullPath + `UserPointData_${request_ids[0]}.pts`; //local test
+                const newPath = '/Users/4dreplay/work/sfm_python/test_pts/' + `UserPointData_${request_ids[0]}.pts`;
+                const newFile = `UserPointData_${request_ids[0]}.pts`;
+                console.log('before file write', newFile)
+                fs.writeFileSync(newPath, JSON.stringify(content), 'utf8', err => {
+                    if (err) {
+                        console.log('fs write file err : ', err)
+                        reject(-10)
+                    }
+                });
+                console.log("end create result file ..")
+                resolve([newPath, newFile])
+            });
+        });
+    });
+
 }

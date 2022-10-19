@@ -6,9 +6,6 @@ const request = require('request');
 const path = require("path");
 var handler = require('../db/handler.js')
 
-// Test Progress
-let counter = 0;
-
 router.post('/calculate', async (req, res, next) => {
   // Exodus API: Call 7.1.1	POST /exodus/autocalib
   const fullPath = path.join(process.env.AUTO_CALIB_DIR_SEND, req.body.task_id)
@@ -165,17 +162,41 @@ router.post('/generate/:job_id', (req, res, next) => {
     }
   });
 
-  // res.status(200).json({
-  //   status: 0, // 0: success, other-error code
-  //   filename: 'UserPointData_0.pts',
-  //   download_url: 'http://localhost:4000/public/images/UserPointData_0.pts',
-  //   message: "success" // 결과 메시지, eg. “SUCCCESS”
-  // });
 });
 
-router.post('/loadtask/:task_id', (req, res, next) => {
-  taskId = req.body.taskId
+router.get('/getresult/:job_id', (req, res) => {
+  //function getResult(job_id) {
+  // Exodus API: 7.1.3	GET /exodus/autocalib/getresult/{job_id}
+  let result = {}
+  const options = {
+    uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/getresult/' + req.params.job_id,
+    method: 'GET',
+    json: true
+  }
 
+  console.log("Call Exodus API: " + options.uri);
+  request.get(options, async function (err, response, body) {
+    if (!err) {
+      // console.log("Response: " + JSON.stringify(body));
+      console.log('detail .. ', body.job_id, body.result)
+      // result['job_id'] = body.job_id;
+      // result['result'] = body.result;
+      // result['message'] = body.message;
+      // result['contents'] = body.contents;
+      // console.log('get result from exodus api is end .. ', result['job_id'])
+      res.status(200).json({
+        job_id: body.job_id,
+        result: body.result,
+        message: body.message,
+        contents: body.contents
+      });
+    } else {
+      console.log(err)
+      result.result = -1;
+    }
+  });
+
+  return result;
 });
 
 module.exports = router;

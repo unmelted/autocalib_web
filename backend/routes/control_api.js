@@ -3,9 +3,11 @@ let express = require('express'),
     multer = require('multer'),
     router = express.Router();
 const request = require('request');
+const axios = require('axios');
 const path = require("path");
-var handler = require('../db/handler.js')
-
+const handler = require('../db/handler.js')
+const taskManager = require('../control/task.js');
+const { response } = require("../app.js");
 
 router.post('/addalias', async (req, res) => {
 
@@ -104,16 +106,47 @@ router.get('/groupinfo/:task_id', async (req, res) => {
     }
 });
 
-router.get('/getresult', async (req, res) => {
+router.post('/getresult', async (req, res) => {
 
     console.log('router getresult ', req.body)
+    let result_json = []
+    let response = null
+    jobs = await handler.getGenJobId(req.body.request_ids)
 
-    // try {
+    for await (const job of jobs) {
+        // const result = await exodus.getResult(job.job_id)
+        try {
+            console.log("get result job : ", job.job_id)
+            response = await axios.get(`http://localhost:4000/api/getresult/${job.job_id}`);
+        } catch (err) {
+            console.log(err);
+            return;
+        }
 
-    // } catch (err) {
+        if (response && response.data.result === 0) {
+            console.log('correct response')
+            result_json.push(response.data.contents)
+        }
+    }
 
-    // }
+    try {
+        [filepath, filename] = await taskManager.createResultfile(req.body.request_ids, result_json);
+        res.status(200).json({
+            status: 0, // 0: success, other-error code
+            filename: filename,
+            download_url: filepath, //'http://localhost:4000/public/images/UserPointData_0.pts',
+            message: "success" // 결과 메시지, eg. “SUCCCESS”
+        });
+    } catch (err) {
+        res.status(500).json({
+            status: -1,
+            filename: '',
+            download_url: '',
+            message: "fail"
+        });
+
+    }
+
 });
-
 
 module.exports = router;

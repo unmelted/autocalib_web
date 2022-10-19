@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import '../css/autocalib.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
-import { TableDataContext } from '../App.js';
-import { getTotalFileSize, getFileExt, isValidFile, isValidImage, getGroupInfo } from './util.js'
+import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
 import { TaskGroupTable } from './task.js'
 
 

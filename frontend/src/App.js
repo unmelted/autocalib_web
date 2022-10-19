@@ -1,4 +1,4 @@
-import React, { useState, createContext } from 'react';
+import React, { useState } from 'react';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -12,31 +12,10 @@ import search from './asset/search.png';
 import help from './asset/help.png';
 import alien from './asset/alien.png';
 
-export const TableDataContext = createContext();
-const initial =
-  [
-    {
-      'group_id': 'Group1',
-      'cam_count': 0,
-      'no': 102,
-      'status': 'None',
-      'job_id': 2067,
-      'gen_job_id': 2030
-    },
-    {
-      'group_id': 'Group2',
-      'cam_count': 0,
-      'no': 103,
-      'status': 'None',
-      'job_id': 2068,
-      'gen_job_id': 2030
-    }
-  ];
 
 function App(props) {
   const [state, setState] = useState('')
   const [isHover, setIsHover] = useState('')
-  const [groupInfo, setGroupInfo] = useState(initial);
 
   // const changeTableData = async (type, params) => {
   //   console.log('chage table data : ', type, params)

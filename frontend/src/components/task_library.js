@@ -1,5 +1,6 @@
-import React, { useState, useEffect, Fragment, createContext } from 'react';
+import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
@@ -9,22 +10,7 @@ import refresh from '../asset/refresh.png';
 import { TaskGroupTable } from './task.js'
 import { PairCanvas } from './canvas.js'
 
-// export const HistoryDataContext = createContext();
-// const initItems = {
-//     '47': {
-//         category: 'calculate',
-//         group_id: 'Group1',
-//         status: 0,
-//         job_id: 0,
-//         result: 0,
-//         message: '',
-//         gen_id: 0,
-//         gen_msg: '',
-//     }
-// }
-
 export const TaskLibrary = (props) => {
-    // const [historyData, setHistoryData] = useState(initItems);
 
     const [tasks, setTasks] = useState('');
     const [loaded, setLoaded] = useState(false);
@@ -139,7 +125,7 @@ export const TaskLibrary = (props) => {
             console.log("onChecked Element : ", checkedList);
         }
 
-        if (requestHistoryloaded == true) {
+        if (requestHistoryloaded === true) {
             return (
                 requestHistory.map((req =>
                     <tr key={req.request_id} >
@@ -193,7 +179,7 @@ export const TaskLibrary = (props) => {
             setRequestHistoryLoaded(false)
         }
 
-        if (loaded == true) {
+        if (loaded === true) {
             return (
                 tasks.map((task =>
                     <tr key={task.task_no} >
@@ -208,7 +194,7 @@ export const TaskLibrary = (props) => {
                             value='History'
                             onClick={() => onHandleHistoryClick(task.task_id)}
                             style={{ width: '80px' }}
-                            hidden={task.count == 0}>
+                            hidden={task.count === 0}>
                         </Button>{' '}
                             <Button size='sm'
                                 as='input'
@@ -246,8 +232,7 @@ export const TaskLibrary = (props) => {
     }
 
     const downloadResult = async () => {
-        // saveAs(downloadInfo.url, downloadInfo.name);
-        // setIsSubmitted(false)
+        let savefile_name = 'UserPointData_2022_1018_history.pts'
         console.log('download result click checked : ', checkedList)
         const data = {
             request_ids: checkedList,
@@ -255,10 +240,15 @@ export const TaskLibrary = (props) => {
 
         let response = null;
         try {
-            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getresult`, data)
+            response = await axios.post(process.env.REACT_APP_SERVER_URL + `/control/getresult`, data)
         }
         catch (err) {
             console.log('get result err ', err)
+        }
+
+        if (response && response.data.status === 0) {
+            console.log(response)
+            saveAs(response.data.download_url, response.data.filename);
         }
     }
 

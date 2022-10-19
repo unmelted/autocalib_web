@@ -307,3 +307,64 @@ exports.selectRequestbyTaskId = function (taskId) {
         });
     });
 }
+
+exports.getGenJobId = function (request_ids) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+
+            db.queryParams(`SELECT job_id FROM task_request WHERE request_id = ANY($1::int[]); `, [request_ids], (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    reject(-1);
+                }
+                else {
+                    if (res.rows.length > 0) {
+                        console.log('get GetJobid query success ' + res.rows);
+                        resolve(res.rows)
+                    }
+                    else {
+                        console.log("get GenJobid query no rows ")
+                        reject(-10)
+                    }
+                }
+            }, client);
+        });
+    });
+}
+
+exports.getFullPath = function (request_id) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+            let genJobId = []
+
+            db.queryParams(`SELECT a.task_path FROM task as a \
+            LEFT OUTER JOIN task_request as b \
+            on a.task_id = b.task_id WHERE b.request_id = $1; `, [request_id], (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    reject(-1);
+                }
+                else {
+                    if (res.rows.length > 0) {
+                        console.log('get full path query success ' + res.rows[0]);
+                        resolve(res.rows[0].task_path)
+                    }
+                    else {
+                        console.log("get fullpath query no rows ")
+                        reject(-10)
+                    }
+                }
+            }, client);
+        });
+    });
+}
