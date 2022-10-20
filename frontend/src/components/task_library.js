@@ -193,7 +193,7 @@ export const TaskLibrary = (props) => {
                             variant='warning'
                             value='History'
                             onClick={() => onHandleHistoryClick(task.task_id)}
-                            style={{ width: '80px' }}
+                            style={{ width: '75px' }}
                             hidden={parseInt(task.count) === 0}>
                         </Button>{' '}
                             <Button size='sm'
@@ -201,8 +201,8 @@ export const TaskLibrary = (props) => {
                                 type='button'
                                 value='Request'
                                 onClick={() => onHandleRequestClick(task.task_id, task.task_path)}
-                                style={{ width: '80px' }}
-                                hidden={parseInt(task.count) > 0}>
+                                style={{ width: '75px' }} >
+                                {/* hidden={parseInt(task.count) > 0}> */}
                             </Button>{' '}
                         </td>
                     </tr >

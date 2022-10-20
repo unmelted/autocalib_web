@@ -49,7 +49,14 @@ exports.createNewTask = async function () {
     console.log("task no " + taskNo)
     let taskId = 0;
     let fullPath = 0;
-    [fullPath, taskId] = getTaskPath(taskNo);
+    try {
+        [fullPath, taskId] = getTaskPath(taskNo);
+    }
+    catch (err) {
+        console.log('create task err : ', err)
+        return [-1, -1, -1]
+    }
+
     console.log("task path : " + taskId)
 
     result = await handler.insertNewTask(taskNo, taskId, fullPath)
@@ -141,8 +148,10 @@ exports.parsingGroupInfo = async function (taskId, fullPath) {
     });
 }
 
-exports.createResultfile = async function (request_ids, result_json) {
+exports.createResultfile = async function (request_ids, result_json, result_group) {
     console.log('create result file ')
+    console.log('result group input : ', result_group)
+
     let content = '';
     let ptsfile = '';
     const fullPath = await handler.getFullPath(request_ids[0])
@@ -172,19 +181,51 @@ exports.createResultfile = async function (request_ids, result_json) {
 
                 obj = JSON.parse(data)
                 console.log(Object.keys(obj.points).length)
-                content = obj; //copy
-                content.points = []; //init
-                console.log('process check.. contents ', content)
 
+                content['RecordName'] = obj.RecordName;
+                content['PreSetNumber'] = obj.PreSetNumber;
+                content['worlds'] = obj.worlds;
+
+                content['points'] = [];
+                console.log('process check.. contents ', content)
+                let temp_array = []
                 for (let a = 0; a < request_ids.length; a++) {
                     for (let i = 0; i < result_json[a].points.length; i++) {
-                        content.points.push(result_json[a].points[i])
+                        temp_array.push(result_json[a].points[i])
                     }
                 }
-                console.log('assemble contents.. ', content);
+
+                for (let n = 0; n < obj.points.length; n++) {
+                    console.log('for enter : ', n, obj.points[n].Group)
+                    let bIn = false
+                    for (let m = 0; m < result_group.length; m++) {
+                        if (obj.points[n].Group === result_group[m]) {
+                            // console.log('skip this cam : ', obj.points[n].Group, obj.points[n].dsc_id)
+                            bIn = true
+                            break;
+                        }
+                    }
+                    if (bIn === false) {
+                        console.log('add this cam : ', obj.points[n].Group, obj.points[n].dsc_id)
+                        temp_array.push(obj.points[n])
+                    }
+                }
+
+                content['points'] = temp_array;
+
                 // const newPath = fullPath + `UserPointData_${request_ids[0]}.pts`; //local test
-                const newPath = '/Users/4dreplay/work/sfm_python/test_pts/' + `UserPointData_${request_ids[0]}.pts`;
-                const newFile = `UserPointData_${request_ids[0]}.pts`;
+                const today = new Date();
+                const date = today.getDate();
+                const month = today.getMonth() + 1;
+                const year = today.getFullYear();
+                const hours = today.getHours();
+                const minutes = today.getMinutes();
+                const seconds = today.getSeconds();
+                const now = year + '_' + month + date + "_" + hours + minutes + seconds;
+                const strnow = String(now)
+
+                const newPath = '/Users/4dreplay/work/sfm_python/test_pts/' + `UserPointData_${request_ids[0]}_${strnow}.pts`;
+                const newFile = `UserPointData_${request_ids[0]}_${strnow}.pts`;
                 console.log('before file write', newFile)
                 fs.writeFileSync(newPath, JSON.stringify(content), 'utf8', err => {
                     if (err) {

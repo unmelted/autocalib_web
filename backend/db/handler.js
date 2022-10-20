@@ -316,7 +316,7 @@ exports.getGenJobId = function (request_ids) {
                 reject(-1)
             }
 
-            db.queryParams(`SELECT job_id FROM task_request WHERE request_id = ANY($1::int[]); `, [request_ids], (err, res) => {
+            db.queryParams(`SELECT job_id, group_id FROM task_request WHERE request_id = ANY($1::int[]); `, [request_ids], (err, res) => {
                 client.release(true);
                 if (err) {
                     console.log(err)

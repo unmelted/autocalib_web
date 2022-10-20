@@ -23,7 +23,7 @@ router.post('/calculate', async (req, res, next) => {
 
   console.log("Call Exodus API: " + options.uri);
   console.log(req.body.task_id);
-  console.log(req.body.task_path);
+  console.log(req.body.group_id);
   request.post(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));

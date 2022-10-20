@@ -22,7 +22,7 @@ const initItems = {
 }
 
 export const TaskGroupTable = ({ taskId, taskPath }) => {
-    console.log("Task Group Table ", taskId, taskPath);
+    // console.log("Task Group Table ", taskId, taskPath);
     const CAL_STATE = {
         ERR: -1,
         READY: 0,
@@ -43,8 +43,6 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
     const [checkedList, setCheckedList] = useState([])
-
-    const [calState, setCalState] = useState(CAL_STATE.READY)
 
     const changeTableDataContext = (type, param) => {
         console.log("changeTableContext", type, param);
@@ -95,7 +93,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     const changeGenData = (type, param) => {
         console.log('changeGenData', type, param)
         changeTableDataContext(type, param);
-        setCalState(CAL_STATE.SUBMIT)
+        // setCalState(CAL_STATE.SUBMIT)
     }
 
     const Canvas = () => {
@@ -117,7 +115,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         console.log("taskRow start.. ", keyindex)
         const [jobId, setJobId] = useState('')
         const [requestId, setRequestId] = useState('')
-        // const [calState, setCalState] = useState(CAL_STATE.READY)
+        const [calState, setCalState] = useState(CAL_STATE.READY)
         const [statusMessage, setStatusMessage] = useState('')
         const [genMessage, setGenMessage] = useState('')
 
@@ -146,6 +144,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 setCalState(CAL_STATE.START);
                 const strmsg = `Request Calculate. Job id ${response.data.job_id}`
                 setStatusMessage(strmsg);
+                changeTableDataContext('changestatus', [keyindex, CAL_STATE.START]);
                 changeTableDataContext('changestatusmsg', [keyindex, strmsg]);
                 changeTableDataContext('addjobid', [keyindex, response.data.job_id]);
                 console.log(" check .. ", groupTable);
@@ -169,14 +168,17 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 let strmsg = ''
                 if (parseInt(response.data.percent) === 100) {
                     setCalState(CAL_STATE.COMPLETE);
+                    changeTableDataContext('changestatus', [keyindex, CAL_STATE.COMPLETE]);
                     if (response.data.result >= 0) {
                         strmsg = ` ${jobId} Done. ${response.data.percent}%`;
                     } else {
                         strmsg = ` ${jobId} Err: ${response.data.result} ${response.data.message}`;
+                        setCalState(CAL_STATE.ERR);
+                        changeTableDataContext('changestatus', [keyindex, CAL_STATE.ERR]);
                     }
                 } else {
                     strmsg = ` ${jobId} Processing .. ${response.data.percent}%`;
-                    setCalState(CAL_STATE.ERR);
+                    changeTableDataContext('changestatus', [keyindex, CAL_STATE.START]);
                 }
 
                 setStatusMessage(strmsg)
@@ -191,6 +193,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             const onCalculateClick = () => {
                 calculate(taskId, taskPath, keyindex);
                 setCalState(CAL_STATE.START);
+                changeTableDataContext('changestatus', [keyindex, CAL_STATE.START]);
             }
 
             const onCancelClick = async () => {
@@ -208,6 +211,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
                 if (response && response.data.status === 0) {
                     setCalState(CAL_STATE.CANCEL);
+                    changeTableDataContext('changestatus', [keyindex, CAL_STATE.CANCEL]);
                     setStatusMessage('Canceled.');
                 }
             }
@@ -220,7 +224,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         value="Calculate"
                         onClick={onCalculateClick}
                         hidden={groupTable[keyindex].cam_count < 5}
-                        disabled={calState !== CAL_STATE.READY}>
+                        disabled={groupTable[keyindex].status !== CAL_STATE.READY}>
                     </Button>{' '}
                     <Button size="sm"
                         as="input"
@@ -229,7 +233,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         value="Cancel"
                         onClick={onCancelClick}
                         hidden={groupTable[keyindex].cam_count < 5}
-                        disabled={calState !== CAL_STATE.START}>
+                        disabled={groupTable[keyindex].status !== CAL_STATE.START && groupTable[keyindex].status !== CAL_STATE.CANCEL}>
                     </Button>{' '}
                 </>
 
@@ -251,7 +255,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         value="Status"
                         onClick={onGetStatus}
                         hidden={groupTable[keyindex].cam_count < 5}
-                        disabled={calState === CAL_STATE.READY || calState === CAL_STATE.CANCEL}>
+                        disabled={groupTable[keyindex].status === CAL_STATE.READY || groupTable[keyindex].status === CAL_STATE.CANCEL}>
                     </Button>{' '}
                     <span id="span-msg">
                         {groupTable[keyindex].status_msg}
@@ -289,6 +293,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     setRightImage(imageUrlSecond);
                     setCalState(CAL_STATE.PAIR_COMPLETE);
                     setCanvasJob([groupTable[keyindex].job_id, taskId, keyindex])
+                    changeTableDataContext('changestatus', [keyindex, CAL_STATE.PAIR_COMPLETE]);
                     changeTableDataContext('changegenmsg', [keyindex, `${response.data.first_image}, ${response.data.first_image} is chosen`])
                 } else {
                     return;
@@ -307,7 +312,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         value="Pick Point"
                         onClick={onGetPairClick}
                         hidden={groupTable[keyindex].cam_count < 5}
-                        disabled={calState !== CAL_STATE.COMPLETE && calState !== CAL_STATE.PAIR_COMPLETE}
+                        disabled={groupTable[keyindex].status !== CAL_STATE.COMPLETE && groupTable[keyindex].status !== CAL_STATE.PAIR_COMPLETE}
                     >
                     </Button>{'  '}
                     <span id="span-msg">
@@ -330,7 +335,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             console.log(" moment draw taskrow result ", calState);
             return (
                 <div>
-                    <InputGroup.Checkbox disabled={groupTable[keyindex].cam_count < 5 || calState !== CAL_STATE.PAIR_COMPLETE}
+                    <InputGroup.Checkbox disabled={groupTable[keyindex].cam_count < 5 || groupTable[keyindex].status !== CAL_STATE.PAIR_COMPLETE}
                         onChange={(e) => onCheckedElement(e.target.checked, groupTable[keyindex].no)}
                         checked={checkedList.includes(groupTable[keyindex].no) ? true : false} />
                 </div >

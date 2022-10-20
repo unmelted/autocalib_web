@@ -4,6 +4,6 @@ CREATE TABLE IF NOT EXISTS task_request (request_id SERIAL PRIMARY KEY NOT NULL,
 
 CREATE TABLE IF NOT EXISTS group_info (no SERIAL PRIMARY KEY ,task_id TEXT, group_id TEXT, cam_count INTEGER);
 
-CREATE TABLE IF NOT EXISTS pts_result (request_id INTEGER PRIMARY KEY, gen_pts JSON);
+CREATE TABLE IF NOT EXISTS pts_result (request_id INTEGER PRIMARY KEY, createdate TIMESTAMP DEFAULT NOW(), pts_path TEXT);
 
 INSERT INTO task (task_no, task_id, task_path ) VALUES (100, -1, -1);

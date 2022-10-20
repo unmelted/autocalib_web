@@ -110,6 +110,7 @@ router.post('/getresult', async (req, res) => {
 
     console.log('router getresult ', req.body)
     let result_json = []
+    let result_group = []
     let response = null
     jobs = await handler.getGenJobId(req.body.request_ids)
 
@@ -124,13 +125,14 @@ router.post('/getresult', async (req, res) => {
         }
 
         if (response && response.data.result === 0) {
-            console.log('correct response')
             result_json.push(response.data.contents)
+            result_group.push(job.group_id)
+            // result_json[job.group_id] = response.data.contents
         }
     }
 
     try {
-        [filepath, filename] = await taskManager.createResultfile(req.body.request_ids, result_json);
+        [filepath, filename] = await taskManager.createResultfile(req.body.request_ids, result_json, result_group);
         res.status(200).json({
             status: 0, // 0: success, other-error code
             filename: filename,
