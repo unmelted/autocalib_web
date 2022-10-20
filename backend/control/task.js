@@ -104,17 +104,20 @@ exports.parsingGroupInfo = async function (taskId, fullPath) {
             console.log("parsingGroupinfo : " + pts)
             fs.readFile(pts, 'utf-8', async function (err, data) {
                 if (err) {
-                    resolve(-1)
+                    reject(-1)
+                    return -1;
                 }
 
                 try {
                     obj = JSON.parse(data)
-                    console.log(Object.keys(obj.points).length)
                 } catch (err) {
                     console.log('parsing json err ', err)
                     reject(-1)
                 }
-
+                if (obj === '') {
+                    reject(-1)
+                }
+                console.log(Object.keys(obj.points).length)
                 for (let i = 0; i < Object.keys(obj.points).length; i++) {
                     if (Object.keys(group).indexOf(obj.points[i].Group) !== -1) {
                         group[obj.points[i].Group].push(obj.points[i].dsc_id)
@@ -132,6 +135,7 @@ exports.parsingGroupInfo = async function (taskId, fullPath) {
                 await insertGroupInfo(taskId, group);
                 console.log("end insert group ..")
                 resolve(0)
+                return 0;
             });
         });
     });

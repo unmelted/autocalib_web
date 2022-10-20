@@ -152,12 +152,12 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             }
         }
 
-        const getStatusSend = async () => {
-            console.log("getStatusSend is called " + jobId);
+        const getStatusSend = async (job_id) => {
+            console.log("getStatusSend is called " + job_id);
             let response = null;
 
             try {
-                response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/calculate/status/${jobId}`)
+                response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/calculate/status/${job_id}`)
 
             } catch (err) {
                 console.log(err)
@@ -240,7 +240,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             // console.log("taskrow status recieve : ", group);
 
             const onGetStatus = () => {
-                getStatusSend();
+                getStatusSend(groupTable[keyindex].job_id);
             }
 
             return (
@@ -263,7 +263,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         const TaskRowGenerate = ({ keyindex }) => {
 
             const onGetStatus = () => {
-                getStatusSend();
+                getStatusSend(groupTable[keyindex].job_id);
             }
 
             const onGetPairClick = async () => {
@@ -288,7 +288,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     setLeftImage(imageUrlFirst);
                     setRightImage(imageUrlSecond);
                     setCalState(CAL_STATE.PAIR_COMPLETE);
-                    setCanvasJob([jobId, taskId, keyindex])
+                    setCanvasJob([groupTable[keyindex].job_id, taskId, keyindex])
                     changeTableDataContext('changegenmsg', [keyindex, `${response.data.first_image}, ${response.data.first_image} is chosen`])
                 } else {
                     return;

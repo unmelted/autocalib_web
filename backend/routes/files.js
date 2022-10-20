@@ -71,7 +71,14 @@ router.post('/upload', async (req, res, next) => {
   const uploadObj = util.promisify(upload.any());
 
   await uploadObj(req, res);
-  result = await taskManager.parsingGroupInfo(taskId, fullPath)
+  try {
+    result = await taskManager.parsingGroupInfo(taskId, fullPath)
+  }
+  catch (err) {
+    console.log('parsing group info reject.. ', err)
+    res.status(500).json({})
+    return;
+  }
 
   console.log("parsing gourp info result  : ", result);
   if (result === 0) {

@@ -21,6 +21,11 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
     const [isAllTarget, setIsAllTarget] = useState(false);
+    const [jobid, setJobid] = useState(jobId)
+    const [taskid, setTaskid] = useState(taskId)
+    const [groupid, setGroupid] = useState(groupId)
+    console.log('start canvas..1 id set ', jobId, taskId, groupId)
+    console.log('start canvas..2 id set ', jobid, taskid, groupid)
     const canvasWidth = parseInt(process.env.REACT_APP_CANVAS_WIDTH, 10);
     const canvasHeight = parseInt(process.env.REACT_APP_CANVAS_HEIGHT, 10);
     const imageWidth = parseInt(process.env.REACT_APP_IMAGE_WIDTH, 10);
@@ -294,7 +299,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         } else if (calibMode.current === '3D') {
             InsertRefPointToStorate('3D')
         }
-
+        console.log('submit points is called job_id : ', jobid)
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D)
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_3D)
 
@@ -321,14 +326,15 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         setIsSubmitted(true);
 
         const data = {
-            task_id: taskId,
-            group_id: groupId,
-            job_id: jobId,
+            task_id: taskid,
+            group_id: groupid,
+            job_id: jobid,
             pts_2d: makeTargetData_2d(),
             pts_3d: makeTargetData_3d()
         }
 
-        const url = process.env.REACT_APP_SERVER_URL + `/api/generate/${jobId}`;
+        console.log('submit points to : ', jobId)
+        const url = process.env.REACT_APP_SERVER_URL + `/api/generate/${jobid}`;
 
         let response = null;
 
@@ -343,8 +349,8 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         if (response && response.data.status === 0) {
             if (response.data.status === 0) {
                 setIsSubmitCompleted(true);
-                changeHandle('addgenid', [groupId, response.data.job_id])
-                changeHandle('changegenmsg', [groupId, `Genenerate pts - ${response.data.job_id} is requested.`])
+                changeHandle('addgenid', [groupid, response.data.job_id])
+                changeHandle('changegenmsg', [groupid, `Genenerate pts - ${response.data.job_id} is requested.`])
             }
         }
     }
@@ -359,7 +365,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             canvasLeftRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'left', context), { passive: false });
             canvasLeftRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'left', context), { passive: false });
             canvasLeftRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'left', context), { passive: false });
-            canvasLeftRef.current.addEventListener('wheel', (event) => onWheel(event, 'left', context), { passive: true });
+            canvasLeftRef.current.addEventListener('wheel', (event) => onWheel(event, 'left', context), { passive: false });
             canvasLeftRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'left', context), { passive: false });
 
         }
@@ -367,7 +373,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             canvasRightRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'right', context), { passive: false });
             canvasRightRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'right', context), { passive: false });
             canvasRightRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'right', context), { passive: false });
-            canvasRightRef.current.addEventListener('wheel', (event) => onWheel(event, 'right', context), { passive: true });
+            canvasRightRef.current.addEventListener('wheel', (event) => onWheel(event, 'right', context), { passive: false });
             canvasRightRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'right', context), { passive: false });
         }
 
@@ -390,9 +396,9 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             right: canvasRightRef.current.getContext('2d')
         };
 
-        console.log("drawImageToCanvas  : " + context['left']);
-        console.log("drawImageToCanvas  : " + context['right']);
-
+        // console.log("drawImageToCanvas  : " + context['left']);
+        // console.log("drawImageToCanvas  : " + context['right']);
+        // 
         context[type].save();
         context[type].setTransform(1, 0, 0, 1, 0, 0);
         context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
