@@ -22,13 +22,13 @@ const initItems = {
     },
 }
 
-export const TaskGroupTable = ({ taskId, taskPath }) => {
+export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
     // console.log("Task Group Table ", taskId, taskPath);
     const CAL_STATE = {
         ERR: -1,
         READY: 0,
         START: 1,
-        COMPLETE: 2,
+        CAL_COMPLETE: 2,
         CANCEL: 3,
         PAIR_COMPLETE: 4,
         SUBMIT: 5,
@@ -83,6 +83,9 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
         else if (type === 'addjobid') {
             groupTable[param[0]].job_id = param[1]
+        }
+        else if (type === 'addrequestid') {
+            groupTable[param[0]].no = param[1]
         } else if (type === 'addgenid') {
             groupTable[param[0]].gen_id = param[1]
             groupTable[param[0]].status = CAL_STATE.SUBMIT
@@ -118,6 +121,29 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
 
     }
+
+    const getGroupStatus = async (keyindex) => {
+        console.log(groupTable[keyindex], groupTable[keyindex].no)
+        let response = null;
+        try {
+            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/groupstatus/${groupTable[keyindex].no}`)
+        } catch (err) {
+            console.log(err)
+        }
+
+        if (response) {
+
+            if (response.data.request_id === 0) {
+                // changeTableDataContext('changestatus', [keyindex, CAL_STATE.READY])
+            }
+            else if (response.data.request_id > 0) {
+                changeTableDataContext('addrequestid', [keyindex, response.data.request_id])
+                changeTableDataContext('addjobid', [keyindex, response.data.job_id])
+                changeTableDataContext('changestatus', [keyindex, CAL_STATE.CAL_COMPLETE])
+            }
+        }
+    }
+
     const TaskRow = ({ keyindex }) => {
         console.log("taskRow start.. ", keyindex)
         const [jobId, setJobId] = useState('')
@@ -170,7 +196,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             if (response && response.data.percent) {
                 let strmsg = ''
                 if (parseInt(response.data.percent) === 100) {
-                    changeTableDataContext('changestatus', [keyindex, CAL_STATE.COMPLETE]);
+                    changeTableDataContext('changestatus', [keyindex, CAL_STATE.CAL_COMPLETE]);
                     if (response.data.result >= 0) {
                         strmsg = ` ${jobId} Done. ${response.data.percent}%`;
                     } else {
@@ -211,6 +237,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             }
 
             console.log(" draw taskrow request ", keyindex, groupTable[keyindex].status);
+
             return (
                 <>
                     <Button size="sm"
@@ -236,7 +263,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
 
         const TaskRowStatus = ({ keyindex }) => {
-            // console.log("taskrow status recieve : ", group);
+            console.log("taskrow status recieve : ", keyindex, groupTable[keyindex].status);
 
             const onGetStatus = () => {
                 getStatusSend(groupTable[keyindex].job_id);
@@ -306,7 +333,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                         value="Pick Point"
                         onClick={onGetPairClick}
                         hidden={groupTable[keyindex].cam_count < 5}
-                        disabled={groupTable[keyindex].status !== CAL_STATE.COMPLETE && groupTable[keyindex].status !== CAL_STATE.PAIR_COMPLETE}
+                        disabled={groupTable[keyindex].status !== CAL_STATE.CAL_COMPLETE && groupTable[keyindex].status !== CAL_STATE.PAIR_COMPLETE}
                     >
                     </Button>{'  '}
                     <span id="span-msg">
@@ -400,7 +427,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
     const GroupTable = ({ groupTable }) => {
         const keys = Object.keys(groupTable)
-        console.log("GroupTable.. ", keys)
+        // console.log("GroupTable.. ", keys)
 
         return (
             keys.map((keyindex =>
@@ -434,38 +461,40 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
     }
 
-    const getGroup = async (taskId) => {
+    const getGroup = async (taskId, entry) => {
         console.log("set task load true ", taskId);
-        let modify_group = {};
         if (taskId !== '') {
             console.log("get group call..  ");
             try {
                 const group = await getGroupInfo(taskId);
-                // for (const g of group) {
-                //     g['status'] = '';
-                //     g['job_id'] = '';
-                //     modify_group[g.group_id] = g
-                // }
                 setGroupInfo(group)
-                // setGroupTable(modify_group)
                 changeTableDataContext('init', [group])
-                setTableLoad(true)
-                console.log("modify data structure save : ", groupTable)
 
             } catch (err) {
                 console.log("getGroup info error : ", err);
+                return;
             }
+
+            if (entry === 'history') {
+                const keys = Object.keys(groupTable)
+                console.log("GroupTable.. ", keys)
+                for await (const key of keys) {
+                    await getGroupStatus(key)
+                }
+            }
+
+            setTableLoad(true)
         }
     }
 
     useEffect(() => {
-        console.log('start .. :', taskId);
-        getGroup(taskId);
+        console.log('start .. :', taskId, entry);
+        getGroup(taskId, entry);
     }, [taskId]);
 
-    useEffect(() => {
-        console.log("use effect groupTable ")
-    }, [groupTable])
+    // useEffect(() => {
+    //     console.log("use effect refresh ")
+    // }, [refresh])
 
     // task main retrun 
     if (tableLoad === false) {

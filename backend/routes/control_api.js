@@ -106,6 +106,35 @@ router.get('/groupinfo/:task_id', async (req, res) => {
     }
 });
 
+router.get('/groupstatus/:group_no', async (req, res) => {
+
+    console.log("router groupinfo task id : ", req.params.group_no)
+
+    try {
+        result = await handler.getGroupStatus(req.params.group_no)
+        if (result === 0) {
+            console.log("get group info end 1")
+            res.status(200).json({
+                message: 'success',
+                request_id: 0,
+                job_id: 0,
+            });
+
+        } else {
+            console.log("get group info end 2 : " + result[0].request_id)
+            res.status(200).json({
+                message: 'success',
+                request_id: result[0].request_id,
+                job_id: result[0].job_id
+            });
+        }
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+
+});
+
 router.post('/getresult', async (req, res) => {
 
     console.log('router getresult ', req.body)

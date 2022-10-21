@@ -28,8 +28,7 @@ exports.getTaskNo = function () {
                         resolve(-10)
                     }
                 }
-            }, client);
-
+            }, client)
         });
     });
 }
@@ -249,6 +248,44 @@ exports.getGroupInfo = function (taskId) {
     });
 }
 
+exports.getGroupStatus = function (groupno) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+
+            db.queryParams("SELECT a.request_id, a.job_id from task_request as a \
+            LEFT OUTER JOIN group_info as b \
+            on a.task_id = b.task_id and a.group_id = b.group_id \
+            WHERE b.no = $1 and a.request_category = 'CALCULATE'; ", [groupno], (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    reject(-1);
+                }
+                else {
+                    if (res.rows.length == 1) {
+                        console.log('get GroupInfo query success ' + res.rows[0].request_id);
+                        resolve(res.rows)
+                    }
+                    else if (res.rows.length == 0) {
+                        console.log('get GroupInfo query success no rows.');
+                        resolve(0)
+                    }
+                    else {
+                        console.log("get groupStatus no err or multi ")
+                        reject(-10)
+                    }
+                }
+
+            }, client);
+
+        });
+    });
+}
+
 exports.selectDatewithinRange = function () {
     return new Promise((resolve, reject) => {
         db.getClient((errClient, client) => {
@@ -275,7 +312,6 @@ exports.selectDatewithinRange = function () {
         });
     });
 };
-
 
 exports.selectRequestbyTaskId = function (taskId) {
     return new Promise((resolve, reject) => {

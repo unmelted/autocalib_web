@@ -215,7 +215,7 @@ function AutoCalib() {
                 </div>
                 <div id="div-task-table"
                     hidden={taskLoad === false}>
-                    <TaskGroupTable taskId={taskId} taskPath={taskPath} />
+                    <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'create'} />
                 </div>
             </div>
         </>

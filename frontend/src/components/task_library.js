@@ -322,7 +322,7 @@ export const TaskLibrary = (props) => {
             </div>
             <div id='table-container3'
                 hidden={requestGrouploaded === false}>
-                <TaskGroupTable taskId={taskId} taskPath={taskPath} />
+                <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'history'} />
             </div>
             <div>
                 <Canvas></Canvas>
