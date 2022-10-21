@@ -342,7 +342,6 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             response = await axios.post(url, data);
         } catch (err) {
             console.log(err);
-            // setStatusMessage('Unable to calculate!');
             return;
         }
 
@@ -351,6 +350,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                 setIsSubmitCompleted(true);
                 changeHandle('addgenid', [groupid, response.data.job_id])
                 changeHandle('changegenmsg', [groupid, `Genenerate pts - ${response.data.job_id} is requested.`])
+                changeHandle('addpostno', [groupid, response.data.request_id])
             }
         }
     }

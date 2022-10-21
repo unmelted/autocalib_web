@@ -148,7 +148,7 @@ export const TaskLibrary = (props) => {
                             </Button>
                         </td>
                         <td hidden={req.request_category !== 'GENERATE'}
-                            disabled={req.job_status !== 100 || req.job_result < 0}>
+                            disabled={req.job_status !== 100 || req.job_result !== 100}>
                             <InputGroup.Checkbox
                                 onChange={(e) => onCheckedElement(e.target.checked, req.request_id)}
                                 checked={checkedList.includes(req.request_id) ? true : false} />
@@ -167,12 +167,14 @@ export const TaskLibrary = (props) => {
     const TaskHistoryTable = ({ tasks }) => {
         const onHandleHistoryClick = async (taskId) => {
             console.log("onHandleRequest buttoin click", taskId);
+            setCheckedList([])
             setTaskId(taskId);
             getRequestHistory(taskId);
         }
 
         const onHandleRequestClick = async (taskId, task_path) => {
             console.log("onHandleRequestClck !! ")
+            setCheckedList([])
             setTaskId(taskId);
             setTaskPath(task_path);
             setRequestGroupLoaded(true)
@@ -232,8 +234,7 @@ export const TaskLibrary = (props) => {
     }
 
     const downloadResult = async () => {
-        let savefile_name = 'UserPointData_2022_1018_history.pts'
-        console.log('download result click checked : ', checkedList)
+        console.log('download result click checked in task_library : ', checkedList)
         const data = {
             request_ids: checkedList,
         }

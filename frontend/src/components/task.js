@@ -11,6 +11,7 @@ import { PairCanvas } from './canvas.js'
 const initItems = {
     'Group1': {
         no: 0,
+        post_no: 0,
         name: '',
         cam_count: 0,
         status: '',
@@ -31,6 +32,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         CANCEL: 3,
         PAIR_COMPLETE: 4,
         SUBMIT: 5,
+        GEN_COMPLETE: 6,
     }
 
     const [refresh, setRefresh] = useState(0)
@@ -53,13 +55,13 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 let tempval = {}
                 tempval.name = g.group_id;
                 tempval.no = g.no;
+                tempval.post_no = -1;
                 tempval.cam_count = g.cam_count;
                 tempval.status = CAL_STATE.READY;
                 tempval.job_id = 0;
                 tempval.status_msg = '';
                 tempval.gen_id = 0;
                 tempval.gen_msg = '';
-
                 groupTable[g.group_id] = tempval;
                 // groupTable[g.group_id].name = g.group_id;
                 // groupTable[g.group_id].no = g.no;
@@ -70,8 +72,12 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 // groupTable[g.group_id].gen_id = 0;
                 // groupTable[g.group_id].gen_msg = '';
             }
+        } else if (type === 'addpostno') {
+            groupTable[param[0]].post_no = param[1]
+
         } else if (type === 'changestatus') {
             groupTable[param[0]].status = param[1]
+
         } else if (type === 'changestatusmsg') {
             groupTable[param[0]].status_msg = param[1]
         }
@@ -82,18 +88,19 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
             groupTable[param[0]].status = CAL_STATE.SUBMIT
             setLeftImage('')
             setRightImage('')
+            // groupTable[param[0]].timer_id = setInterval(() => {
+            //     groupTable[param[0]].timer -= 1;
+            // }, 5000);
 
         } else if (type === 'changegenmsg') {
             groupTable[param[0]].gen_msg = param[1]
-            setRefresh(refresh + 1)
         }
-
+        setRefresh(refresh + 1)
     }
 
     const changeGenData = (type, param) => {
         console.log('changeGenData', type, param)
         changeTableDataContext(type, param);
-        // setCalState(CAL_STATE.SUBMIT)
     }
 
     const Canvas = () => {
@@ -115,9 +122,6 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         console.log("taskRow start.. ", keyindex)
         const [jobId, setJobId] = useState('')
         const [requestId, setRequestId] = useState('')
-        const [calState, setCalState] = useState(CAL_STATE.READY)
-        const [statusMessage, setStatusMessage] = useState('')
-        const [genMessage, setGenMessage] = useState('')
 
         const calculate = async (taskId, taskPath, groupId) => {
             console.log("before calculate " + taskId + " " + groupId);
@@ -134,16 +138,15 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 response = await axios.post(process.env.REACT_APP_SERVER_URL + "/api/calculate", data);
             } catch (err) {
                 console.log(err);
-                setStatusMessage(` Unable to calculate! ${err}`);
+                changeTableDataContext('changestatusmsg', [keyindex, `Unable to calculate ${err}`]);
                 return;
             }
 
             if (response && response.data.status === 0) {
                 setJobId(response.data.job_id);
                 setRequestId(response.data.request_id);
-                setCalState(CAL_STATE.START);
+
                 const strmsg = `Request Calculate. Job id ${response.data.job_id}`
-                setStatusMessage(strmsg);
                 changeTableDataContext('changestatus', [keyindex, CAL_STATE.START]);
                 changeTableDataContext('changestatusmsg', [keyindex, strmsg]);
                 changeTableDataContext('addjobid', [keyindex, response.data.job_id]);
@@ -160,39 +163,32 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
             } catch (err) {
                 console.log(err)
-                setStatusMessage(err);
+                changeTableDataContext('changestatusmsg', [keyindex, `Unable to get status  ${err}`]);
                 return;
             }
 
             if (response && response.data.percent) {
                 let strmsg = ''
                 if (parseInt(response.data.percent) === 100) {
-                    setCalState(CAL_STATE.COMPLETE);
                     changeTableDataContext('changestatus', [keyindex, CAL_STATE.COMPLETE]);
                     if (response.data.result >= 0) {
                         strmsg = ` ${jobId} Done. ${response.data.percent}%`;
                     } else {
                         strmsg = ` ${jobId} Err: ${response.data.result} ${response.data.message}`;
-                        setCalState(CAL_STATE.ERR);
                         changeTableDataContext('changestatus', [keyindex, CAL_STATE.ERR]);
                     }
                 } else {
                     strmsg = ` ${jobId} Processing .. ${response.data.percent}%`;
                     changeTableDataContext('changestatus', [keyindex, CAL_STATE.START]);
                 }
-
-                setStatusMessage(strmsg)
                 changeTableDataContext('changestatusmsg', [keyindex, strmsg]);
             }
         }
 
         const TaskRowRequest = ({ keyindex }) => {
-            console.log("taskrow request recieve : ", keyindex);
-            console.log(groupTable)
 
             const onCalculateClick = () => {
                 calculate(taskId, taskPath, keyindex);
-                setCalState(CAL_STATE.START);
                 changeTableDataContext('changestatus', [keyindex, CAL_STATE.START]);
             }
 
@@ -205,17 +201,16 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     response = await axios.delete(process.env.REACT_APP_SERVER_URL + `/api/cancel/${groupTable[keyindex].job_id}`);
                 } catch (err) {
                     console.log(err);
-                    setStatusMessage('Unable to cancel');
+                    changeTableDataContext('changestatusmsg', [keyindex, `Unable to cancel ${err}`]);
                     return;
                 }
 
                 if (response && response.data.status === 0) {
-                    setCalState(CAL_STATE.CANCEL);
                     changeTableDataContext('changestatus', [keyindex, CAL_STATE.CANCEL]);
-                    setStatusMessage('Canceled.');
                 }
             }
 
+            console.log(" draw taskrow request ", keyindex, groupTable[keyindex].status);
             return (
                 <>
                     <Button size="sm"
@@ -278,7 +273,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${groupTable[keyindex].job_id}`);
                 } catch (err) {
                     console.log(err);
-                    setStatusMessage('Unable to get images!');
+                    changeTableDataContext('changestatusmsg', [keyindex, `Unable to get image  ${err}`]);
                     return;
                 }
 
@@ -291,7 +286,6 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                     console.log(imageUrlSecond)
                     setLeftImage(imageUrlFirst);
                     setRightImage(imageUrlSecond);
-                    setCalState(CAL_STATE.PAIR_COMPLETE);
                     setCanvasJob([groupTable[keyindex].job_id, taskId, keyindex])
                     changeTableDataContext('changestatus', [keyindex, CAL_STATE.PAIR_COMPLETE]);
                     changeTableDataContext('changegenmsg', [keyindex, `${response.data.first_image}, ${response.data.first_image} is chosen`])
@@ -302,7 +296,7 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
 
             }
 
-            console.log(" moment draw taskrow generate ", calState);
+            console.log(" draw taskrow generate ", keyindex, groupTable[keyindex].status);
             return (
                 <>
                     <Button size="sm"
@@ -323,6 +317,37 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
         }
 
         const TaskRowResult = ({ keyindex }) => {
+            const onGetGenStatusClick = async () => {
+                console.log('onGetGenStatus Click')
+                let response = null;
+
+                try {
+                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/calculate/status/${groupTable[keyindex].gen_id}`)
+
+                } catch (err) {
+                    console.log(err)
+                    return;
+                }
+
+                if (response && response.data.percent) {
+                    let strmsg = ''
+                    if (parseInt(response.data.percent) === 100) {
+                        if (response.data.result >= 0) {
+                            strmsg = ` ${groupTable[keyindex].gen_id} Done. ${response.data.percent}%`;
+                            console.log('will call change table data context', keyindex)
+                            changeTableDataContext('changestatus', [keyindex, CAL_STATE.GEN_COMPLETE]);
+                        } else {
+                            strmsg = ` ${groupTable[keyindex].gen_id} Err: ${response.data.result} ${response.data.message}`;
+                            changeTableDataContext('changestatus', [keyindex, CAL_STATE.ERR]);
+                        }
+                    } else {
+                        strmsg = ` ${groupTable[keyindex].gen_id} Processing .. ${response.data.percent}%`;
+                    }
+                    changeTableDataContext('changegenmsg', [keyindex, strmsg]);
+                }
+
+            }
+
             const onCheckedElement = (checked, item) => {
                 console.log("onchekced element ", checked);
                 if (checked) {
@@ -332,12 +357,24 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
                 }
                 console.log("onChecked Element : ", checkedList);
             }
-            console.log(" moment draw taskrow result ", calState);
+            console.log(" draw taskrow result ", keyindex, groupTable[keyindex].status);
             return (
                 <div>
-                    <InputGroup.Checkbox disabled={groupTable[keyindex].cam_count < 5 || groupTable[keyindex].status !== CAL_STATE.PAIR_COMPLETE}
-                        onChange={(e) => onCheckedElement(e.target.checked, groupTable[keyindex].no)}
-                        checked={checkedList.includes(groupTable[keyindex].no) ? true : false} />
+                    <Button size="sm"
+                        as="input"
+                        type='button'
+                        value="Get"
+                        onClick={onGetGenStatusClick}
+                        hidden={groupTable[keyindex].cam_count < 5 || groupTable[keyindex].status === CAL_STATE.GEN_COMPLETE}
+                        disabled={groupTable[keyindex].status !== CAL_STATE.SUBMIT}
+                    >
+                    </Button>
+                    <div hidden={groupTable[keyindex].status !== CAL_STATE.GEN_COMPLETE} >
+                        <InputGroup.Checkbox hidden={groupTable[keyindex].cam_count < 5}
+                            // disabled={groupTable[keyindex].status !== CAL_STATE.GEN_COMPLETE}
+                            onChange={(e) => onCheckedElement(e.target.checked, groupTable[keyindex].post_no)}
+                            checked={checkedList.includes(groupTable[keyindex].post_no) ? true : false} />
+                    </div>
                 </div >
             )
         }
@@ -377,22 +414,24 @@ export const TaskGroupTable = ({ taskId, taskPath }) => {
     };
 
     const downloadResult = async () => {
-        console.log('download result click checked : ', checkedList)
-        let savefile_name = 'UserPointData_2022_1018_task.pts'
+
+        console.log('download result click checked in task: ', checkedList)
         const data = {
             request_ids: checkedList,
         }
 
         let response = null;
         try {
-            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getresult`, data)
+            response = await axios.post(process.env.REACT_APP_SERVER_URL + `/control/getresult`, data)
         }
         catch (err) {
             console.log('get result err ', err)
         }
 
-        saveAs(response.data.download_url, savefile_name);
-
+        if (response && response.data.status === 0) {
+            console.log(response)
+            saveAs(response.data.download_url, response.data.filename);
+        }
     }
 
     const getGroup = async (taskId) => {

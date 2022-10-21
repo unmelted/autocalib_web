@@ -152,7 +152,7 @@ exports.createResultfile = async function (request_ids, result_json, result_grou
     console.log('create result file ')
     console.log('result group input : ', result_group)
 
-    let content = '';
+    let content = new Object()
     let ptsfile = '';
     const fullPath = await handler.getFullPath(request_ids[0])
 
@@ -212,7 +212,7 @@ exports.createResultfile = async function (request_ids, result_json, result_grou
                 }
 
                 content['points'] = temp_array;
-
+                // console.log(content)
                 // const newPath = fullPath + `UserPointData_${request_ids[0]}.pts`; //local test
                 const today = new Date();
                 const date = today.getDate();
