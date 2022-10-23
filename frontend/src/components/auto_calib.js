@@ -1,12 +1,11 @@
-import React, { useEffect, useState, useRef, useContext } from 'react';
+import React, { useState, useRef } from 'react';
 import axios from 'axios';
 import '../css/autocalib.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
-import { TableDataContext } from '../App.js';
-import { getTotalFileSize, getFileExt, isValidFile, isValidImage, getGroupInfo } from './util.js'
+import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
 import { TaskGroupTable } from './task.js'
 
 
@@ -16,7 +15,6 @@ function AutoCalib() {
     const [taskPath, setTaskPath] = useState('');
     const [taskLoad, setTaskLoad] = useState(false);
 
-    // const { groupInfo, changeTableData } = useContext(TableDataContext);
     const taskAlias = useRef(null);
     const [statusMessage, setStatusMessage] = useState("");
     const [isUploaded, setIsUploaded] = useState(false)
@@ -80,7 +78,6 @@ function AutoCalib() {
             setStatusMessage("Upload Completed!");
             await addFileAlias(response.data.taskId);
             console.log("add file alias  call");
-            // await getGroup(response.data.taskId)
             console.log("get group  call");
             setTaskPath(response.data.taskPath);
             setTaskId(response.data.taskId);
@@ -123,50 +120,6 @@ function AutoCalib() {
 
         }
     }
-
-    const getGroup = async (task_id) => {
-        if (task_id !== '') {
-            console.log("get group call..  ");
-            try {
-                const group = await getGroupInfo(task_id);
-                for (const g of group) {
-                    g["status"] = '';
-                }
-                console.log("set task load true ", task_id);
-                // changeTableData('reset', [group]); //// 문제가 되는 부분
-                console.log("chnage table data, set again ");
-            } catch (err) {
-                console.log("getGroup info error : ", err);
-            }
-        }
-    }
-
-    // useEffect(() => {
-
-    //     async function getGroup() {
-    //         if (taskId !== '') {
-    //             console.log("task id useEffect ");
-    //             try {
-    //                 const group = await getGroupInfo(taskId);
-    //                 for (const g of group) {
-    //                     g["status"] = '';
-    //                 }
-    //                 setTaskLoad(true);
-    //                 changeTableData('reset', [group]);
-    //                 console.log("set task load true ", taskId);
-    //             } catch (err) {
-    //                 console.log("getGroup info error : ", err);
-    //             }
-    //         }
-    //     }
-    //     getGroup();
-    // }, [taskId]);
-
-    useEffect(() => {
-        console.log("task load use effect ", taskLoad);
-        console.log("taskId : ", taskId);
-    }, [taskId, taskLoad])
-
 
     // useEffect(() => {
     //     if (isUploaded && calculateState === CALC_STATE.START) {
@@ -245,7 +198,7 @@ function AutoCalib() {
                         readOnly={true}
                     />
                 </Form.Group>
-                <div>
+                <div id='button-row-reset'>
                     <Form.Group className='item-btn-wrppter'>
                         <Button size="md"
                             variant="primary"
@@ -255,16 +208,14 @@ function AutoCalib() {
                             type='button'
                             value="Reset"
                             onClick={reset}
-                            // style={{ float: 'left' }}
                             disabled={!isUploaded}
                         >
                         </Button>
                     </Form.Group>
                 </div>
-                <div className="item-wrapper"
-                    id="div-task-table"
+                <div id="div-task-table"
                     hidden={taskLoad === false}>
-                    <TaskGroupTable taskId={taskId} taskPath={taskPath} />
+                    <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'create'} />
                 </div>
             </div>
         </>

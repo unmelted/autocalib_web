@@ -15,8 +15,8 @@
 
 #table-container3 {
     margin: 3rem 0 0 0;
-    width: 95%;
-    border: 2px solid rgb(99, 99, 99);
+    /* width: 95%; */
+    /* border: 2px solid rgb(99, 99, 99); */
 }
 
 Table thead {
@@ -68,4 +68,10 @@ Table thead {
 
 #th-reqwuest {
     width: 40%;
+}
+
+#button-row-down {
+    display: flex;
+    justify-content: right;
+    margin-bottom: 20px;
 }

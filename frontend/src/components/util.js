@@ -27,11 +27,12 @@ export const isValidFile = (file) => {
 
     return isValidImage(file) || ext === "pts" || ext === "txt" || ext === 'ds_store';
 }
+
 export const getGroupInfo = async function (taskId) {
     console.log("getGroup .. " + taskId)
     let response = null;
     try {
-        response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/groupinfo/${taskId}`)
+        response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/groupinfo/${taskId}`)
     } catch (err) {
         console.log("get groupinfo error")
     }

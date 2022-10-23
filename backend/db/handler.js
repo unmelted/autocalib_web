@@ -28,8 +28,7 @@ exports.getTaskNo = function () {
                         resolve(-10)
                     }
                 }
-            }, client);
-
+            }, client)
         });
     });
 }
@@ -110,9 +109,9 @@ exports.insertNewTaskRequest = function (mode, params) {
 
             if (mode === 'cal') {
                 db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id ) VALUES ($1, $2, $3, $4) RETURNING request_id;", params, (err, res) => {
+                    client.release(true);
                     if (err) {
                         console.log(err)
-                        client.release(true);
                         resolve(-1)
                     }
                     console.log('insertNewTaskRequest cal query success');
@@ -145,9 +144,9 @@ exports.insertNewTaskRequest = function (mode, params) {
             } else if (mode === 'gen') {
                 console.log("insert request ", params[3])
                 db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id, pts_2d, pts_3d ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING request_id;", params, (err, res) => {
+                    client.release(true);
                     if (err) {
                         console.log(err)
-                        client.release(true);
                         resolve(-1)
                     }
                     console.log('insertNewTaskRequest gen query success');
@@ -249,6 +248,44 @@ exports.getGroupInfo = function (taskId) {
     });
 }
 
+exports.getGroupStatus = function (groupno) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+
+            db.queryParams("SELECT a.request_id, a.job_id from task_request as a \
+            LEFT OUTER JOIN group_info as b \
+            on a.task_id = b.task_id and a.group_id = b.group_id \
+            WHERE b.no = $1 and a.request_category = 'CALCULATE'; ", [groupno], (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    reject(-1);
+                }
+                else {
+                    if (res.rows.length == 1) {
+                        console.log('get GroupInfo query success ' + res.rows[0].request_id);
+                        resolve(res.rows)
+                    }
+                    else if (res.rows.length == 0) {
+                        console.log('get GroupInfo query success no rows.');
+                        resolve(0)
+                    }
+                    else {
+                        console.log("get groupStatus no err or multi ")
+                        reject(-10)
+                    }
+                }
+
+            }, client);
+
+        });
+    });
+}
+
 exports.selectDatewithinRange = function () {
     return new Promise((resolve, reject) => {
         db.getClient((errClient, client) => {
@@ -275,7 +312,6 @@ exports.selectDatewithinRange = function () {
         });
     });
 };
-
 
 exports.selectRequestbyTaskId = function (taskId) {
     return new Promise((resolve, reject) => {
@@ -304,6 +340,67 @@ exports.selectRequestbyTaskId = function (taskId) {
 
             }, client);
 
+        });
+    });
+}
+
+exports.getGenJobId = function (request_ids) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+
+            db.queryParams(`SELECT job_id, group_id FROM task_request WHERE request_id = ANY($1::int[]); `, [request_ids], (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    reject(-1);
+                }
+                else {
+                    if (res.rows.length > 0) {
+                        console.log('get GetJobid query success ' + res.rows);
+                        resolve(res.rows)
+                    }
+                    else {
+                        console.log("get GenJobid query no rows ")
+                        reject(-10)
+                    }
+                }
+            }, client);
+        });
+    });
+}
+
+exports.getFullPath = function (request_id) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+            let genJobId = []
+
+            db.queryParams(`SELECT a.task_path FROM task as a \
+            LEFT OUTER JOIN task_request as b \
+            on a.task_id = b.task_id WHERE b.request_id = $1; `, [request_id], (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    reject(-1);
+                }
+                else {
+                    if (res.rows.length > 0) {
+                        console.log('get full path query success ' + res.rows[0]);
+                        resolve(res.rows[0].task_path)
+                    }
+                    else {
+                        console.log("get fullpath query no rows ")
+                        reject(-10)
+                    }
+                }
+            }, client);
         });
     });
 }
