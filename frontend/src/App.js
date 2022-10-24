@@ -92,13 +92,13 @@ function App(props) {
     else if (state === 'guide') {
       return (
         <>
-          <ReviewGallery />
         </>
       )
     }
     else if (state === 'alien') {
       return (
         <>
+          <ReviewGallery />
         </>
       )
     }

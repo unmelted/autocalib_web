@@ -457,8 +457,10 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
         }
 
         if (response && response.data.status === 0) {
-            console.log(response)
-            saveAs(response.data.download_url, response.data.filename);
+            console.log(response.data.filename)
+            const _url = process.env.REACT_APP_SERVER_PTS_URL + response.data.filename;
+            console.log('download url ', _url)
+            saveAs(_url, response.data.filename);
         }
     }
 

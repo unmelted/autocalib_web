@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import FileSaver from 'file-saver';
+import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
@@ -248,9 +248,11 @@ export const TaskLibrary = (props) => {
         }
 
         if (response && response.data.status === 0) {
-            const fileurl = '/Users/4dreplay/work/sfm_python/test_pts/' + response.data.filename;
-            console.log('download saveas ', fileurl)
-            FileSaver.saveAs(fileurl, response.data.filename);
+            console.log(response.data.filename)
+            const _url = process.env.REACT_APP_SERVER_PTS_URL + response.data.filename;
+            console.log('download url ', _url)
+            saveAs(_url, response.data.filename);
+
         }
     }
 

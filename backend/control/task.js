@@ -224,9 +224,9 @@ exports.createResultfile = async function (request_ids, result_json, result_grou
                 const now = year + '_' + month + date + "_" + hours + minutes + seconds;
                 const strnow = String(now)
 
-                const newPath = '/Users/4dreplay/work/sfm_python/test_pts/' + `UserPointData_${request_ids[0]}_${strnow}.pts`;
                 const newFile = `UserPointData_${request_ids[0]}_${strnow}.pts`;
-                console.log('before file write', newFile)
+                const newPath = process.env.AUTO_CALIB_DIR_PTS + newFile;
+                console.log('before file write', newPath)
                 fs.writeFileSync(newPath, JSON.stringify(content), 'utf8', err => {
                     if (err) {
                         console.log('fs write file err : ', err)
