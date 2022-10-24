@@ -259,7 +259,7 @@ exports.getGroupStatus = function (groupno) {
             db.queryParams("SELECT a.request_id, a.job_id from task_request as a \
             LEFT OUTER JOIN group_info as b \
             on a.task_id = b.task_id and a.group_id = b.group_id \
-            WHERE b.no = $1 and a.request_category = 'CALCULATE'; ", [groupno], (err, res) => {
+            WHERE b.no = $1 and a.request_category = 'CALCULATE' and a.job_result != '-25'; ", [groupno], (err, res) => {
                 client.release(true);
                 if (err) {
                     console.log(err)

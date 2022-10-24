@@ -233,6 +233,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
 
                 if (response && response.data.status === 0) {
                     changeTableDataContext('changestatus', [keyindex, CAL_STATE.CANCEL]);
+                    changeTableDataContext('changestatusmsg', [keyindex, 'Job is Canceled.']);
                 }
             }
 
