@@ -75,9 +75,9 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
 
             console.log('check length ', Object.keys(groupTable).length, param[0].length)
             if (Object.keys(groupTable).length > param[0].length) {
-                for (let j = param[0].length; j < Object.keys(groupTable).length; j++) {
-                    console.log('delete', Object.keys(groupTable)[j])
-                    delete groupTable[Object.keys(groupTable)[j]]
+                for (let j = param[0].length; j <= Object.keys(groupTable).length ; j++) {
+                    console.log('delete', Object.keys(groupTable)[j-1])
+                    delete groupTable[Object.keys(groupTable)[j-1]]
                 }
             }
         } else if (type === 'addpostno') {
