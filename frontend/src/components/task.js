@@ -72,6 +72,14 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                 // groupTable[g.group_id].gen_id = 0;
                 // groupTable[g.group_id].gen_msg = '';
             }
+
+            console.log('check length ', Object.keys(groupTable).length, param[0].length)
+            if (Object.keys(groupTable).length > param[0].length) {
+                for (let j = param[0].length; j < Object.keys(groupTable).length; j++) {
+                    console.log('delete', Object.keys(groupTable)[j])
+                    delete groupTable[Object.keys(groupTable)[j]]
+                }
+            }
         } else if (type === 'addpostno') {
             groupTable[param[0]].post_no = param[1]
 

@@ -94,7 +94,7 @@ router.get('/groupinfo/:task_id', async (req, res) => {
 
     try {
         result = await handler.getGroupInfo(req.params.task_id)
-        console.log("get group info end  : " + result[0].group_id)
+        console.log("get group info end  : " + result.length)
         res.status(200).json({
             message: 'success',
             group: result,
