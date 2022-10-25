@@ -40,7 +40,6 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
     const [groupTable, setGroupTable] = useState(initItems);
 
     const [tableLoad, setTableLoad] = useState(false);
-    const [downloadInfo, setDownloadInfo] = useState({});
     const [leftImage, setLeftImage] = useState('');
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
@@ -196,7 +195,9 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
             if (response && response.data.percent) {
                 let strmsg = ''
                 if (parseInt(response.data.percent) === 100) {
-                    changeTableDataContext('changestatus', [keyindex, CAL_STATE.CAL_COMPLETE]);
+                    if (groupTable[keyindex].status !== CAL_STATE.GEN_COMPLETE) {
+                        changeTableDataContext('changestatus', [keyindex, CAL_STATE.CAL_COMPLETE]);
+                    }
                     if (response.data.result >= 0) {
                         strmsg = ` ${jobId} Done. ${response.data.percent}%`;
                     } else {
@@ -247,7 +248,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                         value="Calculate"
                         onClick={onCalculateClick}
                         hidden={groupTable[keyindex].cam_count < 5}
-                        disabled={groupTable[keyindex].status !== CAL_STATE.READY}>
+                        disabled={groupTable[keyindex].status !== CAL_STATE.READY && groupTable[keyindex].status !== CAL_STATE.CANCEL}>
                     </Button>{' '}
                     <Button size="sm"
                         as="input"

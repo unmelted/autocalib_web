@@ -67,13 +67,6 @@ function App(props) {
     setState('')
   }
 
-  const handleMouseEnter = () => {
-    setIsHover(true)
-  }
-  const handleMouseLeave = () => {
-    setIsHover(false)
-  }
-
   const MainContent = () => {
     if (state === 'create') {
       return (
