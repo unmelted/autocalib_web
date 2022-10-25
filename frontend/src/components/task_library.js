@@ -171,6 +171,9 @@ export const TaskLibrary = (props) => {
             setCheckedList([])
             setTaskId(taskId);
             getRequestHistory(taskId);
+            setLeftImage('')
+            setRightImage('')
+
         }
 
         const onHandleRequestClick = async (taskId, task_path) => {
@@ -180,6 +183,9 @@ export const TaskLibrary = (props) => {
             setTaskPath(task_path);
             setRequestGroupLoaded(true)
             setRequestHistoryLoaded(false)
+            setLeftImage('')
+            setRightImage('')
+
         }
 
         if (loaded === true) {
