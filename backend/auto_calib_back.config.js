@@ -1,8 +1,8 @@
 module.exports = {
     apps: [{
-        name: 'auto_calib_back',
+        name: 'autocalib_back',
         script: './bin/www',
-        instances: 8,
+        instances: 4,
         exec_mode: 'cluster',
         autorestart: true,
         watch: true,
