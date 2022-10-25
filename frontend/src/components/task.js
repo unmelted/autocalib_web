@@ -49,7 +49,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
     const changeTableDataContext = (type, param) => {
         console.log("changeTableContext", type, param);
         if (type === 'init') {
-            // groupTable = {};
+            setGroupTable(initItems)
             for (const g of param[0]) {
                 console.log("inner loop : ", g)
                 let tempval = {}
@@ -97,8 +97,13 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
 
         } else if (type === 'changegenmsg') {
             groupTable[param[0]].gen_msg = param[1]
+        } else if (type === 'clear') {
+            groupTable = {}
         }
-        setRefresh(refresh + 1)
+
+        if (type !== 'clear') {
+            setRefresh(refresh + 1)
+        }
     }
 
     const changeGenData = (type, param) => {
@@ -483,7 +488,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
             console.log("get group call..  ");
             try {
                 const group = await getGroupInfo(taskId);
-                setGroupInfo(group)
+                // setGroupInfo(group)
                 changeTableDataContext('init', [group])
 
             } catch (err) {
