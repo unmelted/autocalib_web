@@ -20,6 +20,7 @@ export const TaskLibrary = (props) => {
     const [requestTaskIdMessage, setRequestTaskIdMessage] = useState('')
     const [requestHistoryloaded, setRequestHistoryLoaded] = useState(false)
     const [requestGrouploaded, setRequestGroupLoaded] = useState(false)
+    const [downloadInfo, setDownloadInfo] = useState({ url: '', name: '' });
 
     const [requestHistory, setRequestHistory] = useState('')
     const [requestGroup, setRequestGroup] = useState('')
@@ -250,12 +251,17 @@ export const TaskLibrary = (props) => {
         if (response && response.data.status === 0) {
             console.log(response.data.filename)
             const _url = process.env.REACT_APP_SERVER_PTS_URL + response.data.filename;
+            setDownloadInfo({ url: _url, name: response.data.filename });
+            // saveAs(downloadInfo.url, downloadInfo.name);
             console.log('download url ', _url)
-            saveAs(_url, response.data.filename);
-
         }
     }
 
+    useEffect(() => {
+        if (downloadInfo.url !== '' && downloadInfo.name !== '') {
+            saveAs(downloadInfo.url, downloadInfo.name);
+        }
+    }, [downloadInfo])
 
     const today = new Date();
     let fromdate = new Date()

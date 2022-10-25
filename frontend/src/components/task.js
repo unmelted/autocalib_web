@@ -38,6 +38,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
     const [refresh, setRefresh] = useState(0)
     const [groupInfo, setGroupInfo] = useState('');
     const [groupTable, setGroupTable] = useState(initItems);
+    const [downloadInfo, setDownloadInfo] = useState({ url: '', name: '' });
 
     const [tableLoad, setTableLoad] = useState(false);
     const [leftImage, setLeftImage] = useState('');
@@ -442,6 +443,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
             ));
     };
 
+
     const downloadResult = async () => {
 
         console.log('download result click checked in task: ', checkedList)
@@ -461,9 +463,19 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
             console.log(response.data.filename)
             const _url = process.env.REACT_APP_SERVER_PTS_URL + response.data.filename;
             console.log('download url ', _url)
-            saveAs(_url, response.data.filename);
+            setDownloadInfo({ url: _url, name: response.data.filename });
+            // saveAs(downloadInfo.url, downloadInfo.name);
+            console.log('download url ', _url)
+
         }
     }
+
+    useEffect(() => {
+        if (downloadInfo.url !== '' && downloadInfo.name !== '') {
+            saveAs(downloadInfo.url, downloadInfo.name);
+        }
+    }, [downloadInfo])
+
 
     const getGroup = async (taskId, entry) => {
         console.log("set task load true ", taskId);

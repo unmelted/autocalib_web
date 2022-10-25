@@ -162,6 +162,7 @@ router.post('/getresult', async (req, res) => {
 
     try {
         [filepath, filename] = await taskManager.createResultfile(req.body.request_ids, result_json, result_group);
+        console.log('getresult send success')
         res.status(200).json({
             status: 0, // 0: success, other-error code
             filename: filename,
@@ -169,6 +170,7 @@ router.post('/getresult', async (req, res) => {
             message: "success" // 결과 메시지, eg. “SUCCCESS”
         });
     } catch (err) {
+        console.log('getresult send fail')
         res.status(500).json({
             status: -1,
             filename: '',
