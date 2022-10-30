@@ -75,3 +75,24 @@ Table thead {
     justify-content: right;
     margin-bottom: 20px;
 }
+
+#request-history-gendiv {
+    justify-content: right;
+    align-items: center;
+    display: inline-flex;
+}
+
+/* #gen-result-check {
+    width: 13px;
+    height: 14px;
+    background-color: white;
+    outline-color: black;
+} */
+
+#gen-result-review {
+    margin-left: 20px;
+}
+
+#modal-dialog {
+    background: black;
+}
