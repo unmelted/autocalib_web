@@ -2,13 +2,17 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
+import { Form } from 'react-bootstrap'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
 import '../css/task_library.css';
-import pin from '../asset/pin.png';
 import refresh from '../asset/refresh.png';
 import { TaskGroupTable } from './task.js'
 import { PairCanvas } from './canvas.js'
+import ReviewGallery from './gallery.js';
+import pin from '../asset/pin.png';
+import magni from '../asset/magni.png';
+import play from '../asset/play.png';
 
 export const TaskLibrary = (props) => {
 
@@ -126,6 +130,13 @@ export const TaskLibrary = (props) => {
             console.log("onChecked Element : ", checkedList);
         }
 
+        const onHandleReviewClick = (taskId, requestId, jobId) => {
+            console.log('onHandleReviewClick . ', jobId)
+            return <>
+                <ReviewGallery taskId={taskId} requestId={requestId} jobId={jobId} />
+            </>
+        }
+
         if (requestHistoryloaded === true) {
             return (
                 requestHistory.map((req =>
@@ -143,16 +154,29 @@ export const TaskLibrary = (props) => {
                                 type='button'
                                 value='Pair'
                                 onClick={() => onHandlePairClick(req.request_category, req.task_id, req.group_id, req.job_id)}
-                                style={{ width: '65px' }}
+                                style={{ width: '80px' }}
                                 disabled={req.job_status !== 100 || req.job_result < 0}
                             >
                             </Button>
                         </td>
-                        <td hidden={req.request_category !== 'GENERATE'}
-                            disabled={req.job_status !== 100 || req.job_result !== 100}>
-                            <InputGroup.Checkbox
-                                onChange={(e) => onCheckedElement(e.target.checked, req.request_id)}
-                                checked={checkedList.includes(req.request_id) ? true : false} />
+                        <td hidden={req.request_category !== 'GENERATE'}>
+                            <div id='request-history-gendiv'>
+                                <Button id='gen-result-reivew'
+                                    size='sm'
+                                    // as="input"
+                                    variant="primary"
+                                    type="button"
+                                    onClick={() => onHandleReviewClick(req.task_id, req.request_id, req.job_id)}
+                                    disabled={parseInt(req.job_status) !== 100 || parseInt(req.job_result) !== (100)}  >
+                                    <img src={play} width='20px' />
+                                </Button> &nbsp;&nbsp;
+                                {/* <Form.Check */}
+                                <InputGroup.Checkbox
+                                    id='gen-result-check'
+                                    type='Checkbox'
+                                    onChange={(e) => onCheckedElement(e.target.checked, req.request_id)}
+                                    checked={checkedList.includes(req.request_id) ? true : false} />
+                            </div>
                         </td>
                     </tr >
                 )

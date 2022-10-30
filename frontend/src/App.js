@@ -7,7 +7,6 @@ import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './css/App.css';
 import AutoCalib from './components/auto_calib';
 import TaskLibrary from './components/task_library';
-import ReviewGallery from './components/gallery';
 import plus from './asset/plus.png';
 import search from './asset/search.png';
 import help from './asset/help.png';
@@ -91,7 +90,6 @@ function App(props) {
     else if (state === 'alien') {
       return (
         <>
-          <ReviewGallery />
         </>
       )
     }
