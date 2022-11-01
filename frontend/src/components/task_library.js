@@ -9,10 +9,11 @@ import '../css/task_library.css';
 import refresh from '../asset/refresh.png';
 import { TaskGroupTable } from './task.js'
 import { PairCanvas } from './canvas.js'
-import ReviewGallery from './gallery.js';
+import { ReviewGallery } from './gallery.js';
 import pin from '../asset/pin.png';
 import magni from '../asset/magni.png';
 import play from '../asset/play.png';
+import Modal from 'react-bootstrap/Modal';
 
 export const TaskLibrary = (props) => {
 
@@ -32,6 +33,8 @@ export const TaskLibrary = (props) => {
     const [rightImage, setRightImage] = useState('');
     const [canvasJob, setCanvasJob] = useState('')
     const [checkedList, setCheckedList] = useState([])
+    const [modalshow, setModalShow] = useState(false)
+    const [reviewJob, setReviewJob] = useState('')
 
     const changeHandle = (type, param) => {
         console.log('change handle is called', type, param)
@@ -45,6 +48,9 @@ export const TaskLibrary = (props) => {
 
         } else if (type === 'changegenmsg') {
             console.log('no use.. chagne gen mesage..');
+        } else if (type === 'modalclose') {
+            console.log('notification closing ');
+            setModalShow(false)
         }
     }
 
@@ -61,7 +67,19 @@ export const TaskLibrary = (props) => {
         else {
             return <></>
         }
-
+    }
+    const ReviewModal = () => {
+        console.log('review modal .. : ', modalshow)
+        if (modalshow === true) {
+            return (
+                <>
+                    <ReviewGallery taskId={reviewJob[0]} requestId={reviewJob[1]} changeHandle={changeHandle} ></ReviewGallery>
+                </>
+            )
+        }
+        else {
+            return <></>
+        }
     }
 
     const getRequestHistory = async (taskId) => {
@@ -90,6 +108,7 @@ export const TaskLibrary = (props) => {
     }
 
     const RequstHistoryTable = () => {
+
         const onHandlePairClick = async (category, taskId, groupId, jobId) => {
             console.log("onHandleGetPairClick ", category, taskId, groupId, jobId)
             let response = null;
@@ -130,11 +149,10 @@ export const TaskLibrary = (props) => {
             console.log("onChecked Element : ", checkedList);
         }
 
-        const onHandleReviewClick = (taskId, requestId, jobId) => {
-            console.log('onHandleReviewClick . ', jobId)
-            return <>
-                <ReviewGallery taskId={taskId} requestId={requestId} jobId={jobId} />
-            </>
+        const onHandleReviewClick = (taskId, requestId) => {
+            console.log('onHandleReviewClick . ', requestId, modalshow)
+            setReviewJob([taskId, requestId])
+            setModalShow(true)
         }
 
         if (requestHistoryloaded === true) {
@@ -166,7 +184,7 @@ export const TaskLibrary = (props) => {
                                     // as="input"
                                     variant="primary"
                                     type="button"
-                                    onClick={() => onHandleReviewClick(req.task_id, req.request_id, req.job_id)}
+                                    onClick={() => onHandleReviewClick(req.task_id, req.request_id)}
                                     disabled={parseInt(req.job_status) !== 100 || parseInt(req.job_result) !== (100)}  >
                                     <img src={play} width='20px' />
                                 </Button> &nbsp;&nbsp;
@@ -179,8 +197,8 @@ export const TaskLibrary = (props) => {
                             </div>
                         </td>
                     </tr >
-                )
-                ));
+                ))
+            );
         }
         else {
             return (
@@ -365,6 +383,9 @@ export const TaskLibrary = (props) => {
             </div>
             <div>
                 <Canvas></Canvas>
+            </div>
+            <div>
+                <ReviewModal />
             </div>
         </>
     )

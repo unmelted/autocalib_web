@@ -404,3 +404,38 @@ exports.getFullPath = function (request_id) {
         });
     });
 }
+
+exports.getReviewImages = function (request_id) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+
+            db.queryParams("SELECT job_id FROM task_request WHERE request_id = $1; ", [request_id], (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    reject(-1);
+                }
+                else {
+                    if (res.rows.length === 1) {
+                        console.log('get generated job query success ' + res.rows[0].job_id);
+                        resolve(res.rows)
+                    }
+                    else if (res.rows.length == 0) {
+                        console.log('get generated job query fail - no rows.');
+                        reject(-1)
+                    }
+                    else {
+                        console.log("get groupStatus no err or multi ")
+                        reject(-10)
+                    }
+                }
+
+            }, client);
+
+        });
+    });
+}

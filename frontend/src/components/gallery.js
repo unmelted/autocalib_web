@@ -5,55 +5,70 @@ import ImageGallery from "react-image-gallery";
 import Modal from 'react-bootstrap/Modal';
 import '../css/task_library.css';
 
-export const ReviewGallery = ({ taskId, requestId, jobId }) => {
-    const [show, setShow] = useState(false)
+export const ReviewGallery = ({ taskId, requestId, changeHandle }) => {
+    const [show, setShow] = useState(true)
+    // setShow(true)
+    const [firstcall, setFirstcall] = useState(false)
     const [loaded, setLoaded] = useState(false)
     const [images, setImages] = React.useState(null);
+    let imagelist = []
+    let shouldCancel = false
 
-    let shouldCancel = false;
+    const call = async () => {
+        let response = null
 
-    const ModalWindow = () => {
-        const call = async () => {
-            const response = await axios.get(
-                "https://google-photos-album-demo2.glitch.me/4eXXxxG3rYwQVf948"
-            );
-            if (!shouldCancel && response.data && response.data.length > 0) {
-                setImages(
-                    response.data.map(url => ({
-                        original: `${url}=w960`,
-                        thumbnail: `${url}=w100`
-                    }))
-                );
-                // alert('modal call.. ', images)
-                setLoaded(true)
-                setShow(true)
+        try {
+            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getreview/${requestId}`)
+            console.log('finish await')
+
+        } catch (err) {
+            console.log(err)
+            return;
+        }
+
+        if (response && response.data.status === 0) {
+            for (const item of response.data.images) {
+                const realfile = process.env.REACT_APP_SERVER_REVIEW_URL + item
+                imagelist.push({ original: realfile, })
+
             }
-        };
+            setImages(imagelist)
+            setLoaded(true)
+        }
+    };
 
-
+    if (firstcall === false) {
         if (loaded === false) {
             call();
         }
-        return (
-            <>
-                <Modal show={show}
-                    onHide={() => setShow(false)}
-                    id='modal-dialog'
-                    size='xl'>
-                    <Modal.Header closeButton>
-                        <Modal.Title>
-                            Custom Modal Styling
-                        </Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        <ImageGallery items={images} showThumbnails={false} showIndex={true} slideDuration={50} slideInterval={500} />
-                    </Modal.Body>
-                </Modal>
-            </>
-        )
+        setFirstcall(true)
+
+        // for (const one of images) {
+        //     console.log('list check ..', one)
+        // }
+
     }
 
-    return <ModalWindow></ModalWindow>
+    return (
+        <div>
+            <Modal show={loaded}
+                onHide={() => {
+                    setShow(false)
+                    setLoaded(false)
+                    changeHandle('modalclose', [])
+                }}
+                size='xl'>
+                <Modal.Header closeButton>
+                    <Modal.Title>
+                        {taskId} Generated Output ..
+                    </Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    <ImageGallery items={images} showThumbnails={false} showIndex={true} slideDuration={50} slideInterval={1000} originalHeight={720} originalWidth={1280} />
+                </Modal.Body>
+            </Modal>
+        </div>
+    )
 };
 
 export default ReviewGallery;

@@ -182,4 +182,39 @@ router.post('/getresult', async (req, res) => {
 
 });
 
+
+router.get('/getreview/:request_id', async (req, res) => {
+
+    console.log("router getreivew request_id : ", req.params.request_id)
+
+    try {
+        result = await handler.getReviewImages(req.params.request_id)
+        console.log('getReviewImages hander return : ', result.length)
+        if (result.length === 1) {
+            const job_id = result[0].job_id
+            try {
+                images = await taskManager.getReivewImages(job_id);
+                console.log('images.. ', images)
+                res.status(200).json({
+                    status: 0,
+                    images: images
+                });
+
+            } catch (err) {
+                console.log('taskmanager get reivew images fail : ', err)
+                res.status(500).json({})
+            }
+
+        } else {
+            console.log('cannot get review images . ')
+            res.status(500).json({})
+        }
+    }
+    catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+
+});
+
 module.exports = router;
