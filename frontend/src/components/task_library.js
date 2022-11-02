@@ -13,7 +13,6 @@ import { ReviewGallery } from './gallery.js';
 import pin from '../asset/pin.png';
 import magni from '../asset/magni.png';
 import play from '../asset/play.png';
-import Modal from 'react-bootstrap/Modal';
 
 export const TaskLibrary = (props) => {
 

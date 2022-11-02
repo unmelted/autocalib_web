@@ -28,8 +28,9 @@ export const ReviewGallery = ({ taskId, requestId, changeHandle }) => {
 
         if (response && response.data.status === 0) {
             for (const item of response.data.images) {
+                const desc = item.split('/')[1].split('_')[0]
                 const realfile = process.env.REACT_APP_SERVER_REVIEW_URL + item
-                imagelist.push({ original: realfile, })
+                imagelist.push({ original: realfile, originalTitle: desc, description: desc })
 
             }
             setImages(imagelist)
@@ -64,7 +65,7 @@ export const ReviewGallery = ({ taskId, requestId, changeHandle }) => {
                     </Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    <ImageGallery items={images} showThumbnails={false} showIndex={true} slideDuration={50} slideInterval={1000} originalHeight={720} originalWidth={1280} />
+                    <ImageGallery items={images} showThumbnails={false} showIndex={true} slideInterval={1000} disableSwipe={true} originalHeight={720} originalWidth={1280} />
                 </Modal.Body>
             </Modal>
         </div>

@@ -120,6 +120,7 @@ exports.parsingGroupInfo = async function (taskId, fullPath) {
                 } catch (err) {
                     console.log('parsing json err ', err)
                     reject(-1)
+                    return -1;
                 }
                 if (obj === '') {
                     reject(-1)

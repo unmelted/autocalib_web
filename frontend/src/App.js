@@ -17,35 +17,6 @@ function App(props) {
   const [state, setState] = useState('')
   const [isHover, setIsHover] = useState('')
 
-  // const changeTableData = async (type, params) => {
-  //   console.log('chage table data : ', type, params)
-  //   if (type === 'addJobid') {
-  //     const groupNo = params[0]
-  //     const jobid = params[1]
-  //     console.log(`changeTableData is called with ${groupNo}, ${jobid}`)
-  //     for (const group of groupInfo.groups) {
-  //       if (group.no === groupNo) {
-  //         group["job_id"] = jobid;
-  //         console.log("changeTableData modify the jobid of group.. " + jobid)
-  //         break;
-  //       }
-  //     }
-  //   } else if (type === 'reset') {
-  //     console.log('reset called task_id:', params[0]);
-  //     // const taskId = params[0]
-  //     // try {
-  //     //     const group = await getGroupInfo(taskId);
-  //     //     for (const g of group) {
-  //     //         g["status"] = '';
-  //     //     }
-  //     //     setGroupInfo(group);
-  //     // } catch (err) {
-  //     //     console.log("change Table  data reset err ", err);
-  //     // }
-  //     setGroupInfo(params[0])
-  //   }
-  // }
-
   const onHandleCreateTask = () => {
     setState('create')
   };
@@ -95,6 +66,9 @@ function App(props) {
     }
   }
 
+  console.log(process.env.REACT_APP_VERSION)
+
+
   return (
     <div className="App">
       <nav className="navbar navbar-dark bg-dark py-3"
@@ -112,6 +86,9 @@ function App(props) {
                 style={{ height: '70%', width: '240px', cursor: isHover ? 'pointer' : 'hand' }}
               /> </Col>
             <Col xs lg="3"><h3>Auto-Calibration</h3> </Col>
+          </Row>
+          <Row id='row-version-info'>
+            <Col xs align='right'>FRONT {process.env.REACT_APP_VERSION} / BACK {process.env.REACT_APP_VERSION} / EXODUS {process.env.REACT_APP_VERSION}</Col>
           </Row>
           <hr />
           <Row className="justify-content-md-center">

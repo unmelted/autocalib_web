@@ -3,10 +3,12 @@ import axios from 'axios';
 import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
-import { getGroupInfo } from './util.js'
 import Table from 'react-bootstrap/Table';
-import '../css/task.css';
+import { getGroupInfo } from './util.js'
+import { ReviewGallery } from './gallery.js';
 import { PairCanvas } from './canvas.js'
+import '../css/task.css';
+import play from '../asset/play.png';
 
 const initItems = {
     'Group1': {
@@ -46,6 +48,9 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
     const [canvasJob, setCanvasJob] = useState('')
     const [checkedList, setCheckedList] = useState([])
 
+    const [modalshow, setModalShow] = useState(false)
+    const [reviewJob, setReviewJob] = useState('')
+
     const changeTableDataContext = (type, param) => {
         console.log("changeTableContext", type, param);
         if (type === 'init') {
@@ -75,9 +80,9 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
 
             console.log('check length ', Object.keys(groupTable).length, param[0].length)
             if (Object.keys(groupTable).length > param[0].length) {
-                for (let j = param[0].length; j <= Object.keys(groupTable).length ; j++) {
-                    console.log('delete', Object.keys(groupTable)[j-1])
-                    delete groupTable[Object.keys(groupTable)[j-1]]
+                for (let j = param[0].length; j <= Object.keys(groupTable).length; j++) {
+                    console.log('delete', Object.keys(groupTable)[j - 1])
+                    delete groupTable[Object.keys(groupTable)[j - 1]]
                 }
             }
         } else if (type === 'addpostno') {
@@ -107,6 +112,9 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
             groupTable[param[0]].gen_msg = param[1]
         } else if (type === 'clear') {
             groupTable = {}
+        } else if (type === 'modalclose') {
+            console.log('notification closing ');
+            setModalShow(false)
         }
 
         if (type !== 'clear') {
@@ -133,6 +141,20 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
             return <></>
         }
 
+    }
+
+    const ReviewModal = () => {
+        console.log('review modal .. : ', modalshow)
+        if (modalshow === true) {
+            return (
+                <>
+                    <ReviewGallery taskId={reviewJob[0]} requestId={reviewJob[1]} changeHandle={changeTableDataContext} ></ReviewGallery>
+                </>
+            )
+        }
+        else {
+            return <></>
+        }
     }
 
     const getGroupStatus = async (keyindex) => {
@@ -331,7 +353,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                     setRightImage(imageUrlSecond);
                     setCanvasJob([groupTable[keyindex].job_id, taskId, keyindex])
                     changeTableDataContext('changestatus', [keyindex, CAL_STATE.PAIR_COMPLETE]);
-                    changeTableDataContext('changegenmsg', [keyindex, `${response.data.first_image}, ${response.data.first_image} is chosen`])
+                    changeTableDataContext('changegenmsg', [keyindex, `${response.data.first_image}, ${response.data.second_image} is chosen`])
                 } else {
                     return;
                 }
@@ -400,6 +422,13 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                 }
                 console.log("onChecked Element : ", checkedList);
             }
+
+            const onHandleReviewClick = (requestId) => {
+                console.log('onHandleReviewClick . ', requestId, modalshow)
+                setReviewJob([taskId, requestId])
+                setModalShow(true)
+            }
+
             console.log(" draw taskrow result ", keyindex, groupTable[keyindex].status);
             return (
                 <div>
@@ -412,7 +441,16 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                         disabled={groupTable[keyindex].status !== CAL_STATE.SUBMIT}
                     >
                     </Button>
-                    <div hidden={groupTable[keyindex].status !== CAL_STATE.GEN_COMPLETE} >
+                    <div hidden={groupTable[keyindex].status !== CAL_STATE.GEN_COMPLETE}
+                        id='request-history-gendiv'>
+                        <Button id='gen-result-reivew'
+                            size='sm'
+                            // as="input"
+                            variant="primary"
+                            type="button"
+                            onClick={() => onHandleReviewClick(groupTable[keyindex].post_no)}>
+                            <img src={play} width='20px' />
+                        </Button> &nbsp;&nbsp;
                         <InputGroup.Checkbox hidden={groupTable[keyindex].cam_count < 5}
                             // disabled={groupTable[keyindex].status !== CAL_STATE.GEN_COMPLETE}
                             onChange={(e) => onCheckedElement(e.target.checked, groupTable[keyindex].post_no)}
@@ -569,6 +607,9 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                     {/* <TableDataContext.Provider value={{ groupTable, changeTableDataContext }}> */}
                     <Canvas></Canvas>
                     {/* </TableDataContext.Provider> */}
+                </div>
+                <div>
+                    <ReviewModal />
                 </div>
             </Fragment >
         )

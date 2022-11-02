@@ -9,6 +9,17 @@ const handler = require('../db/handler.js')
 const taskManager = require('../control/task.js');
 const { response } = require("../app.js");
 
+router.get('/getversion', async (req, res) => {
+
+    console.log("getversion is called ");
+    result = process.env.AUTO_CALIB_VERSION;
+    console.log('result ', result)
+    res.status(200).json({
+        version: result,
+
+    })
+});
+
 router.post('/addalias', async (req, res) => {
 
     console.log("add alias is called ");
