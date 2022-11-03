@@ -3,19 +3,22 @@ import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button'
+import Badge from 'react-bootstrap/Badge';
+
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './css/App.css';
 import AutoCalib from './components/auto_calib';
 import TaskLibrary from './components/task_library';
+
 import plus from './asset/plus.png';
 import search from './asset/search.png';
 import help from './asset/help.png';
 import alien from './asset/alien.png';
 
-
 function App(props) {
   const [state, setState] = useState('')
   const [isHover, setIsHover] = useState('')
+  const guideFile = process.env.REACT_APP_SERVER_GUIDE + process.env.REACT_APP_VERSION + '.pdf';
 
   const onHandleCreateTask = () => {
     setState('create')
@@ -53,6 +56,7 @@ function App(props) {
       )
     }
     else if (state === 'guide') {
+      // console.log('guide file name : ', guideFile)
       return (
         <>
         </>
@@ -87,9 +91,10 @@ function App(props) {
               /> </Col>
             <Col xs lg="3"><h3>Auto-Calibration</h3> </Col>
           </Row>
-          <Row id='row-version-info'>
-            <Col xs align='right'>FRONT {process.env.REACT_APP_VERSION} / BACK {process.env.REACT_APP_VERSION} / EXODUS {process.env.REACT_APP_VERSION}</Col>
+          <Row>
+            <Col xs align='right'> <Badge bg="primary" style={{ width: '80px' }}>VERSION </Badge> {process.env.REACT_APP_VERSION} / {process.env.REACT_APP_VERSION} / EXODUS {process.env.REACT_APP_VERSION}</Col>
           </Row>
+          <p></p>
           <hr />
           <Row className="justify-content-md-center">
             <Col xs lg='2'>
@@ -104,8 +109,8 @@ function App(props) {
                 Search Task</Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "guide" ? "primary" : "seconday"}
-                style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleGuide}><img src={help} width="60px" alt="" /> <p></p>
+                style={{ width: '140px', color: '#FFFFFF', float: 'center' }}>
+                <a href={guideFile} target="_blank"><img src={help} width="60px" alt="" /></a> <p></p>
                 Guide</Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "alien" ? "primary" : "seconday"}
