@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
+import axios from 'axios';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -18,6 +19,7 @@ import alien from './asset/alien.png';
 function App(props) {
   const [state, setState] = useState('')
   const [isHover, setIsHover] = useState('')
+  const [version, setVersion] = useState('')
   const guideFile = process.env.REACT_APP_SERVER_GUIDE + process.env.REACT_APP_VERSION + '.pdf';
 
   const onHandleCreateTask = () => {
@@ -69,9 +71,32 @@ function App(props) {
       )
     }
   }
+  const getVersion = async () => {
+    let response = null;
+    try {
+      response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/getversion`)
+    } catch (err) {
+      console.log(err)
+    }
+
+    if (response) {
+      if (response.data) {
+        const exodus_version = response.data.exodus_version;
+        const back_version = response.data.back_version;
+        console.log(exodus_version, back_version)
+
+        const ver_str = `${process.env.REACT_APP_VERSION}  / ${back_version}  / exodus ${exodus_version}`
+        console.log(ver_str)
+        setVersion(ver_str)
+      }
+    }
+  }
+
+  useEffect(() => {
+    getVersion()
+  }, [])
 
   console.log(process.env.REACT_APP_VERSION)
-
 
   return (
     <div className="App">
@@ -92,7 +117,7 @@ function App(props) {
             <Col xs lg="3"><h3>Auto-Calibration</h3> </Col>
           </Row>
           <Row>
-            <Col xs align='right'> <Badge bg="primary" style={{ width: '80px' }}>VERSION </Badge> {process.env.REACT_APP_VERSION} / {process.env.REACT_APP_VERSION} / EXODUS {process.env.REACT_APP_VERSION}</Col>
+            <Col xs align='right'> <Badge bg="primary" style={{ width: '80px' }}>VERSION </Badge>  {version}</Col>
           </Row>
           <p></p>
           <hr />

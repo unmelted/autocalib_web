@@ -199,4 +199,28 @@ router.get('/getresult/:job_id', (req, res) => {
   return result;
 });
 
-module.exports = router;
+
+router.get('/getversion', (req, res) => {
+  // Exodus API: 7.1.2	GET /exodus/autocalib/getversion
+  const options = {
+    uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/getversion',
+    method: 'GET',
+    json: true
+  }
+
+  console.log("Call Exodus API: " + options.uri);
+  request.get(options, async function (err, response, body) {
+    if (!err) {
+      console.log("Response: " + JSON.stringify(body));
+      res.status(200).json({
+        body
+      });
+
+    } else {
+      console.log(err)
+      res.status(500).json({})
+    }
+  });
+}
+
+); module.exports = router;

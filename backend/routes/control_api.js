@@ -12,12 +12,34 @@ const { response } = require("../app.js");
 router.get('/getversion', async (req, res) => {
 
     console.log("getversion is called ");
-    result = process.env.AUTO_CALIB_VERSION;
-    console.log('result ', result)
-    res.status(200).json({
-        version: result,
+    let ex_version = 0
 
-    })
+    const options = {
+        uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/getversion',
+        method: 'GET',
+        json: true
+    }
+
+    console.log("Call Exodus API // request : " + options.uri);
+    request.get(options, async function (err, response, body) {
+        if (!err) {
+            console.log("Response: " + JSON.stringify(body));
+            ex_version = body.version
+
+        } else {
+            console.log(err)
+            res.status(500).json({})
+            return
+        }
+
+        result = process.env.AUTO_CALIB_VERSION;
+        console.log('result ', result, ex_version)
+
+        res.status(200).json({
+            exodus_version: ex_version,
+            back_version: result,
+        })
+    });
 });
 
 router.post('/addalias', async (req, res) => {
