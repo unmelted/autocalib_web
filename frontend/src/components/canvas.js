@@ -14,9 +14,10 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const mousePosRightRef = useRef(null);
     const targetInfoLeftRef = useRef(null);
     const targetInfoRightRef = useRef(null);
-    const targetPointRef = useRef({ left: [], right: [] });
+    const targetPointRef = useRef({ left: [], right: [], world: [] })
     const targetPoint2D = useRef({ left: [], right: [] })
     const targetPoint3D = useRef({ left: [], right: [] })
+    const targetPointWorld = useRef([])
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
@@ -58,6 +59,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const pointRadius = parseInt(process.env.REACT_APP_POINT_RADIUS, 10);
     const maxTargetNum = useRef(0);
     const calibMode = useRef(null);
+    const calibPrevMode = useRef(null)
 
 
     const InsertRefPointToStorate = (storeMode) => {
@@ -82,7 +84,11 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             for (let i = 0; i < targetPointRef.current.right.length; i++) {
                 targetPoint3D.current['right'].push({ x: targetPointRef.current.right[i].x, y: targetPointRef.current.right[i].y });
             }
-
+        } else if (storeMode === 'World') {
+            targetPointWorld.current = [];
+            for (let i = 0; i < targetPointRef.current.world.length; i++) {
+                targetPointWorld.current.push({ x: targetPointRef.current.world[i].x, y: targetPointRef.current.world[i].y });
+            }
         }
     }
 
@@ -97,10 +103,11 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         console.log("now calibration mode is ", calibMode.current)
 
         if (calibMode.current === '3D') {
-            InsertRefPointToStorate('2D')
+            InsertRefPointToStorate(calibPrevMode.current)
 
             targetPointRef.current.left = [];
             targetPointRef.current.right = [];
+            targetPointRef.current.world = [];
             for (let i = 0; i < targetPoint3D.current.left.length; i++) {
                 targetPointRef.current['left'].push({ x: targetPoint3D.current.left[i].x, y: targetPoint3D.current.left[i].y });
             }
@@ -109,11 +116,11 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             }
         }
         else if (calibMode.current === '2D') {
-            InsertRefPointToStorate('3D')
+            InsertRefPointToStorate(calibPrevMode.current)
 
             targetPointRef.current.left = [];
             targetPointRef.current.right = [];
-
+            targetPointRef.current.world = [];
             for (let i = 0; i < targetPoint2D.current.left.length; i++) {
                 targetPointRef.current['left'].push({ x: targetPoint2D.current.left[i].x, y: targetPoint2D.current.left[i].y });
             }
@@ -122,6 +129,17 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             }
 
         }
+        else if (calibMode.current === 'World') {
+            InsertRefPointToStorate(calibPrevMode.current)
+            targetPointRef.current.left = [];
+            targetPointRef.current.right = [];
+            targetPointRef.current.world = [];
+
+            for (let i = 0; i < targetPointWorld.current.length; i++) {
+                targetPointRef.current['world'].push({ x: targetPointWorld.current[i].x, y: targetPointWorld.current[i].y });
+            }
+        }
+
         if (targetPointRef.current['left'].length > 0) {
             drawTarget('left');
         }
@@ -140,25 +158,31 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
 
     const [varClass2D, setvarClass2D] = React.useState("btn-secondary")
     const [varClass3D, setvarClass3D] = React.useState("btn-secondary")
+    const [varClassWorld, setvarClassWorld] = React.useState("btn-secondary")
+
     const [calibMode2D, setCalibMode2D] = React.useState(false)
     const [calibMode3D, setCalibMode3D] = React.useState(false)
+    const [calibModeWorld, setCalibModeWorld] = React.useState(false)
     const [eMessage, seteMessage] = React.useState("Please select Calibration mode.")
 
     const ModeButton2D = ({ id, label }) => {
         const handleModeChange = () => {
             console.log("2d button change", calibMode2D, calibMode3D)
             if (calibMode2D === false) {
-                setCalibMode2D(true)
-                setCalibMode3D(false)
+                // setCalibMode2D(true)
+                // setCalibMode3D(false)
+                // setCalibModeWorld(false)
                 setvarClass2D("btn-primary")
                 setvarClass3D("btn-secondary")
+                setvarClassWorld('btn-secondary')
                 seteMessage("2D Calibration mode : You should pick 2 points per each image.")
+                calibPrevMode.current = calibMode.current;
                 calibMode.current = '2D'
                 maxTargetNum.current = 2
                 console.log(" 2d calib mode true")
             }
             else {
-                setCalibMode2D(false)
+                // setCalibMode2D(false)
                 calibMode.current = null
                 setvarClass2D("btn-secondary")
                 seteMessage("")
@@ -186,17 +210,20 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         const handleModeChange = () => {
             console.log("3d button change")
             if (calibMode3D === false) {
-                setCalibMode2D(false)
-                setCalibMode3D(true)
+                // setCalibMode2D(false)
+                // setCalibMode3D(true)
+                // setCalibModeWorld(false)
                 setvarClass3D("btn-privary")
                 setvarClass2D("btn-secondary")
+                setvarClassWorld('btn-secondary')
+                calibPrevMode.current = calibMode.current;
                 calibMode.current = '3D'
                 maxTargetNum.current = 4
                 seteMessage("3D Calibration mode : You should pick 4 points per each image.")
                 console.log(" 3d calib mode set true")
             }
             else {
-                setCalibMode3D(false)
+                // setCalibMode3D(false)
                 calibMode.current = null
                 setvarClass3D("btn-secondary")
                 seteMessage("")
@@ -218,6 +245,47 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             >
             </Button>)
     };
+
+    const ModeButtonWorld = ({ id, label }) => {
+        const handleModeChange = () => {
+            console.log("world button change")
+            if (calibModeWorld === false) {
+                // setCalibMode2D(false)
+                // setCalibMode3D(false)
+                // setCalibModeWorld(true)
+                setvarClassWorld("btn-primary")
+                setvarClass2D("btn-secondary")
+                setvarClass3D("btn-secondary")
+                seteMessage("World Select  mode : You should pick 4 points for 3D calibration.")
+                calibPrevMode.current = calibMode.current;
+                calibMode.current = 'World'
+                maxTargetNum.current = 4
+
+            }
+            else {
+                // setCalibModeWorld(false)
+                calibMode.current = null
+                setvarClassWorld('btn-secondary')
+                seteMessage('')
+                console.log('world selection mode false')
+            }
+            ModeChange();
+        }
+
+        return (
+            <Button size="sm"
+                variant='primary'
+                className={varClassWorld}
+                id={id}
+                as="input"
+                type='button'
+                value={label}
+                onClick={handleModeChange}
+                style={styleBtn}
+            >
+            </Button>)
+    };
+
 
     const clearPoints = () => {
         targetPointRef.current.left = [];
@@ -538,6 +606,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                     <Form.Group className="modeButton">
                         <ModeButton2D id='2d-mode' label='2D' ></ModeButton2D>
                         <ModeButton3D id='3d-mode' label='3D' ></ModeButton3D>
+                        <ModeButtonWorld id='world' label='World' ></ModeButtonWorld>
                         <span style={{ marginLeft: '30px' }}>{eMessage}</span>
                         <Button
                             size="sm"

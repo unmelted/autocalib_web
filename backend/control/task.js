@@ -114,7 +114,7 @@ exports.parsingGroupInfo = async function (taskId, fullPath) {
                     reject(-1)
                     return -1;
                 }
-
+                console.log(data)
                 try {
                     obj = JSON.parse(data)
                 } catch (err) {

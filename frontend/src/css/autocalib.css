@@ -49,6 +49,14 @@
 
 }
 
+#dropdown-event {
+  float: left;
+  width: 200px;
+  /* height: 80px; */
+  margin-bottom: 20px;
+  margin-right: 20px;
+}
+
 
 #button-row-reset {
   display: flex;

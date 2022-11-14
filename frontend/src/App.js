@@ -137,11 +137,11 @@ function App(props) {
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}>
                 <a href={guideFile} target="_blank"><img src={help} width="60px" alt="" /></a> <p></p>
                 Guide</Button></Col>
-            <Col xs lg='2'>
+            {/* <Col xs lg='2'>
               <Button variant={state === "alien" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FF0000', float: 'center' }}
                 onClick={onHandleAlien}><img src={alien} width="60px" alt="" /> <p></p>
-                BackDoor</Button></Col>
+                BackDoor</Button></Col> */}
 
           </Row>
           <p></p>
