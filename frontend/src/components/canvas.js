@@ -1,23 +1,56 @@
 
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import axios from 'axios';
-import Form from 'react-bootstrap/Form';
+import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button'
+import Form from 'react-bootstrap/Form';
+
 import '../css/canvas.css';
 
 export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupId, changeHandle }) => {
+    const groundtype =
+        [
+            'GROUND TYPE',
+            'BASEBALL HOME',
+            'BASEBALL',
+            'BASKETBALL HALF',
+            'BASKBALL',
+            'BOXING',
+            'ICELINK HALF',
+            'ICELINK',
+            'SOCCER HALF',
+            'SOCCER',
+            'TAEKWONDO',
+            'TENNINS HALF',
+            'TENNIS',
+            'UFC',
+            'VOLLEYBALL HALF',
+            'VOLLEYBALL',
+            'FOOTBALL'
+        ];
+
     const canvasLeftRef = useRef(null);
     const canvasRightRef = useRef(null);
+    const canvasWorldRef = useRef(null);
+
     const leftImageRef = useRef(null);
     const rightImageRef = useRef(null);
+    const worldImageRef = useRef(null);
+
     const mousePosLeftRef = useRef(null);
     const mousePosRightRef = useRef(null);
+    const mousePosWorldRef = useRef(null);
+
     const targetInfoLeftRef = useRef(null);
     const targetInfoRightRef = useRef(null);
+    const targetInfoWorldRef = useRef(null);
+
     const targetPointRef = useRef({ left: [], right: [], world: [] })
     const targetPoint2D = useRef({ left: [], right: [] })
     const targetPoint3D = useRef({ left: [], right: [] })
     const targetPointWorld = useRef([])
+    const [ground, setGround] = useState('')
+    const [worldImage, setWorldImage] = useState('')
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
@@ -25,6 +58,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const [jobid, setJobid] = useState(jobId)
     const [taskid, setTaskid] = useState(taskId)
     const [groupid, setGroupid] = useState(groupId)
+
     console.log('start canvas..1 id set ', jobId, taskId, groupId)
     console.log('start canvas..2 id set ', jobid, taskid, groupid)
     const canvasWidth = parseInt(process.env.REACT_APP_CANVAS_WIDTH, 10);
@@ -38,6 +72,8 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const targetInfo = { left: targetInfoLeftRef, right: targetInfoRightRef };
 
     let context = { left: null, right: null };
+    let contextWorld = null;
+
     let isDragging = {
         left: false,
         right: false
@@ -93,6 +129,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     }
 
     const styleBtn = { float: 'left', width: '100px', marginLeft: '20px' };
+
     function ModeChange() {
 
         setIsAllTarget(false);
@@ -256,7 +293,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                 setvarClassWorld("btn-primary")
                 setvarClass2D("btn-secondary")
                 setvarClass3D("btn-secondary")
-                seteMessage("World Select  mode : You should pick 4 points for 3D calibration.")
+                seteMessage("World Select: Select Ground Type first, and Pick 4 points for 3D calibration.")
                 calibPrevMode.current = calibMode.current;
                 calibMode.current = 'World'
                 maxTargetNum.current = 4
@@ -286,6 +323,22 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             </Button>)
     };
 
+
+    const SelectGroundType = () => {
+        const onHandleChange = (value) => {
+            console.log(value);
+            setGround(value)
+        }
+
+        return (
+            <Form.Select id="groundtype-select"
+                onChange={(event) => onHandleChange(event.target.value)} value={ground} >
+                {groundtype.map((item) => (
+                    <option value={item} key={item}>{item}</option>
+                ))}
+            </Form.Select>
+        )
+    }
 
     const clearPoints = () => {
         targetPointRef.current.left = [];
@@ -452,7 +505,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             context[type].setTransform(1, 0, 0, 1, 0, 0);
             context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
             context[type].restore();
-            context[type].scale(0.16, 0.16);
+            context[type].scale(0.32, 0.32);
             context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
         }
 
@@ -464,6 +517,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             right: canvasRightRef.current.getContext('2d')
         };
 
+        contextWorld = canvasWorldRef.current.getContext('world')
         // console.log("drawImageToCanvas  : " + context['left']);
         // console.log("drawImageToCanvas  : " + context['right']);
         // 
@@ -602,42 +656,54 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     return (
         <>
             <div className="modebtn-wrapper">
-                <div>
-                    <Form.Group className="modeButton">
-                        <ModeButton2D id='2d-mode' label='2D' ></ModeButton2D>
-                        <ModeButton3D id='3d-mode' label='3D' ></ModeButton3D>
-                        <ModeButtonWorld id='world' label='World' ></ModeButtonWorld>
-                        <span style={{ marginLeft: '30px' }}>{eMessage}</span>
-                        <Button
-                            size="sm"
-                            variant="primary"
-                            className="item-btn-wrapper"
-                            id='submit'
-                            as="input"
-                            type='button'
-                            value="Submit"
-                            onClick={submitPoints}
-                            style={{ float: 'right', width: '120px', marginRight: '10px' }}
-                            disabled={isSubmitCompleted === true}
-                        >
-                        </Button>
-                        <Button
-                            size="sm"
-                            variant="primary"
-                            id='clear-point'
-                            as="input"
-                            type='button'
-                            value="Clear Points"
-                            onClick={clearPoints}
-                            style={{ float: 'right', width: '120px', marginRight: '10px' }}
-                        >
-                        </Button>
+                <Row>
+                    <div>
+                        <Form.Group className="modeButton">
+                            <ModeButton2D id='2d-mode' label='2D' ></ModeButton2D>
+                            <ModeButton3D id='3d-mode' label='3D' ></ModeButton3D>
+                            <ModeButtonWorld id='world' label='World' ></ModeButtonWorld>
+                            <SelectGroundType />
+                            {/* <DropdownButton id="dropdown-event" size="sm" menuVariant='dark' title="GROUND TYPE" style={styleBtn} >
+                                <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
+                                <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
+                                <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
+                            </DropdownButton> */}
+                            <Button
+                                size="sm"
+                                variant="primary"
+                                className="item-btn-wrapper"
+                                id='submit'
+                                as="input"
+                                type='button'
+                                value="Submit"
+                                onClick={submitPoints}
+                                style={{ float: 'right', width: '120px', marginRight: '10px' }}
+                                disabled={isSubmitCompleted === true}
+                            >
+                            </Button>
+                            <Button
+                                size="sm"
+                                variant="primary"
+                                id='clear-point'
+                                as="input"
+                                type='button'
+                                value="Clear Points"
+                                onClick={clearPoints}
+                                style={{ float: 'right', width: '120px', marginRight: '10px' }}
+                            >
+                            </Button>
 
-                    </Form.Group>
-                </div>
-            </div>
+                        </Form.Group>
+                    </div>
+                </Row>
+                <Row>
+                    <div className="modebtn-message">
+                        <span >{eMessage}</span>
+                    </div>
+                </Row>
+            </div >
             <div>
-                <div className='canvas-wrapper'>
+                <div className='canvas-wrapper' hidden={calibMode.current === 'World'}>
                     <Form.Group>
                         <img
                             id='left-image'
@@ -662,6 +728,8 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                             ref={targetInfoLeftRef}
                         />
                     </Form.Group>
+                </div>
+                <div className='canvas-wrapper' hidden={calibMode.current === 'World'}>
                     <Form.Group>
                         <img
                             id='right-image'
@@ -687,39 +755,34 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                         />
                     </Form.Group>
                 </div>
-                {/* <Form.Group>
-                    <Button
-                        variant="primary"
-                        className="item-btn-wrapper"
-                        id='submit'
-                        as="input"
-                        type='button'
-                        value="Submit"
-                        onClick={submitPoints}
-                        style={{ float: 'right' }}
-                    >
-                    </Button>
-                    <br></br><br></br>
-                </Form.Group> */}
-
-            </div>
-            {/* <div className='row' style={{ float: 'right' }}>
-                <div style={{ display: 'flex' }} >
+                <div className='canvas-wrapper' hidden={calibMode.current !== 'World'}>
                     <Form.Group>
-                        <Button
-                            variant="primary"
-                            className="item-btn-wrapper"
-                            id='submit'
-                            as="input"
-                            type='button'
-                            value="Submit"
-                            onClick={submitPoints}
-                            style={{ float: 'right' }}
+                        <img
+                            id='world-image'
+                            ref={worldImageRef}
+                            src={worldImage}
+                            onLoad={(e) => initContext('world')}
+                            hidden={true}
+                        />
+                        <canvas
+                            id='canvas-world'
+                            ref={canvasWorldRef}
+                            width={canvasWidth}
+                            height={canvasHeight}
                         >
-                        </Button>
+                        </canvas>
+                        <div
+                            id='mouse-pos-right'
+                            ref={mousePosWorldRef}
+                        />
+                        <div
+                            id='target-right'
+                            ref={targetInfoWorldRef}
+                        />
                     </Form.Group>
                 </div>
-            </div> */}
+
+            </div>
         </>
     );
 }

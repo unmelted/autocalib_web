@@ -5,14 +5,13 @@ import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
-import Dropdown from 'react-bootstrap/Dropdown';
-import DropdownButton from 'react-bootstrap/DropdownButton';
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
 import { TaskGroupTable } from './task.js'
 
 
 
 function AutoCalib() {
+
     const [taskId, setTaskId] = useState('');
     const [taskPath, setTaskPath] = useState('');
     const [taskLoad, setTaskLoad] = useState(false);
@@ -164,11 +163,6 @@ function AutoCalib() {
     return (
         <>
             <div className="form-group">
-                <DropdownButton id="dropdown-event" size="sm" title="EVENT TYPE">
-                    <Dropdown.Item href="#/action-1">Action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-2">Another action</Dropdown.Item>
-                    <Dropdown.Item href="#/action-3">Something else</Dropdown.Item>
-                </DropdownButton>
                 <InputGroup size="sm" className="mb-3" id="filealias-input">
                     <InputGroup.Text id="basic-addon1">
                         Create Task with Alias
