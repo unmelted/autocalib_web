@@ -133,7 +133,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
             console.log("Canvas is called 2 : " + canvasJob)
             return (
                 <>
-                    <PairCanvas enter={'task'} leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]} changeHandle={changeGenData}></PairCanvas>
+                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]} changeHandle={changeGenData}></PairCanvas>
                 </>)
 
         }

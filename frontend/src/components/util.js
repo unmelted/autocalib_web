@@ -43,3 +43,29 @@ export const getGroupInfo = async function (taskId) {
     }
     return 0;
 };
+
+export const getGroundImage = (index) => {
+
+    const imageSrcArray = [
+        'Baseball_Ground.png',
+        'Baseball_Ground.png',
+        'Baseball_Home.png',
+        'Basketball_Ground.png',
+        'Basketball_Half.png',
+        'Boxing.png',
+        'Football.png',
+        'Ice-Link.png',
+        'Ice-Link_Half.png',
+        'Soccer.png',
+        'Soccer_Half.png',
+        'Taekwondo.png',
+        'Tennis.png',
+        'Tennis_Half.png',
+        'UFC.png',
+        'Volleyball.png',
+        'Volleyball_Half.png']
+    const fullPath = './ground/' + imageSrcArray[index]
+    console.log('getGroundImage :', fullPath)
+
+    return fullPath
+}

@@ -244,7 +244,7 @@ exports.createResultfile = async function (request_ids, result_json, result_grou
 exports.getReivewImages = async function (job_id) {
     console.log('task getReviewImages : ', job_id)
     let images = []
-    const fullpath = process.env.AUTO_CALIB_DIR_REVIEW + String(job_id);
+    const fullpath = process.env.AUTO_CALIB_DIR_ANALYSIS + String(job_id);
     console.log('getReviewImages full path : ', fullpath)
 
     return new Promise((resolve, reject) => {

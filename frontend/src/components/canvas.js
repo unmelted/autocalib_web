@@ -4,27 +4,27 @@ import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
-
+import { getGroundImage } from './util.js'
 import '../css/canvas.css';
 
-export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupId, changeHandle }) => {
+export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, changeHandle }) => {
     const groundtype =
         [
             'GROUND TYPE',
-            'BASEBALL HOME',
+            'BASEBALL-HOME',
             'BASEBALL',
-            'BASKETBALL HALF',
+            'BASKETBALL-HALF',
             'BASKBALL',
             'BOXING',
-            'ICELINK HALF',
+            'ICELINK-HALF',
             'ICELINK',
-            'SOCCER HALF',
+            'SOCCER-HALF',
             'SOCCER',
             'TAEKWONDO',
-            'TENNINS HALF',
+            'TENNINS-HALF',
             'TENNIS',
             'UFC',
-            'VOLLEYBALL HALF',
+            'VOLLEYBALL-HALF',
             'VOLLEYBALL',
             'FOOTBALL'
         ];
@@ -50,7 +50,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const targetPoint3D = useRef({ left: [], right: [] })
     const targetPointWorld = useRef([])
     const [ground, setGround] = useState('')
-    const [worldImage, setWorldImage] = useState('')
+    const [worldImage, setWorldImage] = useState('./ground/Baseball_Ground.png')
 
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
@@ -59,32 +59,35 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const [taskid, setTaskid] = useState(taskId)
     const [groupid, setGroupid] = useState(groupId)
 
-    console.log('start canvas..1 id set ', jobId, taskId, groupId)
-    console.log('start canvas..2 id set ', jobid, taskid, groupid)
     const canvasWidth = parseInt(process.env.REACT_APP_CANVAS_WIDTH, 10);
     const canvasHeight = parseInt(process.env.REACT_APP_CANVAS_HEIGHT, 10);
     const imageWidth = parseInt(process.env.REACT_APP_IMAGE_WIDTH, 10);
     const imageHeight = parseInt(process.env.REACT_APP_IMAGE_HEIGHT, 10);
 
-    const canvas = { left: canvasLeftRef, right: canvasRightRef };
-    const image = { left: leftImageRef, right: rightImageRef };
-    const mousePos = { left: mousePosLeftRef, right: mousePosRightRef };
-    const targetInfo = { left: targetInfoLeftRef, right: targetInfoRightRef };
+    const canvas = { left: canvasLeftRef, right: canvasRightRef, world: canvasWorldRef };
+    const image = { left: leftImageRef, right: rightImageRef, world: worldImageRef };
+    // const canvasworld = canvasWorldRef;
 
-    let context = { left: null, right: null };
-    let contextWorld = null;
+    const mousePos = { left: mousePosLeftRef, right: mousePosRightRef, world: mousePosWorldRef };
+    const targetInfo = { left: targetInfoLeftRef, right: targetInfoRightRef, world: targetInfoWorldRef };
+
+    let context = { left: null, right: null, world: null };
+    //let contextWorld = null;
 
     let isDragging = {
         left: false,
-        right: false
+        right: false,
+        world: false
     }
     let dragStartPosition = {
         left: { x: 0, y: 0 },
-        right: { x: 0, y: 0 }
+        right: { x: 0, y: 0 },
+        world: { x: 0, y: 0 }
     }
     let currentTransformedCursor = {
         left: { x: 0, y: 0 },
-        right: { x: 0, y: 0 }
+        right: { x: 0, y: 0 },
+        world: { x: 0, y: 0 }
     }
     const pointColorPallet = [
         process.env.REACT_APP_POINT_COLOR_1,
@@ -98,7 +101,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const calibPrevMode = useRef(null)
 
 
-    const InsertRefPointToStorate = (storeMode) => {
+    const InsertRefPointToStore = (storeMode) => {
         if (storeMode === '2D') {
             targetPoint2D.current.left = [];
             targetPoint2D.current.right = [];
@@ -135,12 +138,15 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         setIsAllTarget(false);
         setIsSubmitted(false);
         setIsSubmitCompleted(false);
-        drawImageToCanvas(null, 'left');
-        drawImageToCanvas(null, 'right');
+        // drawImageToCanvas(null, 'left');
+        // drawImageToCanvas(null, 'right');
+        // drawImageToCanvas(null, 'world');
+
         console.log("now calibration mode is ", calibMode.current)
+        console.log("mode change ", context)
 
         if (calibMode.current === '3D') {
-            InsertRefPointToStorate(calibPrevMode.current)
+            InsertRefPointToStore(calibPrevMode.current)
 
             targetPointRef.current.left = [];
             targetPointRef.current.right = [];
@@ -153,7 +159,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             }
         }
         else if (calibMode.current === '2D') {
-            InsertRefPointToStorate(calibPrevMode.current)
+            InsertRefPointToStore(calibPrevMode.current)
 
             targetPointRef.current.left = [];
             targetPointRef.current.right = [];
@@ -167,7 +173,8 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
 
         }
         else if (calibMode.current === 'World') {
-            InsertRefPointToStorate(calibPrevMode.current)
+            // draw                
+            InsertRefPointToStore(calibPrevMode.current)
             targetPointRef.current.left = [];
             targetPointRef.current.right = [];
             targetPointRef.current.world = [];
@@ -177,14 +184,21 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             }
         }
 
+        drawImageToCanvas(null, 'left', true);
+        drawImageToCanvas(null, 'right', true);
+        drawImageToCanvas(null, 'world', true);
+
         if (targetPointRef.current['left'].length > 0) {
             drawTarget('left');
         }
         if (targetPointRef.current['right'].length > 0) {
             drawTarget('right');
         }
-        console.log(`2d left length: ${targetPoint2D.current.left.length} , 2d right length : ${targetPoint2D.current.right.length}`)
-        console.log(`3d left length: ${targetPoint3D.current.left.length} , 3d right length : ${targetPoint3D.current.right.length}`)
+        if (targetPointRef.current['world'].length > 0) {
+            drawTarget('world');
+        }
+
+
         if ((targetPoint2D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_2D &&
             targetPoint2D.current.right.length === process.env.REACT_APP_MAX_TARGET_NUM_2D) ||
             (targetPoint3D.current.left.length === process.env.REACT_APP_MAX_TARGET_NUM_3D &&
@@ -206,9 +220,6 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         const handleModeChange = () => {
             console.log("2d button change", calibMode2D, calibMode3D)
             if (calibMode2D === false) {
-                // setCalibMode2D(true)
-                // setCalibMode3D(false)
-                // setCalibModeWorld(false)
                 setvarClass2D("btn-primary")
                 setvarClass3D("btn-secondary")
                 setvarClassWorld('btn-secondary')
@@ -247,9 +258,6 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         const handleModeChange = () => {
             console.log("3d button change")
             if (calibMode3D === false) {
-                // setCalibMode2D(false)
-                // setCalibMode3D(true)
-                // setCalibModeWorld(false)
                 setvarClass3D("btn-privary")
                 setvarClass2D("btn-secondary")
                 setvarClassWorld('btn-secondary')
@@ -260,7 +268,6 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                 console.log(" 3d calib mode set true")
             }
             else {
-                // setCalibMode3D(false)
                 calibMode.current = null
                 setvarClass3D("btn-secondary")
                 seteMessage("")
@@ -287,20 +294,22 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         const handleModeChange = () => {
             console.log("world button change")
             if (calibModeWorld === false) {
-                // setCalibMode2D(false)
-                // setCalibMode3D(false)
-                // setCalibModeWorld(true)
                 setvarClassWorld("btn-primary")
                 setvarClass2D("btn-secondary")
                 setvarClass3D("btn-secondary")
-                seteMessage("World Select: Select Ground Type first, and Pick 4 points for 3D calibration.")
                 calibPrevMode.current = calibMode.current;
                 calibMode.current = 'World'
                 maxTargetNum.current = 4
 
+                if (ground !== '') {
+                    seteMessage("World Select: Select Ground Type first, and Pick 4 points for 3D calibration.")
+                    //draw world image to canvas                  
+                } else {
+                    seteMessage("Select Ground Type first.")
+                }
+
             }
             else {
-                // setCalibModeWorld(false)
                 calibMode.current = null
                 setvarClassWorld('btn-secondary')
                 seteMessage('')
@@ -325,14 +334,19 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
 
 
     const SelectGroundType = () => {
-        const onHandleChange = (value) => {
-            console.log(value);
-            setGround(value)
+        const onHandleChange = (target) => {
+            console.log(target.selectedIndex, target.value);
+            const imgsrc = getGroundImage(target.selectedIndex)
+            setGround(target.value)
+            setWorldImage(imgsrc)
+            console.log('select ground type ', target.value, worldImage)
+            // drawImageToCanvas(null, 'world', true)
+            initContext('world')
         }
 
         return (
             <Form.Select id="groundtype-select"
-                onChange={(event) => onHandleChange(event.target.value)} value={ground} >
+                onChange={(event) => onHandleChange(event.target)} value={ground} >
                 {groundtype.map((item) => (
                     <option value={item} key={item}>{item}</option>
                 ))}
@@ -343,13 +357,17 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const clearPoints = () => {
         targetPointRef.current.left = [];
         targetPointRef.current.right = [];
+        targetPointRef.current.world = [];
         targetInfo.left.current.innerText = '';
         targetInfo.right.current.innerText = '';
+        targetInfo.world.current.innerText = '';
+
         setIsAllTarget(false);
         setIsSubmitted(false);
         setIsSubmitCompleted(false);
         drawImageToCanvas(null, 'left', true);
         drawImageToCanvas(null, 'right', true);
+        drawImageToCanvas(null, 'world', true);
         console.log("clear points is called .");
     }
 
@@ -413,12 +431,37 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         return points;
     }
 
+    const makeTargetData_World = () => {
+        if (targetPointWorld.current.length < process.env.REACT_APP_MAX_TARGET_NUM_3D ||
+            targetPointWorld.current.length < process.env.REACT_APP_MAX_TARGET_NUM_3D) {
+            console.log("world points is not enough")
+            return
+
+        }
+
+        console.log(`x: ${targetPointWorld.current[0].x}, y: ${targetPointWorld.current[0].y}`);
+        console.log(`x: ${targetPointWorld.current[1].x}, y: ${targetPointWorld.current[1].y}`);
+        console.log(`x: ${targetPointWorld.current[0].x}, y: ${targetPointWorld.current[0].y}`);
+        console.log(`x: ${targetPointWorld.current[1].x}, y: ${targetPointWorld.current[1].y}`);
+
+        const points = [
+            targetPointWorld.current[0].x, targetPointWorld.current[0].y,
+            targetPointWorld.current[1].x, targetPointWorld.current[1].y,
+            targetPointWorld.current[0].x, targetPointWorld.current[0].y,
+            targetPointWorld.current[1].x, targetPointWorld.current[1].y,
+        ];
+
+        return points;
+    }
+
     const submitPoints = async () => {
         let activeMode = 0
         if (calibMode.current === '2D') {
-            InsertRefPointToStorate('2D')
+            InsertRefPointToStore('2D')
         } else if (calibMode.current === '3D') {
-            InsertRefPointToStorate('3D')
+            InsertRefPointToStore('3D')
+        } else if (calibMode.current === 'World') {
+            InsertRefPointToStore('World')
         }
         console.log('submit points is called job_id : ', jobid)
         console.log(process.env.REACT_APP_MAX_TARGET_NUM_2D)
@@ -451,7 +494,8 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             group_id: groupid,
             job_id: jobid,
             pts_2d: makeTargetData_2d(),
-            pts_3d: makeTargetData_3d()
+            pts_3d: makeTargetData_3d(),
+            world: makeTargetData_World()
         }
 
         console.log('submit points to : ', jobId)
@@ -479,7 +523,8 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const initContext = (type) => {
         context = {
             left: canvasLeftRef.current.getContext('2d'),
-            right: canvasRightRef.current.getContext('2d')
+            right: canvasRightRef.current.getContext('2d'),
+            world: canvasWorldRef.current.getContext('2d')
         };
 
         if (type === 'left') {
@@ -490,23 +535,39 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
             canvasLeftRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'left', context), { passive: false });
 
         }
-        else {
+        else if (type === 'right') {
             canvasRightRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'right', context), { passive: false });
             canvasRightRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'right', context), { passive: false });
             canvasRightRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'right', context), { passive: false });
             canvasRightRef.current.addEventListener('wheel', (event) => onWheel(event, 'right', context), { passive: false });
             canvasRightRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'right', context), { passive: false });
         }
+        else if (type === 'world') {
+            canvasWorldRef.current.addEventListener('mousedown', (event) => onMouseDown(event, 'world', context), { passive: false });
 
-        console.log("addListener is called! ");
+            canvasWorldRef.current.addEventListener('mouseup', (event) => onMouseUp(event, 'world', context), { passive: false });
+            canvasWorldRef.current.addEventListener('mousemove', (event) => onMouseMove(event, 'world', context), { passive: false });
+            // canvasWorldRef.current.addEventListener('wheel', (event) => onWheel(event, 'world', context), { passive: false });
+            canvasWorldRef.current.addEventListener('contextmenu', (event) => onRightClick(event, 'world', context), { passive: false });
+
+        }
 
         if (context[type]) {
             context[type].save();
-            context[type].setTransform(1, 0, 0, 1, 0, 0);
-            context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
+            // context[type].setTransform(1, 0, 0, 1, 0, 0);
+            if (type === 'world') {
+                context[type].clearRect(0, 0, 800, 800);
+            } else {
+                context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
+            }
             context[type].restore();
-            context[type].scale(0.32, 0.32);
-            context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
+            if (type === 'world') {
+                // context[type].scale(1.55, 0.74);
+                context[type].drawImage(image[type].current, 0, 0, 800, 800);
+            } else {
+                context[type].scale(0.32, 0.32);
+                context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
+            }
         }
 
     }
@@ -514,24 +575,35 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     const drawImageToCanvas = (e, type, isInit) => {
         context = {
             left: canvasLeftRef.current.getContext('2d'),
-            right: canvasRightRef.current.getContext('2d')
+            right: canvasRightRef.current.getContext('2d'),
+            world: canvasWorldRef.current.getContext('2d')
         };
 
-        contextWorld = canvasWorldRef.current.getContext('world')
-        // console.log("drawImageToCanvas  : " + context['left']);
-        // console.log("drawImageToCanvas  : " + context['right']);
-        // 
-        context[type].save();
-        context[type].setTransform(1, 0, 0, 1, 0, 0);
-        context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
-        context[type].restore();
-        context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
+        // contextWorld = canvasWorldRef.current.getContext('2d')
+        // console.log('drawImageToCanvas : ', context)
+        // console.log('type : ', type)
 
+        if (context[type]) {
+            context[type].save();
+            // context[type].setTransform(1, 0, 0, 1, 0, 0);
+            if (type === 'world') {
+                context[type].clearRect(0, 0, 800, 800);
+            } else {
+                context[type].clearRect(0, 0, canvas[type].current.width, canvas[type].current.height);
+            }
+            context[type].restore();
+
+            if (type === 'world') {
+                // context[type].scale(1.55, 0.74);
+                context[type].drawImage(image[type].current, 0, 0, 800, 800);
+            } else {
+                context[type].drawImage(image[type].current, 0, 0, imageWidth, imageHeight);
+            }
+        }
     }
 
     const getTransformedPoint = (x, y, type, context) => {
         // console.log("getTransform context : ", context)
-
         const transform = context[type].getTransform();
         const inverseZoom = 1 / transform.a;
 
@@ -599,6 +671,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
     }
 
     const onMouseMove = (event, type, context) => {
+        // console.log("onMouseMove : ", context)
         currentTransformedCursor[type] = getTransformedPoint(event.offsetX, event.offsetY, type, context);
         //mousePos[type].innerText = `Original X: ${event.offsetX}, Y: ${event.offsetY}`;
         mousePos[type].current.innerText = `X: ${currentTransformedCursor[type].x}, Y: ${currentTransformedCursor[type].y}`;
@@ -616,7 +689,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
         e.preventDefault();
         e.stopImmediatePropagation();
 
-        console.log("onRightClick context ", context);
+        // console.log("onRightClick context ", context);
 
         if (calibMode.current == null) {
             seteMessage("Please select calibration mode FIRST!")
@@ -703,7 +776,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                 </Row>
             </div >
             <div>
-                <div className='canvas-wrapper' hidden={calibMode.current === 'World'}>
+                <div className='canvas-wrapper' hidden={calibMode.current === 'World'} dialbed={calibMode.current === 'World'}>
                     <Form.Group>
                         <img
                             id='left-image'
@@ -729,7 +802,7 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                         />
                     </Form.Group>
                 </div>
-                <div className='canvas-wrapper' hidden={calibMode.current === 'World'}>
+                <div className='canvas-wrapper' hidden={calibMode.current === 'World'} disalbed={calibMode.current === 'World'}>
                     <Form.Group>
                         <img
                             id='right-image'
@@ -767,8 +840,8 @@ export const PairCanvas = ({ enter, leftImage, rightImage, jobId, taskId, groupI
                         <canvas
                             id='canvas-world'
                             ref={canvasWorldRef}
-                            width={canvasWidth}
-                            height={canvasHeight}
+                            width={800}
+                            height={800}
                         >
                         </canvas>
                         <div

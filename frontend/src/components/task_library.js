@@ -59,7 +59,7 @@ export const TaskLibrary = (props) => {
             console.log("Canvas is called 2 : " + canvasJob)
             return (
                 <>
-                    <PairCanvas enter={'library'} leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]} changeHandle={changeHandle}></PairCanvas>
+                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]} changeHandle={changeHandle}></PairCanvas>
                 </>)
 
         }
