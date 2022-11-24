@@ -132,13 +132,16 @@ router.get('/image/:job_id', (req, res) => {
 
 router.post('/generate/:job_id', (req, res, next) => {
   // Exodus API: 7.1.4	POST /exodus/autocalib/generate/{job_id}
+  console.log('generate with world : ', req.body.world)
+
   const options = {
     uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/generate',
     method: 'POST',
     body: {
       job_id: req.body.job_id,
       pts_2d: req.body.pts_2d,
-      pts_3d: req.body.pts_3d
+      pts_3d: req.body.pts_3d,
+      world: req.body.world
     },
     json: true
   }
