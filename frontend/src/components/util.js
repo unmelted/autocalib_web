@@ -48,22 +48,23 @@ export const getGroundImage = (index) => {
 
     const imageSrcArray = [
         'Baseball_Ground.png',
-        'Baseball_Ground.png',
         'Baseball_Home.png',
-        'Basketball_Ground.png',
+        'Baseball_Ground.png',
         'Basketball_Half.png',
+        'Basketball_Ground.png',
         'Boxing.png',
-        'Football.png',
-        'Ice-Link.png',
         'Ice-Link_Half.png',
-        'Soccer.png',
+        'Ice-Link.png',
         'Soccer_Half.png',
+        'Soccer.png',
         'Taekwondo.png',
-        'Tennis.png',
         'Tennis_Half.png',
+        'Tennis.png',
         'UFC.png',
+        'Volleyball_Half.png',
         'Volleyball.png',
-        'Volleyball_Half.png']
+        'Football.png'
+    ]
     const fullPath = './ground/' + imageSrcArray[index]
     console.log('getGroundImage :', fullPath)
 

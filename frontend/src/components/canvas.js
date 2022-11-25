@@ -342,6 +342,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
             console.log('select ground type ', target.value, worldImage)
             // drawImageToCanvas(null, 'world', true)
             initContext('world')
+            clearPoints()
         }
 
         return (
@@ -441,14 +442,14 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
 
         console.log(`x: ${targetPointWorld.current[0].x}, y: ${targetPointWorld.current[0].y}`);
         console.log(`x: ${targetPointWorld.current[1].x}, y: ${targetPointWorld.current[1].y}`);
-        console.log(`x: ${targetPointWorld.current[0].x}, y: ${targetPointWorld.current[0].y}`);
-        console.log(`x: ${targetPointWorld.current[1].x}, y: ${targetPointWorld.current[1].y}`);
+        console.log(`x: ${targetPointWorld.current[2].x}, y: ${targetPointWorld.current[2].y}`);
+        console.log(`x: ${targetPointWorld.current[3].x}, y: ${targetPointWorld.current[3].y}`);
 
         const points = [
             targetPointWorld.current[0].x, targetPointWorld.current[0].y,
             targetPointWorld.current[1].x, targetPointWorld.current[1].y,
-            targetPointWorld.current[0].x, targetPointWorld.current[0].y,
-            targetPointWorld.current[1].x, targetPointWorld.current[1].y,
+            targetPointWorld.current[2].x, targetPointWorld.current[2].y,
+            targetPointWorld.current[3].x, targetPointWorld.current[3].y,
         ];
 
         return points;
