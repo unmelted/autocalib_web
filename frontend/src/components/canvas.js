@@ -1,9 +1,10 @@
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
+import { configData } from '../App.js'
 import { getGroundImage } from './util.js'
 import '../css/canvas.css';
 
@@ -29,6 +30,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
             'FOOTBALL'
         ];
 
+    const { configure, changeConfigure } = useContext(configData)
     const canvasLeftRef = useRef(null);
     const canvasRightRef = useRef(null);
     const canvasWorldRef = useRef(null);
@@ -422,12 +424,19 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
         console.log(`x: ${targetPoint2D.current.right[1].x}, y: ${targetPoint2D.current.right[1].y}`);
 
         const points = [
-            targetPoint2D.current.left[0].x, targetPoint2D.current.left[0].y,
-            targetPoint2D.current.left[1].x, targetPoint2D.current.left[1].y,
+            parseInt(targetPoint2D.current.left[0].x / 2), parseInt(targetPoint2D.current.left[0].y / 2),
+            parseInt(targetPoint2D.current.left[1].x / 2), parseInt(targetPoint2D.current.left[1].y / 2),
 
-            targetPoint2D.current.right[0].x, targetPoint2D.current.right[0].y,
-            targetPoint2D.current.right[1].x, targetPoint2D.current.right[1].y,
+            parseInt(targetPoint2D.current.right[0].x / 2), parseInt(targetPoint2D.current.right[0].y / 2),
+            parseInt(targetPoint2D.current.right[1].x / 2), parseInt(targetPoint2D.current.right[1].y / 2),
         ];
+        // const points = [
+        //     targetPoint2D.current.left[0].x, targetPoint2D.current.left[0].y,
+        //     targetPoint2D.current.left[1].x, targetPoint2D.current.left[1].y,
+
+        //     targetPoint2D.current.right[0].x, targetPoint2D.current.right[0].y,
+        //     targetPoint2D.current.right[1].x, targetPoint2D.current.right[1].y,
+        // ];
 
         return points;
     }
@@ -496,7 +505,8 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
             job_id: jobid,
             pts_2d: makeTargetData_2d(),
             pts_3d: makeTargetData_3d(),
-            world: makeTargetData_World()
+            world: makeTargetData_World(),
+            config: configure
         }
 
         console.log('submit points to : ', jobId)

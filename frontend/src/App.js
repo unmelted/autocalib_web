@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, createContext } from 'react';
 import axios from 'axios';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -10,17 +10,41 @@ import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './css/App.css';
 import AutoCalib from './components/auto_calib';
 import TaskLibrary from './components/task_library';
+import Config from './components/config';
 
-import plus from './asset/plus.png';
-import search from './asset/search.png';
-import help from './asset/help.png';
-import alien from './asset/alien.png';
+
+export const configData = createContext();
+const initConfigure = {
+  scale: 'full',
+  pair: 'colmap',
+  labatory: 'false',
+  preprocess: 'Off'
+};
 
 function App(props) {
   const [state, setState] = useState('')
   const [isHover, setIsHover] = useState('')
   const [version, setVersion] = useState('')
+  const [alienTarget, setAlienTarget] = useState('./asset/alien.png')
+  // const [configure, setConfigure] = userSatate(initConfigure)
+  let configure = initConfigure;
+  console.log("configure.. ", configure)
   const guideFile = process.env.REACT_APP_SERVER_GUIDE + process.env.REACT_APP_VERSION + '.pdf';
+
+  const changeConfigure = (params) => {
+    const keys = Object.keys(configure)
+    const pkeys = Object.keys(params)
+
+    for (const key of keys) {
+      for (const pkey of pkeys) {
+        if (key === pkey) {
+          console.log("change Config : ", key, pkey)
+          configure[key] = params[pkey]
+          console.log("change Config result : ", configure[key])
+        }
+      }
+    }
+  };
 
   const onHandleCreateTask = () => {
     setState('create')
@@ -35,25 +59,40 @@ function App(props) {
   };
 
   const onHandleAlien = () => {
-    setState('alien')
+    console.log('handle alien click')
+    if (configure.labatory === false) {
+      configure.labatory = 'true'
+      setAlienTarget('./asset/alien_p.png')
+    } else {
+      configure.labatory = 'false'
+      setAlienTarget('./asset/alien.png')
+    }
   };
 
   const onHandleHome = () => {
     setState('')
   }
 
+  const onHandleConfig = () => {
+    setState('config')
+  }
+
   const MainContent = () => {
     if (state === 'create') {
       return (
         <>
-          <AutoCalib />
+          <configData.Provider value={{ configure, changeConfigure }} >
+            <AutoCalib />
+          </configData.Provider>
         </>
       )
     }
     else if (state === 'search') {
       return (
         <>
-          <TaskLibrary />
+          <configData.Provider value={{ configure, changeConfigure }} >
+            <TaskLibrary />
+          </configData.Provider>
         </>
       )
     }
@@ -64,7 +103,17 @@ function App(props) {
         </>
       )
     }
+    else if (state === 'config') {
+      return (
+        <>
+          <configData.Provider value={{ configure, changeConfigure }} >
+            <Config />
+          </configData.Provider>
+        </>
+      )
+    }
     else if (state === 'alien') {
+      console.log("click alien")
       return (
         <>
         </>
@@ -94,6 +143,7 @@ function App(props) {
 
   useEffect(() => {
     getVersion()
+    console.log('useeffect', alienTarget)
   }, [])
 
   console.log(process.env.REACT_APP_VERSION)
@@ -119,30 +169,32 @@ function App(props) {
           <Row>
             <Col xs align='right'> <Badge bg="primary" style={{ width: '80px' }}>VERSION </Badge>  {version}</Col>
           </Row>
+          <Row>
+            <Col xs align='right'> <Badge bg="dark" onClick={onHandleAlien} style={{ width: '80px' }}>LAB </Badge> <img src={alienTarget} width="20px" alt="" /></Col>
+          </Row>
           <p></p>
           <hr />
           <Row className="justify-content-md-center">
             <Col xs lg='2'>
               <Button className="rounded" variant={state === "create" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleCreateTask}><img src={plus} width="60px" alt="" /><p></p>
+                onClick={onHandleCreateTask}><img src='./asset/plus.png' width="60px" alt="" /><p></p>
                 Create Task</Button> </Col>
             <Col xs lg='2'>
               <Button variant={state === "search" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleSearchTask}><img src={search} width="60px" alt="" /> <p></p>
+                onClick={onHandleSearchTask}><img src='./asset/search.png' width="60px" alt="" /> <p></p>
                 Search Task</Button></Col>
+            <Col xs lg='2'>
+              <Button variant={state === "config" ? "primary" : "seconday"}
+                style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
+                onClick={onHandleConfig}><img src='./asset/config.png' width="60px" alt="" /> <p></p>
+                Config</Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "guide" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}>
-                <a href={guideFile} target="_blank"><img src={help} width="60px" alt="" /></a> <p></p>
+                <a href={guideFile} target="_blank"><img src='./asset/help.png' width="60px" alt="" /></a> <p></p>
                 Guide</Button></Col>
-            {/* <Col xs lg='2'>
-              <Button variant={state === "alien" ? "primary" : "seconday"}
-                style={{ width: '140px', color: '#FF0000', float: 'center' }}
-                onClick={onHandleAlien}><img src={alien} width="60px" alt="" /> <p></p>
-                BackDoor</Button></Col> */}
-
           </Row>
           <p></p>
           <hr />

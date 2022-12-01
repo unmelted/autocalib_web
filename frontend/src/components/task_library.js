@@ -6,13 +6,11 @@ import { Form } from 'react-bootstrap'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
 import '../css/task_library.css';
-import refresh from '../asset/refresh.png';
+
 import { TaskGroupTable } from './task.js'
 import { PairCanvas } from './canvas.js'
 import { ReviewGallery } from './gallery.js';
-import pin from '../asset/pin.png';
-import magni from '../asset/magni.png';
-import play from '../asset/play.png';
+
 
 export const TaskLibrary = (props) => {
 
@@ -185,7 +183,7 @@ export const TaskLibrary = (props) => {
                                     type="button"
                                     onClick={() => onHandleReviewClick(req.task_id, req.request_id)}
                                     disabled={parseInt(req.job_status) !== 100 || parseInt(req.job_result) !== (100)}  >
-                                    <img src={play} width='20px' />
+                                    <img src='./asset/play.png' width='20px' />
                                 </Button> &nbsp;&nbsp;
                                 {/* <Form.Check */}
                                 <InputGroup.Checkbox
@@ -323,7 +321,7 @@ export const TaskLibrary = (props) => {
 
     return (
         <>
-            <p id="task-title" ><img src={pin} width="20px" alt="" />  Task Lists : {daterange}</p>
+            <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  Task Lists : {daterange}</p>
             <div className='table-container1'>
                 <Table striped bordered variant="dark">
                     <thead>
@@ -341,8 +339,8 @@ export const TaskLibrary = (props) => {
                 </Table>
             </div>
             <p id="task-title2" hidden={!requestHistoryloaded}>
-                <img src={pin} width="20px" alt="" />  Task ID : {requestTaskIdMessage} {'  '}
-                <img src={refresh} width="20px" alt="" onClick={() => getRequestHistory(taskId)} /> </p>
+                <img src='./asset/pin.png' width="20px" alt="" />  Task ID : {requestTaskIdMessage} {'  '}
+                <img src='./asset/refresh.png' width="20px" alt="" onClick={() => getRequestHistory(taskId)} /> </p>
             <div className='table-container2' hidden={!requestHistoryloaded}>
                 <Table stripped boardered variant="dark" >
                     <thead>

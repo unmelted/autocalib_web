@@ -10,6 +10,8 @@ router.post('/calculate', async (req, res, next) => {
   // Exodus API: Call 7.1.1	POST /exodus/autocalib
   const fullPath = path.join(process.env.AUTO_CALIB_DIR_SEND, req.body.task_id)
   console.log("calculate input_dir : " + fullPath)
+  console.log('calcualte config : ', req.body.config)
+
   const options = {
     uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib',
     method: 'POST',
@@ -17,6 +19,7 @@ router.post('/calculate', async (req, res, next) => {
       // input_dir: process.env.AUTO_CALIB_DIR_SEND,
       input_dir: fullPath,
       group: req.body.group_id,
+      config: req.body.config
     },
     json: true
   }
@@ -141,7 +144,8 @@ router.post('/generate/:job_id', (req, res, next) => {
       job_id: req.body.job_id,
       pts_2d: req.body.pts_2d,
       pts_3d: req.body.pts_3d,
-      world: req.body.world
+      world: req.body.world,
+      config: req.body.config
     },
     json: true
   }

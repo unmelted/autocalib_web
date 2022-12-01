@@ -1,0 +1,24 @@
+hr {
+	margin-top: 2rem;
+	margin-bottom: 2rem;
+	border: 0;
+	border-top: 2px solid rgba(252, 252, 252, 0.5);
+}
+
+#config-body {
+	margin-left: 3rem;
+	width: 90%;
+	font-size: 13px;
+	font-weight: lighter;
+}
+
+
+.th-item {
+	width: 20%;
+	text-align: left;
+
+}
+
+.th-option {
+	text-align: left;
+}

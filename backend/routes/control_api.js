@@ -216,9 +216,10 @@ router.post('/getresult', async (req, res) => {
 });
 
 
-router.get('/getreview/:request_id', async (req, res) => {
+router.get('/getreview/:request_id/:labatory', async (req, res) => {
 
-    console.log("router getreivew request_id : ", req.params.request_id)
+    console.log("router getreivew request_id : ", req.params.request_id, req.params.labatory)
+    const lab = req.params.labatory
 
     try {
         result = await handler.getReviewImages(req.params.request_id)
@@ -226,7 +227,7 @@ router.get('/getreview/:request_id', async (req, res) => {
         if (result.length === 1) {
             const job_id = result[0].job_id
             try {
-                images = await taskManager.getReivewImages(job_id);
+                images = await taskManager.getReivewImages(job_id, lab);
                 console.log('images.. ', images)
                 res.status(200).json({
                     status: 0,

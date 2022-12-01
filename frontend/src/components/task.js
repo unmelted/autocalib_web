@@ -1,14 +1,14 @@
-import React, { useState, Fragment, useEffect } from 'react';
+import React, { useState, Fragment, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
+import { configData } from '../App.js'
 import { getGroupInfo } from './util.js'
 import { ReviewGallery } from './gallery.js';
 import { PairCanvas } from './canvas.js'
 import '../css/task.css';
-import play from '../asset/play.png';
 
 const initItems = {
     'Group1': {
@@ -36,7 +36,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
         SUBMIT: 5,
         GEN_COMPLETE: 6,
     }
-
+    const { configure, changeConfigure } = useContext(configData)
     const [refresh, setRefresh] = useState(0)
     const [groupInfo, setGroupInfo] = useState('');
     const [groupTable, setGroupTable] = useState(initItems);
@@ -185,12 +185,13 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
         const [requestId, setRequestId] = useState('')
 
         const calculate = async (taskId, taskPath, groupId) => {
-            console.log("before calculate " + taskId + " " + groupId);
+            console.log("before calculate " + taskId + " " + groupId + "  " + configure.scale);
 
             const data = {
                 task_id: taskId,
                 task_path: taskPath,
-                group_id: groupId
+                group_id: groupId,
+                config: configure
             }
 
             let response = null;
@@ -449,7 +450,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                             variant="primary"
                             type="button"
                             onClick={() => onHandleReviewClick(groupTable[keyindex].post_no)}>
-                            <img src={play} width='20px' />
+                            <img src='./asset/play.png' width='20px' />
                         </Button> &nbsp;&nbsp;
                         <InputGroup.Checkbox hidden={groupTable[keyindex].cam_count < 5}
                             // disabled={groupTable[keyindex].status !== CAL_STATE.GEN_COMPLETE}
