@@ -1,10 +1,11 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
 import { Form } from 'react-bootstrap'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
+import { configData } from '../App.js'
 import '../css/task_library.css';
 
 import { TaskGroupTable } from './task.js'
@@ -13,7 +14,7 @@ import { ReviewGallery } from './gallery.js';
 
 
 export const TaskLibrary = (props) => {
-
+    const { configure, changeConfigure } = useContext(configData)
     const [tasks, setTasks] = useState('');
     const [loaded, setLoaded] = useState(false);
 
@@ -107,12 +108,12 @@ export const TaskLibrary = (props) => {
     const RequstHistoryTable = () => {
 
         const onHandlePairClick = async (category, taskId, groupId, jobId) => {
-            console.log("onHandleGetPairClick ", category, taskId, groupId, jobId)
+            console.log("onHandleGetPairClick ", category, taskId, groupId, jobId, configure.pair)
             let response = null;
 
             if (category === 'CALCULATE') {
                 try {
-                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${jobId}`);
+                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${jobId}/${configure.pair}`);
                 } catch (err) {
                     console.log(err);
                     return;

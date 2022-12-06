@@ -424,11 +424,11 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
         console.log(`x: ${targetPoint2D.current.right[1].x}, y: ${targetPoint2D.current.right[1].y}`);
 
         const points = [
-            parseInt(targetPoint2D.current.left[0].x / 2), parseInt(targetPoint2D.current.left[0].y / 2),
-            parseInt(targetPoint2D.current.left[1].x / 2), parseInt(targetPoint2D.current.left[1].y / 2),
+            parseInt(targetPoint2D.current.left[0].x), parseInt(targetPoint2D.current.left[0].y / 2),
+            parseInt(targetPoint2D.current.left[1].x), parseInt(targetPoint2D.current.left[1].y / 2),
 
-            parseInt(targetPoint2D.current.right[0].x / 2), parseInt(targetPoint2D.current.right[0].y / 2),
-            parseInt(targetPoint2D.current.right[1].x / 2), parseInt(targetPoint2D.current.right[1].y / 2),
+            parseInt(targetPoint2D.current.right[0].x), parseInt(targetPoint2D.current.right[0].y),
+            parseInt(targetPoint2D.current.right[1].x), parseInt(targetPoint2D.current.right[1].y),
         ];
         // const points = [
         //     targetPoint2D.current.left[0].x, targetPoint2D.current.left[0].y,
@@ -498,6 +498,9 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
         }
 
         setIsSubmitted(true);
+        const img1 = leftImage.split('/')
+        const img2 = rightImage.split('/')
+        console.log('submitPoints image par : ', img1[img1.length - 1], img2[img2.length - 1])
 
         const data = {
             task_id: taskid,
@@ -506,6 +509,8 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
             pts_2d: makeTargetData_2d(),
             pts_3d: makeTargetData_3d(),
             world: makeTargetData_World(),
+            image1: img1[img1.length - 1],
+            image2: img2[img2.length - 1],
             config: configure
         }
 

@@ -107,10 +107,10 @@ router.delete('/cancel/:job_id', (req, res) => {
 });
 
 
-router.get('/image/:job_id', (req, res) => {
+router.get('/image/:job_id/:pair', (req, res) => {
   // Exodus API: 7.1.3	GET /exodus/autocalib/getpair/{job_id}
   const options = {
-    uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/getpair/' + req.params.job_id,
+    uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/getpair/' + req.params.job_id + '/' + req.params.pair,
     method: 'GET',
     json: true
   }
@@ -136,7 +136,7 @@ router.get('/image/:job_id', (req, res) => {
 router.post('/generate/:job_id', (req, res, next) => {
   // Exodus API: 7.1.4	POST /exodus/autocalib/generate/{job_id}
   console.log('generate with world : ', req.body.world)
-
+  console.log('generate body :', req.body.image1, req.body.image2)
   const options = {
     uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/generate',
     method: 'POST',
@@ -145,6 +145,8 @@ router.post('/generate/:job_id', (req, res, next) => {
       pts_2d: req.body.pts_2d,
       pts_3d: req.body.pts_3d,
       world: req.body.world,
+      image1: req.body.image1,
+      image2: req.body.image2,
       config: req.body.config
     },
     json: true

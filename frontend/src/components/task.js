@@ -335,8 +335,8 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                 let response = null;
 
                 try {
-                    console.log(groupTable[keyindex].job_id)
-                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${groupTable[keyindex].job_id}`);
+                    console.log('get pair -- ', groupTable[keyindex].job_id, configure.pair)
+                    response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/image/${groupTable[keyindex].job_id}/${configure.pair}`);
                 } catch (err) {
                     console.log(err);
                     changeTableDataContext('changestatusmsg', [keyindex, `Unable to get image  ${err}`]);
