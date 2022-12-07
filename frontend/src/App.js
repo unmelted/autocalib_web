@@ -60,7 +60,7 @@ function App(props) {
 
   const onHandleAlien = () => {
     console.log('handle alien click')
-    if (configure.labatory === false) {
+    if (configure.labatory === 'false') {
       configure.labatory = 'true'
       setAlienTarget('./asset/alien_p.png')
     } else {

@@ -424,8 +424,8 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
         console.log(`x: ${targetPoint2D.current.right[1].x}, y: ${targetPoint2D.current.right[1].y}`);
 
         const points = [
-            parseInt(targetPoint2D.current.left[0].x), parseInt(targetPoint2D.current.left[0].y / 2),
-            parseInt(targetPoint2D.current.left[1].x), parseInt(targetPoint2D.current.left[1].y / 2),
+            parseInt(targetPoint2D.current.left[0].x), parseInt(targetPoint2D.current.left[0].y),
+            parseInt(targetPoint2D.current.left[1].x), parseInt(targetPoint2D.current.left[1].y),
 
             parseInt(targetPoint2D.current.right[0].x), parseInt(targetPoint2D.current.right[0].y),
             parseInt(targetPoint2D.current.right[1].x), parseInt(targetPoint2D.current.right[1].y),

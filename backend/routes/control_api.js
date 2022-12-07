@@ -219,18 +219,30 @@ router.post('/getresult', async (req, res) => {
 router.get('/getreview/:request_id/:labatory', async (req, res) => {
 
     console.log("router getreivew request_id : ", req.params.request_id, req.params.labatory)
-    const lab = req.params.labatory
+    let lab = req.params.labatory
 
     try {
         result = await handler.getReviewImages(req.params.request_id)
         console.log('getReviewImages hander return : ', result.length)
         if (result.length === 1) {
             const job_id = result[0].job_id
+            console.log("query pts .. ", result[0].pts_3d, result[0].world)
+            if (lab === 'true') {
+                if (result[0].pts_2d !== null) {
+                    lab = 'true'
+                } else if (result[0].pts_3d !== null && result[0].world !== null) {
+                    lab = 'true'
+                } else {
+                    lab = 'false'
+                }
+            }
+            console.log("final lab? ", lab)
             try {
                 images = await taskManager.getReivewImages(job_id, lab);
                 console.log('images.. ', images)
                 res.status(200).json({
                     status: 0,
+                    labatory: lab,
                     images: images
                 });
 

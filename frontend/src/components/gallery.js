@@ -33,7 +33,7 @@ export const ReviewGallery = ({ taskId, requestId, changeHandle }) => {
             for (const item of response.data.images) {
                 const desc = item.split('/')[1].split('_')[0]
                 let realfile = process.env.REACT_APP_SERVER_REVIEW_URL + item
-                if (configure.labatory === true) {
+                if (response.data.labatory === 'true') {
                     realfile = process.env.REACT_APP_SERVER_ANALYSIS_URL + item
                 }
                 imagelist.push({ original: realfile, originalTitle: desc, description: desc })

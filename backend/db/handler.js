@@ -143,7 +143,7 @@ exports.insertNewTaskRequest = function (mode, params) {
                 }, client);
             } else if (mode === 'gen') {
                 console.log("insert request ", params[3])
-                db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id, pts_2d, pts_3d ) VALUES ($1, $2, $3, $4, $5, $6) RETURNING request_id;", params, (err, res) => {
+                db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id, pts_2d, pts_3d, world ) VALUES ($1, $2, $3, $4, $5, $6, $7) RETURNING request_id;", params, (err, res) => {
                     client.release(true);
                     if (err) {
                         console.log(err)
@@ -413,7 +413,7 @@ exports.getReviewImages = function (request_id) {
                 reject(-1)
             }
 
-            db.queryParams("SELECT job_id FROM task_request WHERE request_id = $1; ", [request_id], (err, res) => {
+            db.queryParams("SELECT job_id, pts_2d, pts_3d, world FROM task_request WHERE request_id = $1; ", [request_id], (err, res) => {
                 client.release(true);
                 if (err) {
                     console.log(err)

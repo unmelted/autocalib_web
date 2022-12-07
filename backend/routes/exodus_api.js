@@ -156,7 +156,7 @@ router.post('/generate/:job_id', (req, res, next) => {
   request.post(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
-      result = await handler.insertNewTaskRequest('gen', ['GENERATE', req.body.task_id, req.body.group_id, body.job_id, req.body.pts_2d, req.body.pts_3d])
+      result = await handler.insertNewTaskRequest('gen', ['GENERATE', req.body.task_id, req.body.group_id, body.job_id, req.body.pts_2d, req.body.pts_3d, req.body.world])
       console.log("insert task request(generate) , return : " + result);
 
       res.status(200).json({
