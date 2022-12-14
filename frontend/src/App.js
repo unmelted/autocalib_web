@@ -15,10 +15,11 @@ import Config from './components/config';
 
 export const configData = createContext();
 const initConfigure = {
-  scale: 'full',
-  pair: 'colmap',
-  labatory: 'false',
-  preprocess: 'Off'
+  scale: 'half', //full , half
+  pair: 'isometric', //initial pair, isometric
+  labatory: 'false', //true, false
+  preprocess: 'Off', //on, off
+  rotation_center: 'zero-cam' //zero-cam, each-center, 3d-center
 };
 
 function App(props) {

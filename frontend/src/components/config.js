@@ -11,11 +11,16 @@ function Config() {
 	const [scale, setScale] = useState(configure.scale)
 	const [pair, setPair] = useState(configure.pair)
 	const [prep, setPrep] = useState(configure.preprocess)
+	const [rotationCenter, setRotationCenter] = useState(configure.rotation_center)
 
 	const handleChange_scale = e => {
 		console.log('scale handleChange is called ', e.target)
 		setScale(e.target.id)
 		changeConfigure({ scale: e.target.id })
+	}
+	const handleChange_rotationCenter = e => {
+		setRotationCenter(e.target.id)
+		changeConfigure({ rotation_center: e.target.id })
 	}
 
 	const handleChange_pair = e => {
@@ -68,7 +73,7 @@ function Config() {
 							<td className='th-option'>
 								<Form.Check
 									inline
-									label="Initial Candidate"
+									label="Initial Matching pair"
 									type={'radio'}
 									id={`colmap`}
 									onChange={handleChange_pair}
@@ -81,6 +86,37 @@ function Config() {
 									id={`isometric`}
 									onChange={handleChange_pair}
 									checked={pair === 'isometric'}
+								/>
+							</td>
+						</tr>
+						<tr>
+							<td className='th-item'>
+								Rotation Center
+							</td>
+							<td className='th-option'>
+								<Form.Check
+									inline
+									label="Index 0 Camera Center"
+									type={'radio'}
+									id={`zero-cam`}
+									onChange={handleChange_rotationCenter}
+									checked={rotationCenter === 'zero-cam'}
+								/>{' '}
+								<Form.Check
+									inline
+									label="Each Own center - Interpolation"
+									type={'radio'}
+									id={`each-center`}
+									onChange={handleChange_rotationCenter}
+									checked={rotationCenter === 'each-center'}
+								/>{' '}
+								<Form.Check
+									inline
+									label="Areal center in 3D points"
+									type={'radio'}
+									id={`3d-center`}
+									onChange={handleChange_rotationCenter}
+									checked={rotationCenter === '3d-center'}
 								/>
 							</td>
 						</tr>
