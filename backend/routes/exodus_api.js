@@ -173,6 +173,44 @@ router.post('/generate/:job_id', (req, res, next) => {
 
 });
 
+
+router.post('/position_tracking/:job_id', (req, res, next) => {
+  // Exodus API: 7.1.4	POST /exodus/autocalib/generate/{job_id}
+
+  const options = {
+    uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/position_tracking',
+    method: 'POST',
+    body: {
+      job_id: req.body.job_id,
+      image: req.body.image1,
+      track_cx: req.body.track_cx,
+      track_cy: req.body.track_cy,
+      config: req.body.config
+    },
+    json: true
+  }
+
+  console.log("Call Exodus API: " + options.uri, req.body.job_id);
+  request.post(options, async function (err, response, body) {
+    if (!err) {
+      console.log("Response: " + JSON.stringify(body));
+      result = await handler.insertNewTaskRequest('tracking', ['POSITION_TRACKING', req.body.task_id, req.body.group_id, body.job_id, [req.body.track_cx, track_cy]])
+      console.log("insert task request(generate) , return : " + result);
+
+      res.status(200).json({
+        status: 0,
+        job_id: body.job_id,
+        result: "success",
+        request_id: result,
+      });
+    } else {
+      console.log(err)
+      res.status(500).json({})
+    }
+  });
+
+});
+
 router.get('/getresult/:job_id', (req, res) => {
   //function getResult(job_id) {
   // Exodus API: 7.1.3	GET /exodus/autocalib/getresult/{job_id}

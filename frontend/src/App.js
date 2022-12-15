@@ -19,7 +19,7 @@ const initConfigure = {
   pair: 'isometric', //initial pair, isometric
   labatory: 'false', //true, false
   preprocess: 'Off', //on, off
-  rotation_center: 'zero-cam' //zero-cam, each-center, 3d-center
+  rotation_center: 'zero-cam', //zero-cam, each-center, 3d-center, tracking-center
 };
 
 function App(props) {

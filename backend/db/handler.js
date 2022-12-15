@@ -124,22 +124,6 @@ exports.insertNewTaskRequest = function (mode, params) {
                         resolve(-10)
                     }
 
-
-                    // db.queryParams("SELECT request_id FROM task_request WHERE request_category = $1 and task_id = $2 and group_id = $3 and job_id = $4;", params, (err, res) => {
-                    //     client.release(true);
-                    //     if (err) {
-                    //         console.log(err)
-                    //         resolve(-1)
-                    //     }
-                    //     if (res.rows.length > 0) {
-                    //         console.log('select current request_id ' + res.rows[0]['request_id']);
-                    //         resolve(res.rows[0]['request_id'])
-                    //     }
-                    //     else {
-                    //         resolve(-10)
-                    //     }
-                    // }, client)
-
                 }, client);
             } else if (mode === 'gen') {
                 console.log("insert request ", params[3])
@@ -158,21 +142,24 @@ exports.insertNewTaskRequest = function (mode, params) {
                         resolve(-10)
                     }
 
-                    // console.log("select request ", params[3])
-                    // db.queryParams("SELECT request_id FROM task_request WHERE request_category = $1 and task_id = $2 and group_id = $3 and job_id = $4 and pts_2d = $5 and pts_3d = $6;", params, (err, res) => {
-                    //     client.release(true);
-                    //     if (err) {
-                    //         console.log(err)
-                    //         resolve(-1)
-                    //     }
-                    //     if (res.rows.length > 0) {
-                    //         console.log('select current request_id ' + res.rows[0]['request_id']);
-                    //         resolve(res.rows[0]['request_id'])
-                    //     }
-                    //     else {
-                    //         resolve(-10)
-                    //     }
-                    // }, client)
+                }, client);
+
+            } else if (mode === 'tracking') {
+                console.log("insert request ", params[3])
+                db.queryParams("INSERT INTO task_request (request_category, task_id, group_id, job_id, pts_2d ) VALUES ($1, $2, $3, $4, $5) RETURNING request_id;", params, (err, res) => {
+                    client.release(true);
+                    if (err) {
+                        console.log(err)
+                        resolve(-1)
+                    }
+                    console.log('insertNewTaskRequest tracking query success');
+                    if (res.rows.length > 0) {
+                        console.log('current request_id ' + res.rows[0]['request_id']);
+                        resolve(res.rows[0]['request_id'])
+                    }
+                    else {
+                        resolve(-10)
+                    }
 
                 }, client);
 
