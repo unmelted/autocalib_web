@@ -11,6 +11,7 @@ import '../css/task_library.css';
 import { TaskGroupTable } from './task.js'
 import { PairCanvas } from './canvas.js'
 import { ReviewGallery } from './gallery.js';
+import { PositionTracking } from './position_tracking.js';
 
 
 export const TaskLibrary = (props) => {
@@ -33,6 +34,8 @@ export const TaskLibrary = (props) => {
     const [checkedList, setCheckedList] = useState([])
     const [modalshow, setModalShow] = useState(false)
     const [reviewJob, setReviewJob] = useState('')
+    const [ptshow, setPtShow] = useState(false)
+    const [ptRequestId, setPtRequestId] = useState(0)
 
     const changeHandle = (type, param) => {
         console.log('change handle is called', type, param)
@@ -80,6 +83,17 @@ export const TaskLibrary = (props) => {
         }
     }
 
+    const ReviewStatistics = () => {
+        console.log("Review Statistics", ptRequestId)
+        if (ptshow === true && ptRequestId !== 0) {
+            return (
+                <>
+                    <PositionTracking requestId={ptRequestId}></PositionTracking>
+                </>
+            )
+        }
+    }
+
     const getRequestHistory = async (taskId) => {
         console.log("onHandleRequest buttoin click", taskId);
         let response = null;
@@ -110,6 +124,7 @@ export const TaskLibrary = (props) => {
         const onHandlePairClick = async (category, taskId, groupId, jobId) => {
             console.log("onHandleGetPairClick ", category, taskId, groupId, jobId, configure.pair)
             let response = null;
+            setPtShow(false)
 
             if (category === 'CALCULATE') {
                 try {
@@ -132,8 +147,6 @@ export const TaskLibrary = (props) => {
                 } else {
                     return;
                 }
-            } else if (category === 'GENERATE') {
-
             }
         }
 
@@ -151,12 +164,21 @@ export const TaskLibrary = (props) => {
             console.log('onHandleReviewClick . ', requestId, modalshow)
             setReviewJob([taskId, requestId])
             setModalShow(true)
+            setPtShow(false)
+        }
+
+        const onHandleRowClick = (category, request_id) => {
+            console.log("onHandle Genclick ", category, request_id, configure.labatory)
+            if (category === 'GENERATE' && configure.labatory === 'true') {
+                setPtRequestId(request_id)
+                setPtShow(true)
+            }
         }
 
         if (requestHistoryloaded === true) {
             return (
                 requestHistory.map((req =>
-                    <tr key={req.request_id} >
+                    <tr key={req.request_id} onClick={() => onHandleRowClick(req.request_category, req.request_id)}>
                         <td> {req.request_id}</td>
                         <td> {req.request_category}</td>
                         <td> {req.group_id}</td>
@@ -213,7 +235,7 @@ export const TaskLibrary = (props) => {
             getRequestHistory(taskId);
             setLeftImage('')
             setRightImage('')
-
+            setPtShow(false)
         }
 
         const onHandleRequestClick = async (taskId, task_path) => {
@@ -225,7 +247,7 @@ export const TaskLibrary = (props) => {
             setRequestHistoryLoaded(false)
             setLeftImage('')
             setRightImage('')
-
+            setPtShow(false)
         }
 
         if (loaded === true) {
@@ -380,7 +402,10 @@ export const TaskLibrary = (props) => {
                 <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'history'} />
             </div>
             <div>
-                <Canvas></Canvas>
+                <Canvas />
+            </div>
+            <div hidden={ptshow === false}>
+                <ReviewStatistics />
             </div>
             <div>
                 <ReviewModal />
