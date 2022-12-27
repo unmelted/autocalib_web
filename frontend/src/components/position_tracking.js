@@ -8,9 +8,9 @@ import { configData } from '../App.js'
 import { getGroundImage } from './util.js'
 import '../css/canvas.css';
 
-export const PositionTracking = ({ requestId }) => {
+export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 
-	console.log("position tracking : ", requestId)
+	console.log("position tracking : ", request_id, group_id, task_id, job_id)
 
 	const canvasRef = useRef(null);
 	const imageRef = useRef(null);
@@ -18,7 +18,7 @@ export const PositionTracking = ({ requestId }) => {
 	const targetInfoRef = useRef(null);
 
 	const targetPointRef = useRef([]);
-	const [calImage, setCalImage] = useState('')
+	const [ptImage, setPtImage] = useState('')
 	const [isSubmitted, setIsSubmitted] = useState(false);
 	const [message, setMessage] = useState('')
 	const [description, setDescription] = useState('')
@@ -172,31 +172,40 @@ export const PositionTracking = ({ requestId }) => {
 
 	const loadData = async () => {
 		let response = null;
-		console.log('load data', requestId)
+		let image, use_width, use_height;
+		console.log('load data', request_id, job_id)
 
-		// try {
-		// 	const url = await axios.get(process.env.REACT_APP_SERVER_URL + `/contol/getstatistics/${requestId}`);
-		// } catch (err) {
-		// 	console.log("loadData err : ", err);
-		// 	return
-		// }
+		try {
+			console.log("get geninfo job : ", job_id)
+			response = await axios.get(process.env.REACT_APP_SERVER_URL + `/api/getgeninfo/${job_id}`);
+		} catch (err) {
+			console.log(err);
+			return;
+		}
 
-		// if (response && response.data.cal_image) {
-		// 	setCalImage(response.data.cal_image);
-		// 	if (response.data.cal_point.length > 0) {
-		// 		DrawGenPoints(response.data.cal_point);
-		// 	}
-		// }
+		if (response && response.data.result === 0) {
+			image = response.data.image
+			use_width = response.data.use_width
+			use_height = response.data.use_height
+			console.log("response image", response.data.image)
+		}
+		else {
+			console.log('cannot get gen info from exodus . ', response.data.result, response.data.message)
+			return;
+		}
+		console.log("load data for position tracking : ", image, use_width, use_height)
 
-		const count = 40
-		const groupname = 'Group1'
-		const inputpt = [1, 1, 3]
-		const image1 = '01001.jpg'
-		const strmessage = `${requestId} camera count : ${count} Group : ${groupname} \n Insert Point : ${inputpt} \n Input Image : ${image1}`
+		const groupname = group_id
+		const percent = (use_width * use_height) / (3840 * 2160) * 100
+		const strmessage = `Group : ${groupname} \n Input Image : ${image} \n Use width : ${use_width} px \n Use height : ${use_height} px\n Usage % : ${percent.toFixed(2)} %`
 		setMessage('')
 		setDescription(strmessage)
 
+		const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + task_id + '/' + image;
+		console.log('imageUrl', imageUrl)
+		setPtImage(imageUrl)
 	}
+
 	const initContext = () => {
 		context = canvasRef.current.getContext('2d')
 		canvasRef.current.addEventListener('mousedown', (event) => onMouseDown(event, context), { passive: false });
@@ -213,30 +222,30 @@ export const PositionTracking = ({ requestId }) => {
 
 	}
 	useEffect(() => {
-		loadData(requestId);
+		loadData(request_id);
 	}, [])
 
 	return (
 		<>
 			<div>
-				<p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  Request : {requestId}</p>
+				<p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  Generated Request : {request_id}</p>
 				<Row>
-					<div className="modebtn-message">
+					<div className="modebtn-message2">
 						<span >{description}</span>
 					</div>
 				</Row>
-				<Row>
+				{/* <Row>
 					<div className="modebtn-message">
 						<span >{message}</span>
 					</div>
-				</Row>
+				</Row> */}
 			</div>
 			<div className='canvas-wrapper' >
 				<Form.Group>
 					<img
 						id='image'
 						ref={imageRef}
-						src={calImage}
+						src={ptImage}
 						onLoad={(e) => initContext()}
 						hidden={true}
 					/>

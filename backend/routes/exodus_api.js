@@ -246,6 +246,35 @@ router.get('/getresult/:job_id', (req, res) => {
   return result;
 });
 
+router.get('/getgeninfo/:job_id', (req, res) => {
+  //function getResult(job_id) {
+  // Exodus API: 7.1.3	GET /exodus/autocalib/getresult/{job_id}
+  let result = {}
+  const options = {
+    uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/getgeninfo/' + req.params.job_id,
+    method: 'GET',
+    json: true
+  }
+
+  console.log("Call Exodus API: " + options.uri);
+  request.get(options, async function (err, response, body) {
+    if (!err) {
+      console.log('result ', body.image, body.use_width, body.use_height)
+      res.status(200).json({
+        result: body.result,
+        message: body.message,
+        image: body.image,
+        use_width: body.use_width,
+        use_height: body.use_height
+      });
+    } else {
+      console.log(err)
+      result.result = -1;
+    }
+  });
+
+  return result;
+});
 
 router.get('/getversion', (req, res) => {
   // Exodus API: 7.1.2	GET /exodus/autocalib/getversion

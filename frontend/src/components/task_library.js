@@ -35,7 +35,7 @@ export const TaskLibrary = (props) => {
     const [modalshow, setModalShow] = useState(false)
     const [reviewJob, setReviewJob] = useState('')
     const [ptshow, setPtShow] = useState(false)
-    const [ptRequestId, setPtRequestId] = useState(0)
+    const [ptRequestId, setPtRequestId] = useState([])
 
     const changeHandle = (type, param) => {
         console.log('change handle is called', type, param)
@@ -84,11 +84,11 @@ export const TaskLibrary = (props) => {
     }
 
     const ReviewStatistics = () => {
-        console.log("Review Statistics", ptRequestId)
-        if (ptshow === true && ptRequestId !== 0) {
+        console.log("Review Statistics", ptRequestId[0])
+        if (ptshow === true && ptRequestId[0] !== 0) {
             return (
                 <>
-                    <PositionTracking requestId={ptRequestId}></PositionTracking>
+                    <PositionTracking request_id={ptRequestId[0]} group_id={ptRequestId[1]} task_id={ptRequestId[2]} job_id={ptRequestId[3]}></PositionTracking>
                 </>
             )
         }
@@ -167,10 +167,10 @@ export const TaskLibrary = (props) => {
             setPtShow(false)
         }
 
-        const onHandleRowClick = (category, request_id) => {
-            console.log("onHandle Genclick ", category, request_id, configure.labatory)
+        const onHandleRowClick = (category, request_id, group_id, task_id, job_id) => {
+            console.log("onHandle Genclick ", category, request_id, configure.labatory, group_id, task_id, job_id)
             if (category === 'GENERATE' && configure.labatory === 'true') {
-                setPtRequestId(request_id)
+                setPtRequestId([request_id, group_id, task_id, job_id])
                 setPtShow(true)
             }
         }
@@ -178,7 +178,7 @@ export const TaskLibrary = (props) => {
         if (requestHistoryloaded === true) {
             return (
                 requestHistory.map((req =>
-                    <tr key={req.request_id} onClick={() => onHandleRowClick(req.request_category, req.request_id)}>
+                    <tr key={req.request_id} onClick={() => onHandleRowClick(req.request_category, req.request_id, req.group_id, req.task_id, req.job_id)}>
                         <td> {req.request_id}</td>
                         <td> {req.request_category}</td>
                         <td> {req.group_id}</td>
