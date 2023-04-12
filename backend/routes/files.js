@@ -5,6 +5,7 @@ const express = require('express'),
   multer = require('multer'),
   router = express.Router();
 
+const handler = require('../db/handler.js')
 const taskManager = require('../control/task.js')
 
 const upload_images = (destPath) => {
@@ -70,12 +71,19 @@ router.post('/upload', async (req, res, next) => {
   upload.array('imgCollection', 1000);
   const uploadObj = util.promisify(upload.any());
 
-  await uploadObj(req, res);
   try {
+    await uploadObj(req, res);
     result = await taskManager.parsingGroupInfo(taskId, fullPath)
   }
   catch (err) {
     console.log('parsing group info reject.. ', err)
+    res.status(500).json({})
+    return;
+  }
+
+  result = await handler.insertNewTask(taskNo, taskId, fullPath)
+
+  if (result < 0) {
     res.status(500).json({})
     return;
   }

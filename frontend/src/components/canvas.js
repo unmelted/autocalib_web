@@ -601,7 +601,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
 
         if (context[type]) {
             context[type].save();
-            // context[type].setTransform(1, 0, 0, 1, 0, 0);
+            context[type].setTransform(1, 0, 0, 1, 0, 0);
             if (type === 'world') {
                 context[type].clearRect(0, 0, 800, 800);
             } else {

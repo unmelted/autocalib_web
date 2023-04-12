@@ -58,14 +58,7 @@ exports.createNewTask = async function () {
     }
 
     console.log("task path : " + taskId)
-
-    result = await handler.insertNewTask(taskNo, taskId, fullPath)
-
-    if (result < 0) {
-        return [-1, -1, -1]
-    } else {
-        return [taskNo, taskId, fullPath];
-    }
+    return [taskNo, taskId, fullPath];
 }
 
 async function insertGroup(taskId, group, item) {
@@ -109,12 +102,12 @@ exports.parsingGroupInfo = async function (taskId, fullPath) {
 
             pts = fullPath + ptsfile;
             console.log("parsingGroupinfo : " + pts)
-            fs.readFile(pts, 'utf-8', async function (err, data) {
+            fs.readFile(pts, 'utf8', async function (err, data) {
                 if (err) {
                     reject(-1)
                     return -1;
                 }
-                console.log(data)
+                // console.log(data)
                 try {
                     obj = JSON.parse(data)
                 } catch (err) {

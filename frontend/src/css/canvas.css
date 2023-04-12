@@ -65,3 +65,11 @@
     border: 2px solid gray;
     height: 140px;
 }
+
+.modebtn-ptApply {
+    float: left;
+    width: 120px;
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

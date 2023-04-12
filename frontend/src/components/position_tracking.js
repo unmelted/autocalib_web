@@ -5,13 +5,12 @@ import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
 import { configData } from '../App.js'
-import { getGroundImage } from './util.js'
 import '../css/canvas.css';
 
 export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 
 	console.log("position tracking : ", request_id, group_id, task_id, job_id)
-
+	const { configure, changeConfigure } = useContext(configData)
 	const canvasRef = useRef(null);
 	const imageRef = useRef(null);
 	const mousePosRef = useRef(null);
@@ -19,7 +18,8 @@ export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 
 	const targetPointRef = useRef([]);
 	const [ptImage, setPtImage] = useState('')
-	const [isSubmitted, setIsSubmitted] = useState(false);
+	const [ptInputDone, setPtInputDone] = useState(false)
+	const [isApplied, setIsApplied] = useState(false);
 	const [message, setMessage] = useState('')
 	const [description, setDescription] = useState('')
 
@@ -48,6 +48,7 @@ export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 	const pointRadius = parseInt(process.env.REACT_APP_POINT_RADIUS, 10);
 	const maxTargetNum = useRef(2);
 
+
 	const getTransformedPoint = (x, y, context) => {
 		// console.log("getTransform context : ", context)
 		const transform = context.getTransform();
@@ -72,6 +73,19 @@ export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 
 	}
 
+	const drawTargetArea = () => {
+
+		context.lineWidth = process.env.REACT_APP_AREA_LINE_WIDTH;
+		context.strokeStyle = process.env.REACT_APP_LINE_COLOR;
+
+		context.beginPath();
+		for (let i = 0; i < maxTargetNum.current; i++) {
+			context.lineTo(targetPointRef.current[i].x, targetPointRef.current[i].y);
+		}
+		context.lineTo(targetPointRef.current[0].x, targetPointRef.current[0].y);
+		context.stroke();
+	}
+
 	const drawTarget = () => {
 		if (targetPointRef.current.length > maxTargetNum.current) {
 			return;
@@ -86,6 +100,11 @@ export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 			drawCircle(targetPointRef.current[i].x, targetPointRef.current[i].y, pointRadius, pointColorPallet[i]);
 			drawCircle(targetPointRef.current[i].x, targetPointRef.current[i].y, pointRadius + 8, pointColorPallet[i]);
 			targetInfo.current.innerText += `[${targetPointRef.current[i].x}, ${targetPointRef.current[i].y}], `;
+		}
+
+		if (targetPointRef.current.length === maxTargetNum.current) {
+			drawTargetArea();
+			setPtInputDone(true)
 		}
 
 	}
@@ -119,10 +138,8 @@ export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 		e.stopImmediatePropagation();
 
 		console.log(currentTransformedCursor.x, currentTransformedCursor.y)
-		console.log(targetPointRef.current.length)
-		console.log(maxTargetNum.current)
 
-		if (targetPointRef.current < maxTargetNum.current) {
+		if (targetPointRef.current.length < maxTargetNum.current) {
 			targetPointRef.current.push({ x: currentTransformedCursor.x, y: currentTransformedCursor.y });
 
 			drawTarget();
@@ -146,28 +163,25 @@ export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 		}
 
 		event.preventDefault();
-	}
-
-
-	const DrawGenPoints = () => {
 
 	}
 
 	const drawImageToCanvas = (e) => {
 		context = canvasRef.current.getContext('2d')
 		context.save();
+		context.setTransform(1, 0, 0, 1, 0, 0);
 		context.clearRect(0, 0, canvas.current.width, canvas.current.height);
 		context.restore();
-		context.scale(0.32, 0.32);
 		context.drawImage(image.current, 0, 0, imageWidth, imageHeight);
 
 	}
 
-
 	const clearPoints = () => {
 		targetPointRef.current = [];
 		targetInfo.current.innerText = '';
-		drawImageToCanvas(null, 'left', true);
+		setPtInputDone(false)
+		drawImageToCanvas(null);
+
 	}
 
 	const loadData = async () => {
@@ -206,6 +220,42 @@ export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 		setPtImage(imageUrl)
 	}
 
+	const ApplyPoints = async () => {
+
+		let response = null;
+
+		const data = {
+			job_id: job_id,
+			image: ptImage.split('/').slice(-1)[0],
+			track_x1: targetPointRef.current[0].x,
+			track_y1: targetPointRef.current[0].y,
+			track_x2: targetPointRef.current[1].x,
+			track_y2: targetPointRef.current[1].y,
+			config: configure,
+			task_id: task_id,
+			group_id: group_id
+		}
+		console.log("Apply points : ", data)
+
+		try {
+			console.log("get geninfo job : ", job_id)
+			response = await axios.post(process.env.REACT_APP_SERVER_URL + `/api/position_tracking`, data);
+		} catch (err) {
+			console.log(err);
+			return;
+		}
+
+		if (response && response.data.result === 0) {
+			console.log("response position tracking", response.data.image)
+		}
+		else {
+			console.log('cannot get gen info from exodus . ', response.data.result, response.data.message)
+			return;
+		}
+
+		clearPoints();
+	}
+
 	const initContext = () => {
 		context = canvasRef.current.getContext('2d')
 		canvasRef.current.addEventListener('mousedown', (event) => onMouseDown(event, context), { passive: false });
@@ -239,6 +289,19 @@ export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {
 						<span >{message}</span>
 					</div>
 				</Row> */}
+				<Button
+					className="modebtn-ptApply"
+					size="sm"
+					variant="primary"
+					id='apply'
+					as="input"
+					type='button'
+					value="Apply"
+					onClick={ApplyPoints}
+					disabled={ptInputDone === false}
+				>
+				</Button>
+
 			</div>
 			<div className='canvas-wrapper' >
 				<Form.Group>

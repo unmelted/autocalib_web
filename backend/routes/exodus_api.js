@@ -174,7 +174,7 @@ router.post('/generate/:job_id', (req, res, next) => {
 });
 
 
-router.post('/position_tracking/:job_id', (req, res, next) => {
+router.post('/position_tracking', (req, res, next) => {
   // Exodus API: 7.1.4	POST /exodus/autocalib/generate/{job_id}
 
   const options = {
@@ -182,10 +182,14 @@ router.post('/position_tracking/:job_id', (req, res, next) => {
     method: 'POST',
     body: {
       job_id: req.body.job_id,
-      image: req.body.image1,
-      track_cx: req.body.track_cx,
-      track_cy: req.body.track_cy,
-      config: req.body.config
+      image: req.body.image,
+      track_x1: req.body.track_x1,
+      track_y1: req.body.track_y1,
+      track_x2: req.body.track_x2,
+      track_y2: req.body.track_y2,
+      config: req.body.config,
+      task_id: req.body.task_id,
+      group_od: req.body.group_id
     },
     json: true
   }
@@ -194,7 +198,7 @@ router.post('/position_tracking/:job_id', (req, res, next) => {
   request.post(options, async function (err, response, body) {
     if (!err) {
       console.log("Response: " + JSON.stringify(body));
-      result = await handler.insertNewTaskRequest('tracking', ['POSITION_TRACKING', req.body.task_id, req.body.group_id, body.job_id, [req.body.track_cx, track_cy]])
+      result = await handler.insertNewTaskRequest('tracking', ['POSITION_TRACKING', req.body.task_id, req.body.group_id, body.job_id, [req.body.track_x1, req.body.track_y1, req.body.track_x2, req.body.track_y2]])
       console.log("insert task request(generate) , return : " + result);
 
       res.status(200).json({
