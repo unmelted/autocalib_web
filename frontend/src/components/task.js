@@ -4,7 +4,7 @@ import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import { configData } from '../App.js'
+import { configData } from './exodus.js'
 import { getGroupInfo } from './util.js'
 import { ReviewGallery } from './gallery.js';
 import { PairCanvas } from './canvas.js'

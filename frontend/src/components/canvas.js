@@ -4,7 +4,7 @@ import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
-import { configData } from '../App.js'
+import { configData } from './exodus.js'
 import { getGroundImage } from './util.js'
 import '../css/canvas.css';
 

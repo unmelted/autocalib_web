@@ -4,7 +4,7 @@ import "react-image-gallery/styles/css/image-gallery.css";
 import ImageGallery from "react-image-gallery";
 import Modal from 'react-bootstrap/Modal';
 import '../css/task_library.css';
-import { configData } from '../App.js'
+import { configData } from './exodus.js'
 
 
 export const ReviewGallery = ({ taskId, requestId, changeHandle }) => {

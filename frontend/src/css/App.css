@@ -22,3 +22,7 @@ hr {
     border: 0;
     border-top: 2px solid rgba(252, 252, 252, 0.5);
 }
+
+. {
+    text-align: center;
+}

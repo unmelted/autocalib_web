@@ -4,7 +4,7 @@ import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import '../css/config.css';
 
-import { configData } from '../App.js'
+import { configData } from './exodus.js'
 
 function Config() {
 	const { configure, changeConfigure } = useContext(configData)
