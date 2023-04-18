@@ -1,28 +1,18 @@
+@import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: "Titillium+Web", sans-serif !important;
+}
+
 body {
     background-color: rgb(53, 53, 53);
     color: white;
-    padding: 3px 3px 3px 3px;
-    font-family: Verdana, sans-serif;
-    font-size: 11pt;
-    text-align: center;
+    font-size: 13pt;
 }
 
 .center {
-    text-align: center;
-}
-
-/* .container {
-    padding-left: 0 !important;
-    padding-right: 0 !important;
-} */
-
-hr {
-    margin-top: 2rem;
-    margin-bottom: 2rem;
-    border: 0;
-    border-top: 2px solid rgba(252, 252, 252, 0.5);
-}
-
-. {
     text-align: center;
 }

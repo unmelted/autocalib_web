@@ -10,7 +10,7 @@ import { TaskGroupTable } from './task.js'
 
 
 
-function AutoCalib() {
+function CreateTask() {
 
     const [taskId, setTaskId] = useState('');
     const [taskPath, setTaskPath] = useState('');
@@ -224,4 +224,4 @@ function AutoCalib() {
 
 }
 
-export default AutoCalib;
+export default CreateTask;

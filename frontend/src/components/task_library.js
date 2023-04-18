@@ -5,7 +5,7 @@ import Button from 'react-bootstrap/Button'
 import { Form } from 'react-bootstrap'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import { configData } from './exodus.js'
+import { configData } from '../App.js'
 import '../css/task_library.css';
 
 import { TaskGroupTable } from './task.js'

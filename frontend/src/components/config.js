@@ -3,8 +3,7 @@ import React, { useState, useRef, useEffect, useContext } from 'react';
 import Table from 'react-bootstrap/Table';
 import Form from 'react-bootstrap/Form';
 import '../css/config.css';
-
-import { configData } from './exodus.js'
+import { configData } from '../App.js'
 
 function Config() {
 	const { configure, changeConfigure } = useContext(configData)

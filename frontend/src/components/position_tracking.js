@@ -4,7 +4,7 @@ import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
-import { configData } from './exodus.js'
+import { configData } from '../App.js';
 import '../css/canvas.css';
 
 export const PositionTracking = ({ request_id, group_id, task_id, job_id }) => {

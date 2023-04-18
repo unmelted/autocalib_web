@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from "react";
-import { Link, Outlet } from 'react-router-dom';
-import { Sidebar, Menu, MenuItem, SidebarFooter, useProSidebar } from "react-pro-sidebar";
+import React from "react";
+import { Link } from 'react-router-dom';
+import { Sidebar, Menu, MenuItem, useProSidebar } from "react-pro-sidebar";
 import HomeOutlinedIcon from "@mui/icons-material/HomeOutlined";
+import '../css/sidebar.css';
 
 function Sidenavbar() {
 	const { collapseSidebar, toggleSidebar, collapsed, toggled, broken, rtl } =
@@ -18,66 +19,49 @@ function Sidenavbar() {
 		}
 	};
 
-	function changeBackground(e) {
-		e.target.style.background = 'red';
-		// e.target.background = "red";
-	}
-	function revertBackground(e) {
-		e.target.style.background = "rgb(0, 0, 0, 1)";
-		e.target.background = "rgb(0, 0, 0, 0)";
-
-	}
-
 	return (
-		<>
+		<div strype={{ height: '100%' }}>
 			<Sidebar
-				breakPoint="md"
 				transitionDuration={800}
-				backgroundColor="rgb(0, 0, 0, 1)"
+				width='300px'
+				backgroundColor="rgb(30, 30, 30, 1)"
 				rtl={false}
-				style={{ height: "80vh" }}
+				style={{ height: "60vh" }}
 				defaultCollapsed
 			>
 				<Menu
 					menuItemStyles={{
-						button: ({ level, active }) => {
-							// only apply styles on first level elements of the tree
-							if (level === 0)
+						button: ({ level }) => {
+							if (level === 0) {
 								return {
-									// color: disabled ? '#f5d9ff' : '#d359ff',
-									backgroundColor: active ? '#000000' : '#000000',
-									background: active ? '#000000' : '#000000',
-								};
-						},
-					}}
-				>
-					<MenuItem icon={<img src={(toggled == true) ? 'https://4dreplay.com/4d/wp-content/uploads/2021/10/logo_white-2.png' : '/asset/4d.png'} width={(toggled == true) ? '320px' : '40px'} onMouseLeave={revertBackground} />}
+
+									backgroundColor: "rgb(30, 30, 30, 1)",
+									"&:hover": {
+										backgroundColor: "red",
+									},
+									alignItems: 'left'
+								}
+							}
+						}
+					}}>
+					<MenuItem active='true' onClick={() => {
+						toggle();
+					}}> {' '}</MenuItem>
+					<MenuItem icon={<img src={(toggled === true) ? '' : '/asset/4d.png'} width={(toggled === true) ? '0px' : '40px'} />}
 						onClick={() => {
 							toggle();
-						}}
-						onMouseOver={changeBackground}
-						onMouseLeave={revertBackground}
-						style={{ alignItems: "left" }}>
+						}} >
+						{<img src='https://4dreplay.com/4d/wp-content/uploads/2021/10/logo_white-2.png' width="200px" />}
 					</MenuItem>
-					<MenuItem icon={<HomeOutlinedIcon onMouseLeave={revertBackground} />}
-						component={<Link to="/" />}
-						onMouseOver={changeBackground}
-						onMouseLeave={revertBackground}
-					>HOME</MenuItem>
-					<MenuItem icon={<img src='/asset/chess-board_w.png' width="20px" onMouseLeave={revertBackground} />}
-						component={<Link to="/exodus" />}
-						onMouseOver={changeBackground}
-						onMouseLeave={revertBackground}> CALIBRATION</MenuItem>
-					<MenuItem icon={<img src='/asset/chart-network_w.png' width="20px" onMouseLeave={revertBackground} />}
-						component={<Link to="/kairos" />}
-						onMouseOver={changeBackground}
-						onMouseLeave={revertBackground}> MULTI-TRACKER </MenuItem>
-					<MenuItem icon={<img src='/asset/help.png' width="20px" onMouseLeave={revertBackground} />}
-						onMouseOver={changeBackground}
-						onMouseLeave={revertBackground}>HELP </MenuItem>
+					<MenuItem icon={<HomeOutlinedIcon />} component={<Link to="/" />}> HOME</MenuItem>
+					<MenuItem icon={<img src='/asset/chess-board_w.png' width="20px" />} component={<Link to="/exodus" />}>
+						CALIBRATION</MenuItem>
+					<MenuItem icon={<img src='/asset/chart-network_w.png' width="20px" />}
+						component={<Link to="/kairos" />}> MULTI-TRACKER </MenuItem>
+					<MenuItem icon={<img src='/asset/help.png' width="20px" />}>HELP </MenuItem>
 				</Menu>
 			</Sidebar>
-		</>
+		</div >
 	);
 }
 

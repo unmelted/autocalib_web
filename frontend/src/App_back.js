@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import './css/App.css';
-import AutoCalib from './components/auto_calib';
+import AutoCalib from './components/create_task';
 
 class App extends Component {
 

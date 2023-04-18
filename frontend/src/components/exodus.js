@@ -1,4 +1,4 @@
-import React, { useEffect, useState, createContext } from 'react';
+import React, { useEffect, useState, useContext } from 'react';
 import axios from 'axios';
 import Container from 'react-bootstrap/Container';
 import Row from 'react-bootstrap/Row';
@@ -8,19 +8,11 @@ import Badge from 'react-bootstrap/Badge';
 
 import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/App.css';
-import AutoCalib from './auto_calib';
+import { configData } from '../App.js';
+import CreateTask from './create_task';
 import TaskLibrary from './task_library';
 import Config from './config';
 
-
-export const configData = createContext();
-const initConfigure = {
-  scale: 'half', //full , half
-  pair: 'isometric', //initial pair, isometric
-  labatory: 'false', //true, false
-  preprocess: 'Off', //on, off
-  rotation_center: 'zero-cam', //zero-cam, each-center, 3d-center, tracking-center
-};
 
 function Exodus(props) {
   const [state, setState] = useState('')
@@ -28,24 +20,9 @@ function Exodus(props) {
   const [version, setVersion] = useState('')
   const [alienTarget, setAlienTarget] = useState('./asset/alien.png')
   // const [configure, setConfigure] = userSatate(initConfigure)
-  let configure = initConfigure;
+  const { configure, changeConfigure } = useContext(configData)
   console.log("configure.. ", configure)
   const guideFile = process.env.REACT_APP_SERVER_GUIDE + process.env.REACT_APP_VERSION + '.pdf';
-
-  const changeConfigure = (params) => {
-    const keys = Object.keys(configure)
-    const pkeys = Object.keys(params)
-
-    for (const key of keys) {
-      for (const pkey of pkeys) {
-        if (key === pkey) {
-          console.log("change Config : ", key, pkey)
-          configure[key] = params[pkey]
-          console.log("change Config result : ", configure[key])
-        }
-      }
-    }
-  };
 
   const onHandleCreateTask = () => {
     setState('create')
@@ -83,7 +60,7 @@ function Exodus(props) {
       return (
         <>
           <configData.Provider value={{ configure, changeConfigure }} >
-            <AutoCalib />
+            <CreateTask />
           </configData.Provider>
         </>
       )
@@ -152,7 +129,7 @@ function Exodus(props) {
   return (
     <div className="App">
       <nav className="navbar navbar-dark bg-dark py-3"
-        style={{ height: "20px" }}>
+        style={{ height: "30px" }}>
       </nav>
       <Container>
         <Row>
@@ -179,22 +156,22 @@ function Exodus(props) {
             <Col xs lg='2'>
               <Button className="rounded" variant={state === "create" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleCreateTask}><img src='./asset/plus.png' width="40px" alt="" /><p></p>
+                onClick={onHandleCreateTask}><img src='./asset/plus.png' width="60px" alt="" /><p></p>
                 Create Task</Button> </Col>
             <Col xs lg='2'>
               <Button variant={state === "search" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleSearchTask}><img src='./asset/search.png' width="40px" alt="" /> <p></p>
+                onClick={onHandleSearchTask}><img src='./asset/search.png' width="60px" alt="" /> <p></p>
                 Search Task</Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "config" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-                onClick={onHandleConfig}><img src='./asset/config.png' width="40px" alt="" /> <p></p>
+                onClick={onHandleConfig}><img src='./asset/config.png' width="60px" alt="" /> <p></p>
                 Config</Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "guide" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}>
-                <a href={guideFile} target="_blank"><img src='./asset/help.png' width="40px" alt="" /></a> <p></p>
+                <a href={guideFile} target="_blank"><img src='./asset/help.png' width="60px" alt="" /></a> <p></p>
                 Guide</Button></Col>
           </Row>
           <p></p>

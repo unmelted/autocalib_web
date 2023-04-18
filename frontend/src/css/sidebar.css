@@ -1,0 +1,16 @@
+.css-msh7cd.ps-collapsed {
+	border-right-style: none;
+	border-right-width: 0px;
+	border-color: black;
+}
+
+.css-msh7cd.ps-toggled {
+	border-right-style: none;
+	border-right-width: 0px;
+	border-color: black;
+}
+
+a.ps-menu-button.ps-active {
+	background-color: red;
+	background: red;
+}
