@@ -25,7 +25,7 @@ const initItems = {
 }
 
 export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
-    // console.log("Task Group Table ", taskId, taskPath);
+    console.log("Task Group Table ", taskId, taskPath);
     const CAL_STATE = {
         ERR: -1,
         READY: 0,

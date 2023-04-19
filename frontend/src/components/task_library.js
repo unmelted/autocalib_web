@@ -8,13 +8,14 @@ import Table from 'react-bootstrap/Table';
 import { configData } from '../App.js'
 import '../css/task_library.css';
 
-import { TaskGroupTable } from './task.js'
+import { TaskGroupTable } from './task_group.js'
 import { PairCanvas } from './canvas.js'
 import { ReviewGallery } from './gallery.js';
 import { PositionTracking } from './position_tracking.js';
 
 
-export const TaskLibrary = (props) => {
+export const TaskLibrary = ({ from }) => {
+    console.log("task library from : ", from)
     const { configure, changeConfigure } = useContext(configData)
     const [tasks, setTasks] = useState('');
     const [loaded, setLoaded] = useState(false);

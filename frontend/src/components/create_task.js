@@ -1,16 +1,17 @@
 import React, { useState, useRef } from 'react';
 import axios from 'axios';
-import '../css/autocalib.css';
+import '../css/create_task.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
-import { TaskGroupTable } from './task.js'
+import { TaskGroupTable } from './task_group.js'
 
 
 
-function CreateTask() {
+export const CreateTask = ({ from }) => {
+    console.log("where from props : ", from)
 
     const [taskId, setTaskId] = useState('');
     const [taskPath, setTaskPath] = useState('');

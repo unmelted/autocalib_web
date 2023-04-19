@@ -1,10 +1,12 @@
-import React, { createContext, useContext } from 'react';
-import { Routes, Route, RouteObject } from "react-router-dom";
+import React, { createContext } from 'react';
+import { Routes, Route } from "react-router-dom";
 import Sidenavbar from './components/sidebar.js';
+
+// import './css/App.css';
+import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import Home from './home.js';
 import Exodus from './components/exodus.js';
 import Kairos from './components/kairos.js';
-
 
 export const configData = createContext();
 const initConfigure = {
@@ -57,7 +59,7 @@ function App() {
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="exodus" element={<Exodus />} />
-            <Route path="Kairos" element={<Kairos />} />
+            <Route path="kairos" element={<Kairos />} />
           </Routes>
         </configData.Provider>
       </div>

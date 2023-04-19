@@ -6,11 +6,11 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button'
 import Badge from 'react-bootstrap/Badge';
 
-import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
+// import '../../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import '../css/App.css';
 import { configData } from '../App.js';
-import CreateTask from './create_task';
-import TaskLibrary from './task_library';
+import { CreateTask } from './create_task.js';
+import { TaskLibrary } from './task_library.js';
 import Config from './config';
 
 
@@ -60,7 +60,7 @@ function Exodus(props) {
       return (
         <>
           <configData.Provider value={{ configure, changeConfigure }} >
-            <CreateTask />
+            <CreateTask from={'exodus'} />
           </configData.Provider>
         </>
       )
@@ -69,7 +69,7 @@ function Exodus(props) {
       return (
         <>
           <configData.Provider value={{ configure, changeConfigure }} >
-            <TaskLibrary />
+            <TaskLibrary from={'exodus'} />
           </configData.Provider>
         </>
       )
@@ -127,9 +127,9 @@ function Exodus(props) {
   console.log(process.env.REACT_APP_VERSION)
 
   return (
-    <div className="App">
-      <nav className="navbar navbar-dark bg-dark py-3"
-        style={{ height: "30px" }}>
+    <div >
+      <nav className="navbar navbar-dark bg-dark py-1"
+        style={{ height: "10px" }}>
       </nav>
       <Container>
         <Row>
@@ -157,22 +157,22 @@ function Exodus(props) {
               <Button className="rounded" variant={state === "create" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
                 onClick={onHandleCreateTask}><img src='./asset/plus.png' width="60px" alt="" /><p></p>
-                Create Task</Button> </Col>
+                CREATE </Button> </Col>
             <Col xs lg='2'>
               <Button variant={state === "search" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
                 onClick={onHandleSearchTask}><img src='./asset/search.png' width="60px" alt="" /> <p></p>
-                Search Task</Button></Col>
+                SEARCH </Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "config" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
                 onClick={onHandleConfig}><img src='./asset/config.png' width="60px" alt="" /> <p></p>
-                Config</Button></Col>
+                CONFIG </Button></Col>
             <Col xs lg='2'>
               <Button variant={state === "guide" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}>
                 <a href={guideFile} target="_blank"><img src='./asset/help.png' width="60px" alt="" /></a> <p></p>
-                Guide</Button></Col>
+                GUIDE </Button></Col>
           </Row>
           <p></p>
           <hr />
