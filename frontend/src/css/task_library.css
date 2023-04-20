@@ -19,11 +19,11 @@
     /* border: 2px solid rgb(99, 99, 99); */
 }
 
-Table thead {
+/* Table thead {
     position: sticky;
     top: 0px;
     margin: 0 0 0 0;
-}
+} */
 
 #task-title {
     margin: 5px 0 10px 0;

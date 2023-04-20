@@ -254,3 +254,77 @@ exports.getReivewImages = async function (job_id, labatory) {
         });
     });
 }
+
+exports.parsingDscList = async function (taskId) {
+
+    let ptsfile = '';
+    let ext_name = '';
+    dsclist = []
+    let result = -1;
+    let bPtscheck = false;
+    let bExtcheck = false;
+
+    const baseDir = process.env.AUTO_CALIB_DIR;
+    const fullPath = path.join(String(baseDir), String(taskId)) + '/';
+    console.log(fullPath);
+
+    return new Promise((resolve, reject) => {
+        fs.readdir(fullPath, function (err, filelist) {
+
+            for (const file of filelist) {
+                const ext = file.split('.');
+                if (ext[1].toLowerCase() === 'pts') {
+                    ptsfile = file;
+                    bPtscheck = true;
+                }
+                else if (ext[1].toLowerCase() === 'jpg') {
+                    ext_sub = ext[0].split('_');
+                    ext_name = ext_sub[1];
+                    console.log('ext_name : ', ext_name);
+                    bExtcheck = true;
+                }
+
+                if (bPtscheck && bExtcheck) {
+                    break;
+                }
+
+            }
+
+            if (ptsfile == '') {
+                resolve(-1)
+            }
+
+            pts = fullPath + ptsfile;
+            console.log("parsingGroupinfo : " + pts)
+            fs.readFile(pts, 'utf8', async function (err, data) {
+                if (err) {
+                    reject(-1)
+                    return -1;
+                }
+                // console.log(data)
+                try {
+                    obj = JSON.parse(data)
+                } catch (err) {
+                    console.log('parsing json err ', err)
+                    reject(-1)
+                    return -1;
+                }
+                if (obj === '') {
+                    reject(-1)
+                }
+                console.log(Object.keys(obj.points).length)
+                for (let i = 0; i < Object.keys(obj.points).length; i++) {
+                    dsclist.push({
+                        name: obj.points[i].dsc_id,
+                        group: obj.points[i].Group,
+                        img: obj.points[i].dsc_id + '_' + ext_name + '.jpg'
+                    });
+                }
+
+                console.log("check.. ", dsclist);
+
+                resolve(dsclist)
+            });
+        });
+    });
+}

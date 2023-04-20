@@ -27,7 +27,7 @@ const upload_images = (destPath) => {
     const isValidMimeType = (mimeType == "image/png" || mimeType == "image/jpeg");
     const isValidExt = (ext == "png" || ext == "jpg" || ext == "jpeg");
 
-    return (isValidMimeType && isValidExt) || ext == "pts" || ext == "txt";
+    return (isValidMimeType && isValidExt) || ext == "pts" || ext == "txt" || ext == "adj";;
   }
 
   const upload = multer({

@@ -24,8 +24,9 @@ const initItems = {
     },
 }
 
-export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
-    console.log("Task Group Table ", taskId, taskPath);
+export const TaskGroupTable = ({ taskId, taskPath, from }) => {
+    console.log("Task Group Table ", taskId, taskPath, from);
+
     const CAL_STATE = {
         ERR: -1,
         READY: 0,
@@ -531,8 +532,8 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
 
     const getGroup = async (taskId, entry) => {
         console.log("set task load true ", taskId);
+
         if (taskId !== '') {
-            console.log("get group call..  ");
             try {
                 const group = await getGroupInfo(taskId);
                 // setGroupInfo(group)
@@ -545,7 +546,6 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
 
             if (entry === 'history') {
                 const keys = Object.keys(groupTable)
-                console.log("GroupTable.. ", keys)
                 for await (const key of keys) {
                     await getGroupStatus(key)
                 }
@@ -556,8 +556,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
     }
 
     useEffect(() => {
-        console.log('start .. :', taskId, entry);
-        getGroup(taskId, entry);
+        getGroup(taskId, from);
     }, [taskId]);
 
     // useEffect(() => {
@@ -565,7 +564,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
     // }, [refresh])
 
     // task main retrun 
-    if (tableLoad === false) {
+    if (tableLoad === false || from === 'kairos') {
         return (<div />)
     }
     else {
@@ -578,7 +577,7 @@ export const TaskGroupTable = ({ taskId, taskPath, entry }) => {
                         <thead>
                             <tr>
                                 <th id="th-name">Group Name</th>
-                                <th id="th-count">Camera Count</th>
+                                <th id="th-count">Cam Count</th>
                                 <th id="th-request">Request</th>
                                 <th id="th-status">Status</th>
                                 <th id="th-generate">Generate</th>

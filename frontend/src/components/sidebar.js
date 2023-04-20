@@ -20,13 +20,13 @@ function Sidenavbar() {
 	};
 
 	return (
-		<div strype={{ height: '100%' }}>
+		<div>
 			<Sidebar
 				transitionDuration={800}
 				width='300px'
 				backgroundColor="rgb(30, 30, 30, 1)"
 				rtl={false}
-				style={{ height: "60vh" }}
+				style={{ height: "100vh" }}
 				defaultCollapsed
 			>
 				<Menu

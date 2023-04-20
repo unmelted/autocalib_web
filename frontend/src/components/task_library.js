@@ -12,7 +12,7 @@ import { TaskGroupTable } from './task_group.js'
 import { PairCanvas } from './canvas.js'
 import { ReviewGallery } from './gallery.js';
 import { PositionTracking } from './position_tracking.js';
-
+import { TaskUnityTable } from './task_unity.js';
 
 export const TaskLibrary = ({ from }) => {
     console.log("task library from : ", from)
@@ -25,6 +25,7 @@ export const TaskLibrary = ({ from }) => {
     const [requestTaskIdMessage, setRequestTaskIdMessage] = useState('')
     const [requestHistoryloaded, setRequestHistoryLoaded] = useState(false)
     const [requestGrouploaded, setRequestGroupLoaded] = useState(false)
+    const [requstUnityTable, setRequestUnityTable] = useState(false)
     const [downloadInfo, setDownloadInfo] = useState({ url: '', name: '' });
 
     const [requestHistory, setRequestHistory] = useState('')
@@ -228,6 +229,20 @@ export const TaskLibrary = ({ from }) => {
         }
     }
 
+    const RequestUnityTable = () => {
+        if (requstUnityTable === true && taskPath !== '') {
+            return (
+                <>
+                    <TaskUnityTable taskId={taskId} taskPath={taskPath} from={'kairos'} />
+                </>)
+
+        } else {
+            return (
+                <>
+                </>)
+        }
+    }
+
     const TaskHistoryTable = ({ tasks }) => {
         const onHandleHistoryClick = async (taskId) => {
             console.log("onHandleRequest buttoin click", taskId);
@@ -251,10 +266,19 @@ export const TaskLibrary = ({ from }) => {
             setPtShow(false)
         }
 
+        const onHandleRowClick = async (taskId, task_path) => {
+            console.log("history table row is clicked ", taskId, task_path)
+            if (from === 'kairos') {
+                setTaskId(taskId);
+                setTaskPath(task_path);
+                setRequestUnityTable(true)
+            }
+        }
+
         if (loaded === true) {
             return (
                 tasks.map((task =>
-                    <tr key={task.task_no} >
+                    <tr key={task.task_no} onClick={() => onHandleRowClick(task.task_id, task.task_path)} >
                         <td> {task.task_no}</td>
                         <td> {task.task_id}</td>
                         <td>{task.createdate}</td>
@@ -266,15 +290,15 @@ export const TaskLibrary = ({ from }) => {
                             value='History'
                             onClick={() => onHandleHistoryClick(task.task_id)}
                             style={{ width: '75px' }}
-                            hidden={parseInt(task.count) === 0}>
+                            hidden={parseInt(task.count) === 0 || from === 'kairos'}>
                         </Button>{' '}
                             <Button size='sm'
                                 as='input'
                                 type='button'
                                 value='Request'
                                 onClick={() => onHandleRequestClick(task.task_id, task.task_path)}
-                                style={{ width: '75px' }} >
-                                {/* hidden={parseInt(task.count) > 0}> */}
+                                style={{ width: '75px' }}
+                                hidden={from === 'kairos'}>
                             </Button>{' '}
                         </td>
                     </tr >
@@ -345,9 +369,9 @@ export const TaskLibrary = ({ from }) => {
 
     return (
         <>
-            <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  Task Lists : {daterange}</p>
             <div className='table-container1'>
-                <Table striped bordered variant="dark">
+                <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  Task Lists : {daterange}</p>
+                <Table id="table-body" striped bordered variant="dark">
                     <thead>
                         <tr>
                             <th id="th-no">Task No</th>
@@ -357,7 +381,7 @@ export const TaskLibrary = ({ from }) => {
                             <th id="th-request">Request</th>
                         </tr>
                     </thead>
-                    <tbody id="table-body">
+                    <tbody>
                         <TaskHistoryTable tasks={tasks} hidden={!loaded}></TaskHistoryTable>
                     </tbody>
                 </Table>
@@ -366,7 +390,7 @@ export const TaskLibrary = ({ from }) => {
                 <img src='./asset/pin.png' width="20px" alt="" />  Task ID : {requestTaskIdMessage} {'  '}
                 <img src='./asset/refresh.png' width="20px" alt="" onClick={() => getRequestHistory(taskId)} /> </p>
             <div className='table-container2' hidden={!requestHistoryloaded}>
-                <Table stripped boardered variant="dark" >
+                <Table id="table-body" striped bordered variant="dark" >
                     <thead>
                         <tr>
                             <th>Request Id</th>
@@ -379,7 +403,7 @@ export const TaskLibrary = ({ from }) => {
                             <th>Try</th>
                         </tr>
                     </thead>
-                    <tbody id="table-body">
+                    <tbody>
                         <RequstHistoryTable ></RequstHistoryTable>
                     </tbody>
                 </Table>
@@ -400,16 +424,19 @@ export const TaskLibrary = ({ from }) => {
             </div>
             <div id='table-container3'
                 hidden={requestGrouploaded === false}>
-                <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'history'} />
+                <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={from} />
             </div>
-            <div>
+            <div hidden={from === 'kairos'}>
                 <Canvas />
             </div>
-            <div hidden={ptshow === false}>
+            <div hidden={ptshow === false || from === 'kairos'}>
                 <ReviewStatistics />
             </div>
             <div>
                 <ReviewModal />
+            </div>
+            <div>
+                <RequestUnityTable />
             </div>
         </>
     )

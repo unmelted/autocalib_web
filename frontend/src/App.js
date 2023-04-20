@@ -4,7 +4,7 @@ import Sidenavbar from './components/sidebar.js';
 
 // import './css/App.css';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
-import Home from './home.js';
+import Home from './components/home.js';
 import Exodus from './components/exodus.js';
 import Kairos from './components/kairos.js';
 

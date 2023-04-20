@@ -263,4 +263,28 @@ router.get('/getreview/:request_id/:labatory', async (req, res) => {
 
 });
 
+router.get('/gettaskimages/:task_id', async (req, res) => {
+
+    console.log("get task images is called ", req.params.task_id);
+
+    try {
+        result = await taskManager.parsingDscList(req.params.task_id);
+
+        if (result < 0) {
+            console.log("gettaskimages error : ", result);
+            res.status(500).json({})
+
+        }
+
+        res.status(200).json({
+            message: 'success',
+            request_array: result,
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+})
+
 module.exports = router;

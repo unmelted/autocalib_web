@@ -25,7 +25,7 @@ export const isValidFile = (file) => {
     // const mimeType = file.type;
     const ext = getFileExt(file);
 
-    return isValidImage(file) || ext === "pts" || ext === "txt" || ext === 'ds_store';
+    return isValidImage(file) || ext === "pts" || ext === "txt" || ext === "adj" || ext === 'ds_store';
 }
 
 export const getGroupInfo = async function (taskId) {

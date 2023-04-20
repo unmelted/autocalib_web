@@ -217,7 +217,7 @@ export const CreateTask = ({ from }) => {
                 </div>
                 <div id="div-task-table"
                     hidden={taskLoad === false}>
-                    <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'create'} />
+                    <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'create'} from={from} />
                 </div>
             </div>
         </>
