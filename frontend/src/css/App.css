@@ -1,10 +1,24 @@
 @import url('https://fonts.googleapis.com/css2?family=Titillium+Web&display=swap');
 
-* {
+html,
+body #root {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
-    font-family: "Titillium+Web", sans-serif !important;
+    font-family: "Titillium+Web", Bruno+Ace, sans-serif !important;
+}
+
+
+.home_div {
+
+    width: 100%;
+    font-family: "Bruno+Ace";
+    font-size: 13pt;
+    display: flex;
+}
+
+.home_title {
+    font-family: "Bruno+Ace";
 }
 
 body {
@@ -15,4 +29,17 @@ body {
 
 .center {
     text-align: center;
+}
+
+.App-container {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.Home {
+    text-align: center;
+    width: 100%;
+    max-width: 600px;
 }

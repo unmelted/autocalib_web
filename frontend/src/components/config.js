@@ -13,7 +13,6 @@ function Config() {
 	const [version, setVersion] = useState(' V0.0.0.1 / V0.0.0.1 / kairos V0.0.0.1')
 	const [alienTarget, setAlienTarget] = useState('./asset/alien.png')
 
-
 	const { configure, changeConfigure } = useContext(configData)
 	const [scale, setScale] = useState(configure.scale)
 	const [pair, setPair] = useState(configure.pair)
