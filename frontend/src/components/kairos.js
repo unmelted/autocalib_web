@@ -81,7 +81,7 @@ function Kairos(props) {
 						<Row>
 							<Button
 								size="sm"
-								variant="info"
+								variant="primary"
 								id='upload'
 								as="input"
 								type='button'
@@ -91,7 +91,7 @@ function Kairos(props) {
 							</Button> &nbsp;&nbsp; &nbsp;&nbsp;
 							<Button
 								size="sm"
-								variant="info"
+								variant="primary"
 								id='exodus'
 								as="input"
 								type='button'

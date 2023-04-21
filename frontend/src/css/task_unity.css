@@ -1,0 +1,50 @@
+.messagebox-wrapper {
+	width: 95%;
+	border: 2px solid gray;
+	margin: 15px 0 15px 0;
+	padding: 10px;
+	height: 55px;
+	/* align-items: center; */
+	/* display: flex; */
+}
+
+
+#task-title {
+	/* margin: 3rem 0 0 0; */
+	font-size: 18px;
+	font-weight: bold;
+	text-align: left;
+	display: block;
+}
+
+#selected {
+	/* margin: 3rem 0 0 0; */
+	font-size: 18px;
+	font-weight: bold;
+	text-align: right;
+	display: block;
+}
+
+#table-body {
+	width: 100%;
+	font-size: 13px;
+	font-weight: lighter;
+	/* text-align: center; */
+}
+
+#th-name {
+	width: 6%;
+}
+
+#th-count {
+	width: 5%;
+}
+
+#th-request {
+	width: 10%;
+	/* text-align: center; */
+}
+
+#th-status {
+	width: 20%;
+}

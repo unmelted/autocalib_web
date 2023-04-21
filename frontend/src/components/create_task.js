@@ -7,6 +7,7 @@ import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
 import { TaskGroupTable } from './task_group.js'
+import { TaskUnityTable } from './task_unity.js';
 
 
 
@@ -20,6 +21,7 @@ export const CreateTask = ({ from }) => {
     const taskAlias = useRef(null);
     const [statusMessage, setStatusMessage] = useState("");
     const [isUploaded, setIsUploaded] = useState(false)
+    const [requstUnityTable, setRequestUnityTable] = useState(false)
 
     const [percent, setPercent] = useState(0);
 
@@ -83,7 +85,12 @@ export const CreateTask = ({ from }) => {
             console.log("get group  call");
             setTaskPath(response.data.taskPath);
             setTaskId(response.data.taskId);
-            setTaskLoad(true);
+
+            if (from === 'exodus') {
+                setTaskLoad(true);
+            } else if (from === 'kairos') {
+                setRequestUnityTable(true);
+            }
 
         }
     }
@@ -120,6 +127,20 @@ export const CreateTask = ({ from }) => {
 
         if (response && response.data) {
 
+        }
+    }
+
+    const RequestUnityTable = () => {
+        if (requstUnityTable === true && taskId !== '') {
+            return (
+                <>
+                    <TaskUnityTable taskId={taskId} taskPath={taskPath} from={'kairos'} />
+                </>)
+
+        } else {
+            return (
+                <>
+                </>)
         }
     }
 
@@ -218,6 +239,9 @@ export const CreateTask = ({ from }) => {
                 <div id="div-task-table"
                     hidden={taskLoad === false}>
                     <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'create'} from={from} />
+                </div>
+                <div>
+                    <RequestUnityTable />
                 </div>
             </div>
         </>

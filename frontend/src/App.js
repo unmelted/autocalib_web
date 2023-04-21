@@ -1,4 +1,4 @@
-import React, { createContext } from 'react';
+import React, { createContext, useEffect } from 'react';
 import { Routes, Route } from "react-router-dom";
 import Sidenavbar from './components/sidebar.js';
 
@@ -7,6 +7,7 @@ import '../node_modules/bootstrap/dist/css/bootstrap.min.css';
 import Home from './components/home.js';
 import Exodus from './components/exodus.js';
 import Kairos from './components/kairos.js';
+import Config from './components/config.js';
 
 export const configData = createContext();
 const initConfigure = {
@@ -18,8 +19,8 @@ const initConfigure = {
 };
 
 function App() {
-
   let configure = initConfigure;
+
   const changeConfigure = (params) => {
     const keys = Object.keys(configure)
     const pkeys = Object.keys(params)
@@ -49,17 +50,21 @@ function App() {
   // ];
   // let element = useRoutes(routes);
 
+  useEffect(() => {
+  }, [])
+
   return (
     <>
       <div style={{ display: 'flex', height: '100%' }}>
         <configData.Provider value={{ configure, changeConfigure }} >
           <Sidenavbar />
-          <main>
+          <main >
           </main>
           <Routes>
             <Route path="/" element={<Home />} />
             <Route path="exodus" element={<Exodus />} />
             <Route path="kairos" element={<Kairos />} />
+            <Route path="config" element={<Config />} />
           </Routes>
         </configData.Provider>
       </div>

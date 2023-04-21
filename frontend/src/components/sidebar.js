@@ -26,7 +26,7 @@ function Sidenavbar() {
 				width='300px'
 				backgroundColor="rgb(30, 30, 30, 1)"
 				rtl={false}
-				style={{ height: "100vh" }}
+				style={{ height: "200vh" }}
 				defaultCollapsed
 			>
 				<Menu
@@ -58,6 +58,9 @@ function Sidenavbar() {
 						CALIBRATION</MenuItem>
 					<MenuItem icon={<img src='/asset/chart-network_w.png' width="20px" />}
 						component={<Link to="/kairos" />}> MULTI-TRACKER </MenuItem>
+					<MenuItem icon={<img src='/asset/config.png' width="20px" />}
+						component={<Link to="/config" />}> CONFIG </MenuItem>
+
 					<MenuItem icon={<img src='/asset/help.png' width="20px" />}>HELP </MenuItem>
 				</Menu>
 			</Sidebar>

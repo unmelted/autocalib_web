@@ -370,7 +370,7 @@ export const TaskLibrary = ({ from }) => {
     return (
         <>
             <div className='table-container1'>
-                <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  Task Lists : {daterange}</p>
+                <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  TASK LIST : {daterange}</p>
                 <Table id="table-body" striped bordered variant="dark">
                     <thead>
                         <tr>
@@ -387,7 +387,7 @@ export const TaskLibrary = ({ from }) => {
                 </Table>
             </div>
             <p id="task-title2" hidden={!requestHistoryloaded}>
-                <img src='./asset/pin.png' width="20px" alt="" />  Task ID : {requestTaskIdMessage} {'  '}
+                <img src='./asset/pin.png' width="20px" alt="" />  TASK ID: {requestTaskIdMessage} {'  '}
                 <img src='./asset/refresh.png' width="20px" alt="" onClick={() => getRequestHistory(taskId)} /> </p>
             <div className='table-container2' hidden={!requestHistoryloaded}>
                 <Table id="table-body" striped bordered variant="dark" >

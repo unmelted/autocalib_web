@@ -259,6 +259,7 @@ exports.parsingDscList = async function (taskId) {
 
     let ptsfile = '';
     let ext_name = '';
+    imglist = []
     dsclist = []
     let result = -1;
     let bPtscheck = false;
@@ -277,15 +278,12 @@ exports.parsingDscList = async function (taskId) {
                     ptsfile = file;
                     bPtscheck = true;
                 }
-                else if (ext[1].toLowerCase() === 'jpg') {
+                else if (ext[1].toLowerCase() === 'jpg' || ext[1].toLowerCase() === 'png' ||
+                    ext[1].toLowerCase() === 'jpeg') {
                     ext_sub = ext[0].split('_');
                     ext_name = ext_sub[1];
                     console.log('ext_name : ', ext_name);
-                    bExtcheck = true;
-                }
-
-                if (bPtscheck && bExtcheck) {
-                    break;
+                    imglist.push(ext_sub[0])
                 }
 
             }
@@ -314,11 +312,13 @@ exports.parsingDscList = async function (taskId) {
                 }
                 console.log(Object.keys(obj.points).length)
                 for (let i = 0; i < Object.keys(obj.points).length; i++) {
-                    dsclist.push({
-                        name: obj.points[i].dsc_id,
-                        group: obj.points[i].Group,
-                        img: obj.points[i].dsc_id + '_' + ext_name + '.jpg'
-                    });
+                    if (imglist.includes(obj.points[i].dsc_id)) {
+                        dsclist.push({
+                            name: obj.points[i].dsc_id,
+                            group: obj.points[i].Group,
+                            img: obj.points[i].dsc_id + '_' + ext_name + '.jpg'
+                        });
+                    }
                 }
 
                 console.log("check.. ", dsclist);
