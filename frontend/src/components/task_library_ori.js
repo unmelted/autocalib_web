@@ -14,156 +14,10 @@ import { ReviewGallery } from './gallery.js';
 import { PositionTracking } from './position_tracking.js';
 import { TaskUnityTable } from './task_unity.js';
 
-let taskCarriage = {
-    task: [],
-    task_loaded: false,
-    requestGrouploaded: false,
-    requestHistoryLoaded: false,
-    requestUnityTable: true,
-    task_id: '',
-    task_path: '',
-    leftImage: '',
-    rigbtImage: '',
-    ptShow: false,
-    checkedList: []
-};
-
-export const TaskHistory = async ({ from }) => {
-
-    const today = new Date();
-    let fromdate = new Date()
-    fromdate.setDate(today.getDate() - 7);
-    const todate = today.toLocaleDateString();
-    const daterange = fromdate.toLocaleDateString() + ' - ' + todate
-
-    const [tasks, setTasks] = useState('');
-    const [tasksLoaded, setTasksLoaded] = useState(false);
-
-    const onHandleHistoryClick = async (taskId) => {
-        console.log("onHandleRequest buttoin click", taskId);
-        taskCarriage['checkedList'] = [];
-        taskCarriage['task_id'] = taskId;
-        taskCarriage['leftImage'] = '';
-        taskCarriage['rigbtImage'] = '';
-        taskCarriage['ptShow'] = false;
-
-        // getRequestHistory(taskId);
-    }
-
-    const onHandleRequestClick = async (taskId, task_path) => {
-        console.log("onHandleRequestClck !! ")
-        taskCarriage['checkedList'] = [];
-        taskCarriage['task_id'] = taskId;
-        taskCarriage['task_path'] = task_path;
-        taskCarriage['leftImage'] = '';
-        taskCarriage['rigbtImage'] = '';
-        taskCarriage['ptShow'] = false;
-
-        taskCarriage['requestGrouploaded'] = true;
-        taskCarriage['requestHistoryLoaded'] = false;
-        taskCarriage['leftImage'] = '';
-        taskCarriage['rigbtImage'] = '';
-        taskCarriage['ptShow'] = false;
-
-    }
-
-    const onHandleRowClick = async (taskId, task_path) => {
-        console.log("history table row is clicked ", taskId, task_path)
-        if (from === 'kairos') {
-            taskCarriage['task_id'] = taskId;
-            taskCarriage['task_path'] = task_path;
-            taskCarriage['requestUnityTable'] = true;
-        }
-    }
-    const getTasks = async () => {
-        let response = null;
-        try {
-            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/gettask`);
-        }
-        catch (err) {
-            console.log(err)
-        }
-
-        if (response && response.data.task_array) {
-            console.log('gettasks response', response.data.task_array);
-            setTasks(response.data.task_array)
-            setTasksLoaded(true)
-            taskCarriage['task'] = response.data.task_array;
-            taskCarriage['task_loaded'] = true;
-        }
-    }
-
-    useEffect(() => {
-        getTasks();
-        console.log('task library useEffect is called')
-        // console.log(taskCarriage['task'])
-    }, [tasks]);
-
-    const TaskHistoryRecords = async () => {
-        return (
-            tasks.map((task =>
-                <tr key={task.task_no} onClick={() => onHandleRowClick(task.task_id, task.task_path)} >
-                    <td> {task.task_no}</td>
-                    <td> {task.task_id}</td>
-                    <td>{task.createdate}</td>
-                    <td>{task.alias}</td>
-                    <td align='left'><Button size='sm'
-                        as='input'
-                        type='button'
-                        variant='warning'
-                        value='History'
-                        onClick={() => onHandleHistoryClick(task.task_id)}
-                        style={{ width: '75px' }}
-                        hidden={parseInt(task.count) === 0 || from === 'kairos'}>
-                    </Button>{' '}
-                        <Button size='sm'
-                            as='input'
-                            type='button'
-                            value='Request'
-                            onClick={() => onHandleRequestClick(task.task_id, task.task_path)}
-                            style={{ width: '75px' }}
-                            hidden={from === 'kairos'}>
-                        </Button>{' '}
-                    </td>
-                </tr >
-            ))
-        )
-    }
-    if (tasksLoaded === true) {
-
-        return (
-            <>
-                <div className='table-container1'>
-                    <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  TASK LIST : {daterange}</p>
-                    <Table id="table-body" striped bordered variant="dark">
-                        <thead>
-                            <tr>
-                                <th id="th-no">Task No</th>
-                                <th id="th-id">Task ID</th>
-                                <th id="th-date">Create Date</th>
-                                <th id="th-alias">Description</th>
-                                <th id="th-request">Request</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <TaskHistoryRecords />
-                        </tbody>
-                    </Table>
-                </div>
-            </>
-        );
-    } else {
-        return (
-            <></>
-        )
-    }
-};
-
-
 export const TaskLibrary = ({ from }) => {
     console.log("task library from : ", from)
     const { configure, changeConfigure } = useContext(configData)
-
+    const [tasks, setTasks] = useState('');
     const [loaded, setLoaded] = useState(false);
 
     const [taskId, setTaskId] = useState('');
@@ -389,6 +243,90 @@ export const TaskLibrary = ({ from }) => {
         }
     }
 
+    const TaskHistoryTable = ({ tasks }) => {
+        const onHandleHistoryClick = async (taskId) => {
+            console.log("onHandleRequest buttoin click", taskId);
+            setCheckedList([])
+            setTaskId(taskId);
+            getRequestHistory(taskId);
+            setLeftImage('')
+            setRightImage('')
+            setPtShow(false)
+        }
+
+        const onHandleRequestClick = async (taskId, task_path) => {
+            console.log("onHandleRequestClck !! ")
+            setCheckedList([])
+            setTaskId(taskId);
+            setTaskPath(task_path);
+            setRequestGroupLoaded(true)
+            setRequestHistoryLoaded(false)
+            setLeftImage('')
+            setRightImage('')
+            setPtShow(false)
+        }
+
+        const onHandleRowClick = async (taskId, task_path) => {
+            console.log("history table row is clicked ", taskId, task_path)
+            if (from === 'kairos') {
+                setTaskId(taskId);
+                setTaskPath(task_path);
+                setRequestUnityTable(true)
+            }
+        }
+
+        if (loaded === true) {
+            return (
+                tasks.map((task =>
+                    <tr key={task.task_no} onClick={() => onHandleRowClick(task.task_id, task.task_path)} >
+                        <td> {task.task_no}</td>
+                        <td> {task.task_id}</td>
+                        <td>{task.createdate}</td>
+                        <td>{task.alias}</td>
+                        <td align='left'><Button size='sm'
+                            as='input'
+                            type='button'
+                            variant='warning'
+                            value='History'
+                            onClick={() => onHandleHistoryClick(task.task_id)}
+                            style={{ width: '75px' }}
+                            hidden={parseInt(task.count) === 0 || from === 'kairos'}>
+                        </Button>{' '}
+                            <Button size='sm'
+                                as='input'
+                                type='button'
+                                value='Request'
+                                onClick={() => onHandleRequestClick(task.task_id, task.task_path)}
+                                style={{ width: '75px' }}
+                                hidden={from === 'kairos'}>
+                            </Button>{' '}
+                        </td>
+                    </tr >
+                )
+                ));
+        } else {
+            return (
+                <></>
+            )
+        }
+    };
+
+    const getTasks = async () => {
+        let response = null;
+        try {
+            console.log('send gettasks');
+            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/gettask`);
+        }
+        catch (err) {
+            console.log(err)
+        }
+
+        if (response && response.data.task_array) {
+            setTasks(response.data.task_array)
+            setLoaded(true)
+        }
+    }
+
     const downloadResult = async () => {
         console.log('download result click checked in task_library : ', checkedList)
         const data = {
@@ -418,12 +356,21 @@ export const TaskLibrary = ({ from }) => {
         }
     }, [downloadInfo])
 
+    const today = new Date();
+    let fromdate = new Date()
+    fromdate.setDate(today.getDate() - 7);
+    const todate = today.toLocaleDateString();
+    const daterange = fromdate.toLocaleDateString() + ' - ' + todate
+    console.log(" library title ", daterange)
 
+    useEffect(() => {
+        getTasks();
+    }, [])
 
     return (
         <>
             <div className='table-container1'>
-                <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  TASK LIST : {''}</p>
+                <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  TASK LIST : {daterange}</p>
                 <Table id="table-body" striped bordered variant="dark">
                     <thead>
                         <tr>
@@ -435,7 +382,7 @@ export const TaskLibrary = ({ from }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        <TaskHistory hidden={!taskCarriage['task_loaded']}></TaskHistory>
+                        <TaskHistoryTable tasks={tasks} hidden={!loaded}></TaskHistoryTable>
                     </tbody>
                 </Table>
             </div>

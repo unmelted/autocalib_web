@@ -7,19 +7,22 @@ import { ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import '../css/task_unity.css';
 
+import { commonData } from '../App';
 let itemData = [];
 
-export const TaskUnityTable = ({ taskId, taskPath, from }) => {
-    let first = true;
+export const TaskUnityTable = ({ from, callback }) => {
+    const { common, changeCommon } = useContext(commonData)
+
+    const [taskId, setTaskId] = useState(common.selectedTaskId);
     const [tableLoad, setTableLoad] = useState(false);
     const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskId + '/';
     const [selectList, setSelectList] = useState([]);
-    const [eMessage1, seteMessage1] = useState("0 Camera selected ");
+    const [message, setMessage] = useState("0 Camera selected ");
 
-    console.log("Task Unity Table ", taskId, taskPath, from, imageUrl);
+    console.log("Task Unity Table ", taskId, from, imageUrl);
 
-    const getTaskData = async (taskId, taskPath) => {
-        console.log('start getTaskData : ', taskId, taskPath)
+    const getTaskData = async (taskId) => {
+        console.log('start getTaskData : ', taskId)
 
         let response = null;
         try {
@@ -36,42 +39,45 @@ export const TaskUnityTable = ({ taskId, taskPath, from }) => {
             itemData = response.data.request_array;
             for (var i = 0; i < itemData.length; i++) {
                 itemData[i].img = imageUrl + itemData[i].img;
-                console.log('itemData[i].img : ', itemData[i].img);
             }
 
             setTableLoad(true);
         }
     }
 
-    const onHandleRowClick = (name) => {
-        console.log('onHandleRowClick : ', name);
+    const onHandleImageClick = (name) => {
+        console.log("onHandleRowClick : ", name);
+
         if (selectList.includes(name)) {
             setSelectList(selectList.filter((item) => item !== name))
         } else {
             setSelectList([...selectList, name]);
         }
-        console.log("selected : ", selectList)
-        seteMessage1(selectList.length + " Camera selected");
+
     }
 
     const onSelectDoneClick = () => {
-
+        changeCommon('selectedTaskImages', selectList);
+        callback('change_step3')
     }
 
     useEffect(() => {
 
-    }, [taskId, selectList]);
+    }, [common.selectedTaskId]);
 
-    if (first === true) {
-        getTaskData(taskId, taskPath);
-        first = false;
+    useEffect(() => {
+        console.log(selectList);
+        setMessage(selectList.length + " Camera selected");
+    }, [selectList]);
+
+    if (tableLoad === false) {
+        getTaskData(taskId);
     }
 
     if (tableLoad === false) {
-        return (<div />)
+        return (<></>)
     }
     else {
-        console.log("table loaded true .... ");
 
         return (
             <>
@@ -82,7 +88,7 @@ export const TaskUnityTable = ({ taskId, taskPath, from }) => {
                     </div>
                     <ImageList sx={{ width: '95%' }} cols={5} rowHeight={240} style={{ marginTop: '20px ' }}>
                         {itemData.map((item) => (
-                            <ImageListItem key={item.name} onClick={() => onHandleRowClick(item.name)}>
+                            <ImageListItem key={item.name} onClick={() => onHandleImageClick(item.name)}>
                                 <img
                                     src={`${item.img}?w=240&fit=crop&auto=format`}
                                     srcSet={`${item.img}?w=240&fit=crop&auto=format&dpr=2 2x`}
@@ -104,7 +110,7 @@ export const TaskUnityTable = ({ taskId, taskPath, from }) => {
                     <Row>
                         <Col></Col>
                         <Col md='auto'>
-                            <p>{eMessage1}</p></Col>
+                            <p>{message}</p></Col>
                         <Col xs lg="2">
                             <Button
                                 size="sm"

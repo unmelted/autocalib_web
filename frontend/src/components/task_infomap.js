@@ -3,12 +3,17 @@ import axios from 'axios';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
+
 import '../css/task_unity.css';
+
+import { commonData } from '../App';
 
 export const TaskInfoMap = ({ taskId, selectedList }) => {
     console.log("Task Info map ", taskId, selectedList);
+    const { common, changeCommon } = useContext(commonData)
 
-    const InfoMapTable = ({ }) => {
+
+    const InfoMapTable = () => {
         return (
             <>
             </>
@@ -17,7 +22,7 @@ export const TaskInfoMap = ({ taskId, selectedList }) => {
 
 
     return (
-        <Fragment >
+        <>
             <div id="button-row-down" >
                 <Button
                     size="sm"
@@ -50,6 +55,6 @@ export const TaskInfoMap = ({ taskId, selectedList }) => {
                     </tbody>
                 </Table>
             </div>
-        </Fragment >
+        </>
     )
 };

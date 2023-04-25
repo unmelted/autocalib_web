@@ -1,24 +1,41 @@
+.page-container {
+	max-width: 1152px;
+	margin: 0 auto;
+}
+
+@media only screen and (max-width: 768px) {
+	.page-conatiner {
+		max-width: 100%;
+	}
+
+}
+
+Container,
+table {
+	width: 100%;
+	table-layout: fixed;
+	border-collapse: collapse;
+}
+
+
+.clock {
+
+	font-size: 2em;
+	text-align: left;
+}
+
 hr {
-	margin-top: 2rem;
+	width: 100%;
+	margin-top: 1rem;
 	margin-bottom: 2rem;
 	border: 0;
 	border-top: 2px solid rgba(252, 252, 252, 0.5);
 }
 
-#config-body {
-	margin-left: 1rem;
-	width: 100%;
-	font-size: 13px;
-	font-weight: lighter;
-}
-
-
 .th-item {
 	width: 20%;
-	text-align: left;
-
 }
 
 .th-option {
-	text-align: left;
+	width: 80%;
 }

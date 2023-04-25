@@ -6,4 +6,6 @@ CREATE TABLE IF NOT EXISTS group_info (no SERIAL PRIMARY KEY ,task_id TEXT, grou
 
 CREATE TABLE IF NOT EXISTS pts_result (request_id INTEGER PRIMARY KEY, createdate TIMESTAMP DEFAULT NOW(), pts_path TEXT);
 
+CREATE TABLE IF NOT EXISTS inline_board (no INTEGER NOT NULL PRIMARY, createdateTIMESTAMP DEFAULT NOW(), emoji TEXT, detail TEXT NOT NULL);
+
 INSERT INTO task (task_no, task_id, task_path ) VALUES (100, -1, -1);

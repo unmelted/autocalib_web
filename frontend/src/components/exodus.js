@@ -163,11 +163,11 @@ function Exodus(props) {
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
                 onClick={onHandleSearchTask}><img src='./asset/search.png' width="60px" alt="" /> <p></p>
                 SEARCH </Button></Col>
-            <Col xs lg='2'>
+            {/* <Col xs lg='2'>
               <Button variant={state === "config" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
                 onClick={onHandleConfig}><img src='./asset/config.png' width="60px" alt="" /> <p></p>
-                CONFIG </Button></Col>
+                CONFIG </Button></Col> */}
             <Col xs lg='2'>
               <Button variant={state === "guide" ? "primary" : "seconday"}
                 style={{ width: '140px', color: '#FFFFFF', float: 'center' }}>
