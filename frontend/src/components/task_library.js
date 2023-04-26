@@ -93,11 +93,6 @@ export const TaskHistory = async ({ from }) => {
         }
     }
 
-    useEffect(() => {
-        getTasks();
-        console.log('task library useEffect is called')
-        // console.log(taskCarriage['task'])
-    }, [tasks]);
 
     const TaskHistoryRecords = async () => {
         return (

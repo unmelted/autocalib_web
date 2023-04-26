@@ -26,14 +26,12 @@ const initCommon = {
   selectedTaskImages: [],
   leftCanvasImage: '',
   rightCanvasImage: '',
-  task_records: [],
-  task_history: [],
 }
 
 function App() {
+  console.log("App.. ", process.env.REACT_APP_VERSION)
   let configure = initConfigure;
   let common = initCommon;
-  const [subscribers, setSubscribers] = useState([]);
 
   const changeConfigure = (params) => {
     const keys = Object.keys(configure)
@@ -42,7 +40,7 @@ function App() {
     for (const key of keys) {
       for (const pkey of pkeys) {
         if (key === pkey) {
-          console.log("change Config : ", key, pkey)
+
           configure[key] = params[pkey]
           console.log("change Config result : ", configure[key])
         }
@@ -57,16 +55,13 @@ function App() {
     for (const key of keys) {
       for (const pkey of pkeys) {
         if (key === pkey) {
-          console.log("change common data : ", key, pkey)
+
           common[key] = params[pkey]
           console.log("change common data result : ", common[key])
         }
       }
     }
   };
-
-  console.log("App.. ", process.env.REACT_APP_VERSION)
-
 
   useEffect(() => {
   }, [])

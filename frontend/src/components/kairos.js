@@ -1,4 +1,4 @@
-import React, { useEffect, useState, useContext } from 'react';
+import React, { useEffect, useState, useContext, memo } from 'react';
 import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -21,7 +21,6 @@ function Kairos(props) {
 	const [step2, setStep2] = useState('none'); //none | upload | history
 	const [step3, setStep3] = useState('none'); //none | task_id
 	const [step4, setStep4] = useState('none'); //none | task_id * imagelist
-	const [step5, setStep5] = useState('none');
 	const { common, changeCommon } = useContext(commonData)
 
 	const callback = (status) => {
@@ -33,13 +32,26 @@ function Kairos(props) {
 			setStep4(common.selectedTaskId)
 		}
 		else if (status === 'change_step4') {
-			setStep5('complelte')
+
+			setStep4('none')
 		}
 	}
 
+	const initStep = (step) => {
+		if (step === 0) {
+			setStep1('none')
+		}
+
+		if (step === 0 || step === 1) {
+			setStep2('none')
+			setStep3('none')
+			setStep4('none')
+		}
+	};
+
 	useEffect(() => {
 
-	}, [step0, step1])
+	}, [])
 
 	const Step0_Module = () => {
 		console.log("step0_module start ")
@@ -87,7 +99,7 @@ function Kairos(props) {
 						<Col xs lg='2'>
 							<Button className='rounded' variant={step0 === 'create' ? 'primary' : 'seconday'}
 								style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-								onClick={() => { setStep0('create'); setStep3('none') }}><img src='./asset/plus.png' width='60px' alt='' /><p></p>
+								onClick={() => { initStep(0); setStep0('create'); }}><img src='./asset/plus.png' width='60px' alt='' /><p></p>
 								CREATE</Button> </Col>
 						<Col xs lg='2'>
 							<Button variant='no'
@@ -97,7 +109,7 @@ function Kairos(props) {
 						<Col xs lg='2'>
 							<Button variant={step0 === 'play' ? 'primary' : 'seconday'}
 								style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-								onClick={() => { setStep0('play'); setStep3('none') }}><img src='./asset/play.png' width='60px' alt='' /> <p></p>
+								onClick={() => { initStep(0); setStep0('play'); }}><img src='./asset/play.png' width='60px' alt='' /> <p></p>
 								PLAY</Button></Col>
 					</Row>
 					<p></p>
@@ -123,7 +135,7 @@ function Kairos(props) {
 								type='button'
 								value='UPLOAD ALL'
 								style={{ width: '160px' }}
-								onClick={() => { setStep1('upload') }}>
+								onClick={() => { initStep(1); setStep1('upload') }}>
 							</Button> &nbsp;&nbsp; &nbsp;&nbsp;
 							<Button
 								size="sm"
@@ -133,7 +145,7 @@ function Kairos(props) {
 								type='button'
 								value="FROM EXODUS"
 								style={{ width: '160px' }}
-								onClick={() => { setStep1('exodus') }}>
+								onClick={() => { initStep(1); setStep1('exodus') }}>
 							</Button>
 						</Row>
 					</div>
@@ -178,6 +190,8 @@ function Kairos(props) {
 	}
 
 	const Step3_Module = () => {
+		console.log("step3_module start : ", step3);
+
 		if (step3 !== 'none') {
 			return (
 				<>
@@ -193,7 +207,7 @@ function Kairos(props) {
 		if (step4 !== 'none') {
 			return (
 				<>
-					<TaskInfoMap from={'kairos'} callback={callback} />
+					<TaskInfoMap from={step0} callback={callback} />
 				</>
 			)
 		} else {

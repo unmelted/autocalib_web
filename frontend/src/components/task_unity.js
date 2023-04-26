@@ -1,4 +1,4 @@
-import React, { useState, Fragment, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
 import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -8,6 +8,7 @@ import CheckCircleIcon from '@mui/icons-material/CheckCircle';
 import '../css/task_unity.css';
 
 import { commonData } from '../App';
+let selTaskId = '';
 let itemData = [];
 
 export const TaskUnityTable = ({ from, callback }) => {
@@ -57,20 +58,18 @@ export const TaskUnityTable = ({ from, callback }) => {
     }
 
     const onSelectDoneClick = () => {
-        changeCommon('selectedTaskImages', selectList);
+        changeCommon({ selectedTaskImages: selectList });
         callback('change_step3')
+        itemData = [];
     }
-
-    useEffect(() => {
-
-    }, [common.selectedTaskId]);
 
     useEffect(() => {
         console.log(selectList);
         setMessage(selectList.length + " Camera selected");
     }, [selectList]);
 
-    if (tableLoad === false) {
+    if (tableLoad === false && selTaskId !== taskId) {
+        selTaskId = taskId;
         getTaskData(taskId);
     }
 
@@ -131,5 +130,3 @@ export const TaskUnityTable = ({ from, callback }) => {
         )
     };
 };
-
-

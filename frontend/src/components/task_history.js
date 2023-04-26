@@ -36,8 +36,6 @@ export const TaskHistory = ({ from, callback }) => {
 	const onHandleRowClick = async (taskId, task_path) => {
 		console.log("history table row is clicked ", taskId, task_path)
 		changeCommon({ selectedTaskId: taskId })
-		changeCommon({ selectedHistoryId: '' })
-		changeCommon({ selectedRequestId: '' })
 
 		callback('change_step2')
 	}
@@ -57,11 +55,6 @@ export const TaskHistory = ({ from, callback }) => {
 			setTasksLoaded(true)
 		}
 	}
-
-	useEffect(() => {
-		console.log('task library useEffect is called')
-
-	}, []);
 
 	if (tasksLoaded === false) {
 		getTasks();
@@ -107,11 +100,11 @@ export const TaskHistory = ({ from, callback }) => {
 					<Table id="table-body" striped bordered variant="dark">
 						<thead>
 							<tr>
-								<th id="th-no">Task No</th>
-								<th id="th-id">Task ID</th>
-								<th id="th-date">Create Date</th>
-								<th id="th-alias">Description</th>
-								<th id="th-request">Request</th>
+								<th id="th-no">TASK NO</th>
+								<th id="th-id">TASK ID</th>
+								<th id="th-date">CREATE DATE</th>
+								<th id="th-alias">DESC.</th>
+								<th id="th-request">REQUEST</th>
 							</tr>
 						</thead>
 						<tbody>
