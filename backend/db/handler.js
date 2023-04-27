@@ -40,8 +40,8 @@ exports.insertNewTask = function (taskNo, taskPath, fullPath) {
                 console.log("client connect err " + err)
                 resolve(-1)
             }
-
-            db.queryParams("INSERT INTO task (task_no, task_id, task_path) VALUES ($1, $2, $3);", [taskNo, taskPath, fullPath], (err) => {
+            task_type = 'exodus'
+            db.queryParams("INSERT INTO task (task_no, task_id, task_type, task_path) VALUES ($1, $2, $3);", [taskNo, taskPath, task_type, fullPath], (err) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
@@ -423,6 +423,27 @@ exports.getReviewImages = function (request_id) {
 
             }, client);
 
+        });
+    });
+}
+
+exports.createMultiTracker = function (taskId, camCount) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                resolve(-1)
+            }
+
+            db.queryParams("INSERT INTO multi_tracker (task_id, cam_count) VALUES ($1, $2);", [taskId, camCount], (err) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    resolve(-1);
+                }
+                console.log('insertNewTask query success');
+                resolve(0)
+            }, client);
         });
     });
 }

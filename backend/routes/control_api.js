@@ -287,4 +287,24 @@ router.get('/gettaskimages/:task_id', async (req, res) => {
     }
 })
 
+router.get('/createmulti/:task_id/:cam_count', async (req, res) => {
+
+    console.log("router create multitracker task id : ", req.params.task_id)
+
+    try {
+        result = await handler.createMultiTracker(req.params.task_id, req.params.cam_count)
+        console.log("create multi tracker end ")
+
+        res.status(200).json({
+            message: 'success',
+            group: result,
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+});
+
+
 module.exports = router;

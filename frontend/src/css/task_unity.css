@@ -8,7 +8,6 @@
 	/* display: flex; */
 }
 
-
 #task-title {
 	/* margin: 3rem 0 0 0; */
 	font-size: 18px;
@@ -60,11 +59,11 @@
 }
 
 #th-no {
-	width: 10%;
+	width: 5%;
 }
 
 #th-camera {
-	width: 20%;
+	width: 10%;
 }
 
 #th-ip {
@@ -72,13 +71,22 @@
 }
 
 #th-apply {
-	width: 15%;
+	width: 7%;
 }
 
 #th-status {
 	width: 10%;
 }
 
-#th-run {
+#th-msg {
 	width: 15%;
+}
+
+#th-run {
+	width: 7%;
+}
+
+.image-effect:hover {
+	opacity: 0.7;
+	cursor: pointer;
 }

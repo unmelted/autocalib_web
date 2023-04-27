@@ -29,6 +29,7 @@ function Kairos(props) {
 			setStep3(common.selectedTaskId)
 		}
 		else if (status === 'change_step3') {
+			setStep3('none')
 			setStep4(common.selectedTaskId)
 		}
 		else if (status === 'change_step4') {
@@ -51,7 +52,7 @@ function Kairos(props) {
 
 	useEffect(() => {
 
-	}, [])
+	}, [step3])
 
 	const Step0_Module = () => {
 		console.log("step0_module start ")

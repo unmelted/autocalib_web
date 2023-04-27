@@ -14,8 +14,6 @@
     /* align-items: center; */
 }
 
-
-
 .canvas-wrapper {
     /* margin: 20px 5px 5px 5px; */
     /* margin-left: 70px; */
@@ -31,11 +29,6 @@
     color: yellowgreen;
 }
 
-.modeButton {
-    text-align: left;
-    margin: 15px 5px 15px 5px;
-    color: yellowgreen;
-}
 
 #groundtype-select {
     float: left;
