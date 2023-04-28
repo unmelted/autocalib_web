@@ -309,34 +309,15 @@ router.get('/createmulti/:task_id/:cam_count', async (req, res) => {
 
 router.post('/updatetracker', async (req, res) => {
 
-    console.log("router update tracker task_id : ", req.body.task_id)
-    console.log("info map : ", req.body.info_map)
+    const data = req.body
+    console.log("update tracker ", data)
 
     try {
-        result = await handler.updateMultiTracker(tr_taskid, req.body.task_id, req.body.cam_count)
-        console.log("create multi tracker end ")
-
-        const options = {
-            uri: process.env.KRONOS_URL + '/kronos/status',
-            method: 'GET',
-            json: true
-        }
-
-        console.log("Call Kronos API // request : " + options.uri);
-        request.get(options, async function (err, response, body) {
-            if (!err) {
-                console.log("Response status : " + JSON.stringify(body.status));
-
-            } else {
-                console.log(err)
-                res.status(500).json({})
-            }
-        });
-
+        result = await handler.updateMultiTracker(req.body.tracker_task_id, req.body.info_map)
+        console.log("update multi tracker end ")
 
         res.status(200).json({
             message: 'success',
-            group: result,
         });
 
     } catch (err) {
@@ -345,5 +326,33 @@ router.post('/updatetracker', async (req, res) => {
     }
 });
 
+router.post('/ping', async (req, res) => {
+
+    console.log("router update tracker tracker ip : ", req.body.tracker_ip)
+    const options = {
+        uri: process.env.KRONOS_URL + '/kronos/status',
+        method: 'GET',
+        json: true
+    }
+
+    console.log("Call Kronos API // request : " + options.uri);
+    // request.get(options, async function (err, response, body)  {
+    // if (!err) {
+    // result = JSON.stringify(body.status)
+    // console.log("Response status : " + result);
+
+    res.status(200).json({
+        status: 'success',
+        message: 'ready',
+
+    });
+
+    // } else {
+    // console.log(err)
+    // res.status(500).json({})
+    // }
+    // });
+
+});
 
 module.exports = router;

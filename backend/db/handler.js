@@ -458,7 +458,7 @@ exports.updateMultiTracker = function (tr_taskId, info_map) {
                 resolve(-1)
             }
 
-            db.queryParams("UPDATE multi_tracker SET info_map = $1 where tracker_task_id = $2;", [tr_taskId, info_map], (err) => {
+            db.queryParams("UPDATE multi_tracker SET info_map = $2 where tracker_task_id = $1;", [tr_taskId, JSON.stringify(info_map)], (err) => {
                 client.release(true);
                 if (err) {
                     console.log(err)

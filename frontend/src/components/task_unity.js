@@ -57,6 +57,7 @@ export const TaskUnityTable = ({ from, callback }) => {
         }
         console.log("createMultitracker : ", taskId);
         console.log("tracker_taskid : ", response.data.tracker_taskid);
+        changeCommon({ trackerTaskId: response.data.tracker_taskid });
         setTrackerTaskid(response.data.tracker_taskid);
     }
 
@@ -74,7 +75,7 @@ export const TaskUnityTable = ({ from, callback }) => {
     const onSelectDoneClick = async () => {
 
         await createMultitracker(taskId);
-        changeCommon({ selectedTaskImages: selectList, trackerTaskId: trackerTaskId });
+        changeCommon({ selectedTaskImages: selectList });
         callback('change_step3')
         itemData = [];
     }

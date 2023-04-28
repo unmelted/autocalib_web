@@ -15,8 +15,9 @@ import { commonData } from '../App';
 export const TaskInfoMap = ({ from, callback }) => {
     const { common, changeCommon } = useContext(commonData)
     const [taskId, setTaskId] = useState(common.selectedTaskId);
+    const [trackerTaskId, setTrackerTaskId] = useState(common.trackerTaskId);
     const [selectedList, setSelectedList] = useState(common.selectedTaskImages);
-    const [infoMap, setInfoMap] = useState([]);
+    const [infoMap, setInfoMap] = useState({});
     const [message, setMessage] = useState('');
 
 
@@ -25,13 +26,13 @@ export const TaskInfoMap = ({ from, callback }) => {
     console.log("Task Info map ", taskId, selectedList);
 
     const initMapData = () => {
-        const newMap = [];
+        const newMap = {};
         selectedList.forEach((cam) => {
             newMap[cam] = {
                 stream_url: '',
                 tracker_url: '',
                 tracker_status: 'none',
-                message: '',
+                message: '-',
             };
         })
         console.log("initMapdata : ", newMap);
@@ -40,16 +41,21 @@ export const TaskInfoMap = ({ from, callback }) => {
     }
 
     const updateInfoMap = async () => {
-        console.log('start updateInfoMap ');
+
 
         const data = {
-            task_id: taskId,
+            tracker_task_id: common.trackerTaskId,
             info_map: infoMap,
         }
+        console.log('start updateInfoMap ', data);
 
         let response = null;
         try {
-            response = await axios.post(process.env.REACT_APP_SERVER_URL + `/control/updatetracker`, data);
+            response = await axios.post(process.env.REACT_APP_SERVER_URL + "/control/updatetracker", data, {
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            });
         } catch (err) {
             console.log(err);
             return
@@ -60,33 +66,65 @@ export const TaskInfoMap = ({ from, callback }) => {
         }
     }
 
-    const onHandleApplyClick = async (camera) => {
-        console.log("handleApply ", camera, infoMap[camera])
+    const checkPing = async (camera) => {
+        console.log('start checkPing : ', camera);
+
+        const data = {
+            tracker_ip: infoMap[camera].tracker_url
+        }
+
+        let response = null;
+        try {
+            response = await axios.post(process.env.REACT_APP_SERVER_URL + `/control/ping`, data);
+        } catch (err) {
+            console.log(err);
+            return
+        }
+
+        if (response) {
+            console.log('response.data : ', response.data);
+            if (response.data.status === 'success') {
+                infoMap[camera].tracker_status = 'success';
+                infoMap[camera].message = response.data.message;
+            }
+            else {
+                infoMap[camera].tracker_status = 'fail';
+                infoMap[camera].message = response.data.message;
+            }
+        }
+    }
+
+    const onHandlePingClick = async (camera) => {
+        console.log("handlePingClick ", camera, infoMap[camera])
+        checkPing(camera)
+
+    }
+
+    const onHandleApplyAllClick = async () => {
+        console.log("handleApplyAll click ", infoMap)
         await updateInfoMap();
 
     }
 
-    const handleIpChange = (event, camera, type) => {
-        console.log('handleIpChange : ', event, camera, type);
+    const onHandleIpChange = (event, camera, type) => {
+        console.log('handleIpChange : ', camera, type);
 
-        if (type === ' tracker') {
+        if (type === 'tracker') {
+            console.log('tracker url : ', event);
             infoMap[camera].tracker_url = event;
         }
         else if (type === 'stream') {
-            infoMap[camera].stream_url = event;
+            infoMap[camera].stream_url = event.target.value;
         }
 
+        console.log('info map : ', infoMap);
     }
 
     const onHandleRunClick = (camera) => {
         console.log("handleRun ", camera, infoMap[camera])
     }
 
-    const onApplyAllClick = () => {
-
-    }
-
-    const onRunAllClick = () => {
+    const onRunAllClick = (camera) => {
 
     }
 
@@ -107,20 +145,20 @@ export const TaskInfoMap = ({ from, callback }) => {
                     <td>{index + 1}</td>
                     <td>{cam}</td>
                     <td>
-                        <IPut onChange={(event) => { handleIpChange(event, cam, 'tracker') }} />
+                        <IPut onChange={(event) => { onHandleIpChange(event, cam, 'tracker') }} />
                     </td>
                     <td>
                         {/* <IPut onChange={(event) => { handleIpChange(event, cam, 'stream') }} /> */}
-                        <Form.Control type="text" size="sm" style={{ padding: '2px' }} onChange={(event) => { handleIpChange(event, cam, 'stream') }} />
+                        <Form.Control type="text" size="sm" style={{ padding: '2px' }} onChange={(event) => { onHandleIpChange(event, cam, 'stream') }} />
                     </td>
                     <td>
                         <img src='./asset/arrow-circle.png' width="18px" alt=""
-                            onClick={() => onHandleApplyClick(cam)} hidden={from === 'play'} className="image-effect" />
+                            onClick={() => onHandlePingClick(cam)} hidden={from === 'play'} className="image-effect" />
                     </td>
                     <td>
                         <img src='./asset/bullet_g.png' width="18px" alt="" />
                     </td>
-                    <td> {message} </td>
+                    <td> .. </td>
                     <td>
                         <img src='./asset/play-circle.png' width="18px" alt=""
                             onClick={() => onHandleRunClick(cam)} hidden={from === 'play'} className="image-effect" />
@@ -200,7 +238,7 @@ export const TaskInfoMap = ({ from, callback }) => {
                             as="input"
                             type='button'
                             value="Apply All"
-                            onClick={onRunAllClick}
+                            onClick={onHandleApplyAllClick}
                             style={{ float: 'right', width: '120px', marginRight: '20px' }}
                         >
                         </Button>
