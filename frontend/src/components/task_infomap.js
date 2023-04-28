@@ -18,7 +18,7 @@ export const TaskInfoMap = ({ from, callback }) => {
     const [selectedList, setSelectedList] = useState(common.selectedTaskImages);
     const [infoMap, setInfoMap] = useState([]);
     const [message, setMessage] = useState('');
-    const [ipvalue, setIpValue] = useState('');
+
 
     const ipRegex = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
@@ -28,8 +28,8 @@ export const TaskInfoMap = ({ from, callback }) => {
         const newMap = [];
         selectedList.forEach((cam) => {
             newMap[cam] = {
-                stream_ip: '',
-                tracker_ip: '',
+                stream_url: '',
+                tracker_url: '',
                 tracker_status: 'none',
                 message: '',
             };
@@ -39,12 +39,42 @@ export const TaskInfoMap = ({ from, callback }) => {
         setInfoMap(newMap);
     }
 
-    const onHandleApplyClick = (camera) => {
-        console.log("handleApply ", camera, infoMap[camera])
+    const updateInfoMap = async () => {
+        console.log('start updateInfoMap ');
+
+        const data = {
+            task_id: taskId,
+            info_map: infoMap,
+        }
+
+        let response = null;
+        try {
+            response = await axios.post(process.env.REACT_APP_SERVER_URL + `/control/updatetracker`, data);
+        } catch (err) {
+            console.log(err);
+            return
+        }
+
+        if (response) {
+            console.log('response.data : ', response.data);
+        }
     }
 
-    const handleIpChange = (event, camera) => {
-        console.log('handleIpChange : ', event, camera);
+    const onHandleApplyClick = async (camera) => {
+        console.log("handleApply ", camera, infoMap[camera])
+        await updateInfoMap();
+
+    }
+
+    const handleIpChange = (event, camera, type) => {
+        console.log('handleIpChange : ', event, camera, type);
+
+        if (type === ' tracker') {
+            infoMap[camera].tracker_url = event;
+        }
+        else if (type === 'stream') {
+            infoMap[camera].stream_url = event;
+        }
 
     }
 
@@ -57,6 +87,10 @@ export const TaskInfoMap = ({ from, callback }) => {
     }
 
     const onRunAllClick = () => {
+
+    }
+
+    const onGetStreamClick = () => {
 
     }
 
@@ -76,7 +110,8 @@ export const TaskInfoMap = ({ from, callback }) => {
                         <IPut onChange={(event) => { handleIpChange(event, cam, 'tracker') }} />
                     </td>
                     <td>
-                        <IPut onChange={(event) => { handleIpChange(event, cam, 'stream') }} />
+                        {/* <IPut onChange={(event) => { handleIpChange(event, cam, 'stream') }} /> */}
+                        <Form.Control type="text" size="sm" style={{ padding: '2px' }} onChange={(event) => { handleIpChange(event, cam, 'stream') }} />
                     </td>
                     <td>
                         <img src='./asset/arrow-circle.png' width="18px" alt=""
@@ -85,8 +120,7 @@ export const TaskInfoMap = ({ from, callback }) => {
                     <td>
                         <img src='./asset/bullet_g.png' width="18px" alt="" />
                     </td>
-                    <td> message
-                    </td>
+                    <td> {message} </td>
                     <td>
                         <img src='./asset/play-circle.png' width="18px" alt=""
                             onClick={() => onHandleRunClick(cam)} hidden={from === 'play'} className="image-effect" />
@@ -99,14 +133,38 @@ export const TaskInfoMap = ({ from, callback }) => {
     return (
         <>
             <div className='table-container'>
-                <Table id="table-body" striped bordered variant="dark">
+                <div className='messagebox-wrapper-map'>
+                    <Row>
+                        <Col md='auto'>
+                            <span id='task-title' style={{ marginBottom: '10px' }}>
+                                <img src='./asset/checkbox.png' width="20px" alt="" />  Task ID : {taskId} </span>
+                        </Col>
+                        <Col md='auto'></Col>
+                        <Col md lg='2' className="d-flex justify-content-start align-items-center">
+                            <Button
+                                size="md"
+                                variant="primary"
+                                id='submit'
+                                as="input"
+                                type='button'
+                                value="Get Stream URL"
+                                onClick={onGetStreamClick}
+                                style={{ float: 'right', width: '160px', marginRight: '10px' }}
+                            >
+                            </Button>
+                        </Col>
+                        <Col md lg='2' className="d-flex justify-content-start align-items-center" >
+                            <Form.Control size="sm" type="text" placeholder="url.." disabled readOnly /> </Col>
+                    </Row>
+                </div>
+                <Table id="table-body" striped bordered variant="dark" >
                     <thead>
                         <tr>
                             <th id="th-no">NO</th>
                             <th id="th-camera">CAMERA</th>
                             <th id="th-ip">TRACKER URL</th>
                             <th id="th-ip">STREAM URL</th>
-                            <th id="th-apply">APPLY</th>
+                            <th id="th-apply">PING</th>
                             <th id="th-status">STATUS</th>
                             <th id="th-msg">MESSAGE</th>
                             <th id="th-run">RUN</th>
@@ -125,15 +183,16 @@ export const TaskInfoMap = ({ from, callback }) => {
                     <Col xs lg="6">
                         <Button
                             size="sm"
-                            variant="primary"
+                            variant="danger"
                             id='submit'
                             as="input"
                             type='button'
                             value="Run All"
                             onClick={onRunAllClick}
-                            style={{ float: 'right', width: '120px', marginRight: '90px' }}
+                            style={{ float: 'right', width: '120px', marginRight: '60px' }}
                         >
                         </Button>
+
                         <Button
                             size="sm"
                             variant="primary"
@@ -141,11 +200,10 @@ export const TaskInfoMap = ({ from, callback }) => {
                             as="input"
                             type='button'
                             value="Apply All"
-                            onClick={onApplyAllClick}
+                            onClick={onRunAllClick}
                             style={{ float: 'right', width: '120px', marginRight: '20px' }}
                         >
                         </Button>
-
                     </Col>
                 </Row>
             </div>

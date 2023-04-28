@@ -40,8 +40,8 @@ exports.insertNewTask = function (taskNo, taskPath, fullPath) {
                 console.log("client connect err " + err)
                 resolve(-1)
             }
-            task_type = 'exodus'
-            db.queryParams("INSERT INTO task (task_no, task_id, task_type, task_path) VALUES ($1, $2, $3);", [taskNo, taskPath, task_type, fullPath], (err) => {
+            //task_type = 'exodus' will add really.. 
+            db.queryParams("INSERT INTO task (task_no, task_id, task_path) VALUES ($1, $2, $3);", [taskNo, taskPath, fullPath], (err) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
@@ -427,21 +427,44 @@ exports.getReviewImages = function (request_id) {
     });
 }
 
-exports.createMultiTracker = function (taskId, camCount) {
+exports.createMultiTracker = function (tr_taskId, taskId, camCount) {
     return new Promise((resolve, reject) => {
+
         db.getClient((errClient, client) => {
             if (errClient) {
                 console.log("client connect err " + err)
                 resolve(-1)
             }
 
-            db.queryParams("INSERT INTO multi_tracker (task_id, cam_count) VALUES ($1, $2);", [taskId, camCount], (err) => {
+            db.queryParams("INSERT INTO multi_tracker (tracker_task_id ,task_id, cam_count) VALUES ($1, $2, $3);", [tr_taskId, taskId, camCount], (err) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
                     resolve(-1);
                 }
-                console.log('insertNewTask query success');
+                console.log('insert new Tracker query success');
+                resolve(0)
+            }, client);
+        });
+    });
+}
+
+exports.updateMultiTracker = function (tr_taskId, info_map) {
+    return new Promise((resolve, reject) => {
+
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                resolve(-1)
+            }
+
+            db.queryParams("UPDATE multi_tracker SET info_map = $1 where tracker_task_id = $2;", [tr_taskId, info_map], (err) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    resolve(-1);
+                }
+                console.log('updateMultiTracker query success');
                 resolve(0)
             }, client);
         });

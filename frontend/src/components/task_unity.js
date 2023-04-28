@@ -13,7 +13,7 @@ let itemData = [];
 
 export const TaskUnityTable = ({ from, callback }) => {
     const { common, changeCommon } = useContext(commonData)
-
+    const [trackerTaskId, setTrackerTaskid] = useState('');
     const [taskId, setTaskId] = useState(common.selectedTaskId);
     const [tableLoad, setTableLoad] = useState(false);
     const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskId + '/';
@@ -46,6 +46,20 @@ export const TaskUnityTable = ({ from, callback }) => {
         }
     }
 
+    const createMultitracker = async (taskId) => {
+
+        let response = null;
+        try {
+            response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/createmulti/${taskId}/${selectList.length}`);
+        } catch (err) {
+            console.log(err);
+            return;
+        }
+        console.log("createMultitracker : ", taskId);
+        console.log("tracker_taskid : ", response.data.tracker_taskid);
+        setTrackerTaskid(response.data.tracker_taskid);
+    }
+
     const onHandleImageClick = (name) => {
         console.log("onHandleRowClick : ", name);
 
@@ -57,8 +71,10 @@ export const TaskUnityTable = ({ from, callback }) => {
 
     }
 
-    const onSelectDoneClick = () => {
-        changeCommon({ selectedTaskImages: selectList });
+    const onSelectDoneClick = async () => {
+
+        await createMultitracker(taskId);
+        changeCommon({ selectedTaskImages: selectList, trackerTaskId: trackerTaskId });
         callback('change_step3')
         itemData = [];
     }
@@ -83,7 +99,7 @@ export const TaskUnityTable = ({ from, callback }) => {
                 <div>
                     <div className='messagebox-wrapper'>
                         <p id='task-title'>
-                            <img src='./asset/pin.png' width="20px" alt="" />  Task ID : {taskId} / Total {itemData.length} cameras. </p>
+                            <img src='./asset/checkbox.png' width="20px" alt="" />  Task ID : {taskId} / Total {itemData.length} cameras. </p>
                     </div>
                     <ImageList sx={{ width: '95%' }} cols={5} rowHeight={240} style={{ marginTop: '20px ' }}>
                         {itemData.map((item) => (
@@ -118,7 +134,7 @@ export const TaskUnityTable = ({ from, callback }) => {
                                 id='submit'
                                 as="input"
                                 type='button'
-                                value="Done"
+                                value="Select Done"
                                 onClick={onSelectDoneClick}
                                 style={{ float: 'right', width: '120px', marginRight: '10px' }}
                             >

@@ -40,6 +40,20 @@ getTaskPath = function (taskNo) {
     return [fullPath, taskId];
 }
 
+exports.getNewTrTaskNo = function (task_id) {
+
+    taskNo = task_id.split("_")[2]
+    const today = new Date();
+    const date = today.getDate();
+    const month = today.getMonth() + 1;
+    const year = today.getFullYear();
+    const time = today.getHours() + "_" + today.getMinutes();
+    const now = year + "_" + month + date + "_" + String(time) + "_" + String(taskNo);
+    const taskId = String(now)
+
+    return taskId;
+}
+
 exports.createNewTask = async function () {
 
     taskNo = await getNewTaskNo();

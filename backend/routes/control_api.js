@@ -290,10 +290,49 @@ router.get('/gettaskimages/:task_id', async (req, res) => {
 router.get('/createmulti/:task_id/:cam_count', async (req, res) => {
 
     console.log("router create multitracker task id : ", req.params.task_id)
+    tr_taskid = taskManager.getNewTrTaskNo(req.params.task_id)
 
     try {
-        result = await handler.createMultiTracker(req.params.task_id, req.params.cam_count)
+        result = await handler.createMultiTracker(tr_taskid, req.params.task_id, req.params.cam_count)
         console.log("create multi tracker end ")
+
+        res.status(200).json({
+            message: 'success',
+            tracker_taskid: tr_taskid,
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+});
+
+router.post('/updatetracker', async (req, res) => {
+
+    console.log("router update tracker task_id : ", req.body.task_id)
+    console.log("info map : ", req.body.info_map)
+
+    try {
+        result = await handler.updateMultiTracker(tr_taskid, req.body.task_id, req.body.cam_count)
+        console.log("create multi tracker end ")
+
+        const options = {
+            uri: process.env.KRONOS_URL + '/kronos/status',
+            method: 'GET',
+            json: true
+        }
+
+        console.log("Call Kronos API // request : " + options.uri);
+        request.get(options, async function (err, response, body) {
+            if (!err) {
+                console.log("Response status : " + JSON.stringify(body.status));
+
+            } else {
+                console.log(err)
+                res.status(500).json({})
+            }
+        });
+
 
         res.status(200).json({
             message: 'success',

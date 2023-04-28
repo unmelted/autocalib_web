@@ -26,7 +26,7 @@
 
 #table-body {
 	width: 100%;
-	font-size: 13px;
+	font-size: 14px;
 	font-weight: lighter;
 	/* text-align: center; */
 }
@@ -53,9 +53,18 @@
 .table-container {
 	margin: 30px 0 0 0;
 	width: 95%;
-	max-height: 25vh;
 	overflow-y: auto;
 	text-align: center;
+}
+
+.messagebox-wrapper-map {
+	width: 95%;
+	/* border: 2px solid gray; */
+	margin: 15px 0 15px 0;
+	padding: 10px;
+	height: 55px;
+	/* align-items: center; */
+	/* display: flex; */
 }
 
 #th-no {

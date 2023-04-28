@@ -96,7 +96,7 @@ export const TaskHistory = ({ from, callback }) => {
 		return (
 			<>
 				<div className='table-container1'>
-					<p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  TASK LIST : {daterange}</p>
+					<p id="task-title" ><img src='./asset/checkbox.png' width="20px" alt="" />  TASK LIST : {daterange}</p>
 					<Table id="table-body" striped bordered variant="dark">
 						<thead>
 							<tr>

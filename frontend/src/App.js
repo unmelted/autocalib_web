@@ -26,6 +26,7 @@ const initCommon = {
   selectedTaskImages: [],
   leftCanvasImage: '',
   rightCanvasImage: '',
+  trackerTaskId: '',
 }
 
 function App() {
@@ -55,7 +56,7 @@ function App() {
     for (const key of keys) {
       for (const pkey of pkeys) {
         if (key === pkey) {
-
+          console.log("change common data :", key, pkey)
           common[key] = params[pkey]
           console.log("change common data result : ", common[key])
         }
