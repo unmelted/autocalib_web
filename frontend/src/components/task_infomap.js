@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect, useContext, Component } from 'react';
 import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Col from 'react-bootstrap/Col';
@@ -12,33 +12,20 @@ import '../css/task_unity.css';
 import { commonData } from '../App';
 
 //from : create or play in kairos
-export const TaskInfoMap = ({ from, callback }) => {
+export const TaskInfoMap = ({ from, callback, initMap }) => {
     const { common, changeCommon } = useContext(commonData)
     const [taskId, setTaskId] = useState(common.selectedTaskId);
     const [trackerTaskId, setTrackerTaskId] = useState(common.trackerTaskId);
     const [selectedList, setSelectedList] = useState(common.selectedTaskImages);
-    const [infoMap, setInfoMap] = useState({});
+    const [infoMap, setInfoMap] = useState(initMap);
     const [message, setMessage] = useState('');
-
+    const bullet_img = { none: './asset/bullet_g.png', success: './asset/bullet_gr.png', fail: './asset/bullet_r.png' };
 
     const ipRegex = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
     console.log("Task Info map ", taskId, selectedList);
+    console.log("task info map initMap : ", initMap);
 
-    const initMapData = () => {
-        const newMap = {};
-        selectedList.forEach((cam) => {
-            newMap[cam] = {
-                stream_url: '',
-                tracker_url: '',
-                tracker_status: 'none',
-                message: '-',
-            };
-        })
-        console.log("initMapdata : ", newMap);
-
-        setInfoMap(newMap);
-    }
 
     const updateInfoMap = async () => {
 
@@ -51,11 +38,7 @@ export const TaskInfoMap = ({ from, callback }) => {
 
         let response = null;
         try {
-            response = await axios.post(process.env.REACT_APP_SERVER_URL + "/control/updatetracker", data, {
-                headers: {
-                    'Content-Type': 'application/json',
-                }
-            });
+            response = await axios.post(process.env.REACT_APP_SERVER_URL + "/control/updatetracker", data);
         } catch (err) {
             console.log(err);
             return
@@ -83,48 +66,58 @@ export const TaskInfoMap = ({ from, callback }) => {
 
         if (response) {
             console.log('response.data : ', response.data);
+            const newMap = { ...infoMap };
             if (response.data.status === 'success') {
-                infoMap[camera].tracker_status = 'success';
-                infoMap[camera].message = response.data.message;
+                newMap[camera].tracker_status = 'success';
+                newMap[camera].message = response.data.message;
             }
             else {
-                infoMap[camera].tracker_status = 'fail';
-                infoMap[camera].message = response.data.message;
+                newMap[camera].tracker_status = 'fail';
+                newMap[camera].message = response.data.message;
             }
+            setInfoMap(newMap);
         }
     }
 
     const onHandlePingClick = async (camera) => {
-        console.log("handlePingClick ", camera, infoMap[camera])
+        console.log("handlePingClick ", camera, infoMap)
         checkPing(camera)
 
     }
 
-    const onHandleApplyAllClick = async () => {
+    const onHandlePingAllClick = async () => {
         console.log("handleApplyAll click ", infoMap)
-        await updateInfoMap();
 
+        for (let i = 0; i < Object.keys(infoMap).length; i++) {
+            console.log("pingall i : ", i, infoMap[Object.keys(infoMap)[i]].tracker_url);
+            checkPing(Object.keys(infoMap)[i]);
+        }
     }
 
     const onHandleIpChange = (event, camera, type) => {
         console.log('handleIpChange : ', camera, type);
+        const newMap = { ...infoMap };
 
         if (type === 'tracker') {
             console.log('tracker url : ', event);
-            infoMap[camera].tracker_url = event;
+            newMap[camera].tracker_url = event;
         }
         else if (type === 'stream') {
-            infoMap[camera].stream_url = event.target.value;
+            newMap[camera].stream_url = event.target.value;
         }
-
-        console.log('info map : ', infoMap);
+        console.log('handleIpChange result : ', infoMap);
     }
 
     const onHandleRunClick = (camera) => {
         console.log("handleRun ", camera, infoMap[camera])
     }
 
-    const onRunAllClick = (camera) => {
+    const onHandleReadyClick = async () => {
+        await updateInfoMap();
+        // setInfoMap(newMap);    
+    }
+
+    const onHandleRunAllClick = () => {
 
     }
 
@@ -133,10 +126,19 @@ export const TaskInfoMap = ({ from, callback }) => {
     }
 
     useEffect(() => {
+        const onUnload = () => {
+            window.scrollTo(0, 0);
+        };
 
-        initMapData();
+        window.addEventListener('beforeunload', onUnload);
+
+        return () => {
+            window.removeEventListener('beforeunload', onUnload);
+        };
 
     }, []);
+    // value={infoMap[cam].tracker_url}
+    //value={infoMap[cam].stream_url}    
 
     const InfoMapTable = () => {
         return (
@@ -145,20 +147,24 @@ export const TaskInfoMap = ({ from, callback }) => {
                     <td>{index + 1}</td>
                     <td>{cam}</td>
                     <td>
-                        <IPut onChange={(event) => { onHandleIpChange(event, cam, 'tracker') }} />
+                        <IPut onChange={(event) => { onHandleIpChange(event, cam, 'tracker') }}
+                            defaultValue={infoMap[cam].tracker_url} />
                     </td>
                     <td>
                         {/* <IPut onChange={(event) => { handleIpChange(event, cam, 'stream') }} /> */}
-                        <Form.Control type="text" size="sm" style={{ padding: '2px' }} onChange={(event) => { onHandleIpChange(event, cam, 'stream') }} />
+                        <Form.Control type="text" size="sm" style={{ padding: '2px' }}
+                            onChange={(event) => { onHandleIpChange(event, cam, 'stream') }}
+                            defaultValue={infoMap[cam].stream_url} />
                     </td>
                     <td>
                         <img src='./asset/arrow-circle.png' width="18px" alt=""
                             onClick={() => onHandlePingClick(cam)} hidden={from === 'play'} className="image-effect" />
                     </td>
                     <td>
-                        <img src='./asset/bullet_g.png' width="18px" alt="" />
+                        <img src={bullet_img[infoMap[cam].tracker_status]} width="18px" alt="" />
                     </td>
-                    <td> .. </td>
+                    <td> {infoMap[cam].message} </td>
+                    {/* <td> ... </td> */}
                     <td>
                         <img src='./asset/play-circle.png' width="18px" alt=""
                             onClick={() => onHandleRunClick(cam)} hidden={from === 'play'} className="image-effect" />
@@ -226,8 +232,19 @@ export const TaskInfoMap = ({ from, callback }) => {
                             as="input"
                             type='button'
                             value="Run All"
-                            onClick={onRunAllClick}
-                            style={{ float: 'right', width: '120px', marginRight: '60px' }}
+                            onClick={onHandleRunAllClick}
+                            style={{ float: 'right', width: '120px', marginRight: '80px' }}
+                        >
+                        </Button>
+                        <Button
+                            size="sm"
+                            variant="info"
+                            id='submit'
+                            as="input"
+                            type='button'
+                            value="Ready"
+                            onClick={onHandleReadyClick}
+                            style={{ float: 'right', width: '120px', marginRight: '20px' }}
                         >
                         </Button>
 
@@ -237,8 +254,8 @@ export const TaskInfoMap = ({ from, callback }) => {
                             id='submit'
                             as="input"
                             type='button'
-                            value="Apply All"
-                            onClick={onHandleApplyAllClick}
+                            value="Ping All"
+                            onClick={onHandlePingAllClick}
                             style={{ float: 'right', width: '120px', marginRight: '20px' }}
                         >
                         </Button>

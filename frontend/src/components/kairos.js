@@ -22,6 +22,7 @@ function Kairos(props) {
 	const [step3, setStep3] = useState('none'); //none | task_id
 	const [step4, setStep4] = useState('none'); //none | task_id * imagelist
 	const { common, changeCommon } = useContext(commonData)
+	const [infoMap, setInfoMap] = useState({});
 
 	const callback = (status) => {
 		console.log("change callback :  ", status)
@@ -29,6 +30,19 @@ function Kairos(props) {
 			setStep3(common.selectedTaskId)
 		}
 		else if (status === 'change_step3') {
+			const newMap = {};
+			common.selectedTaskImages.forEach((cam) => {
+				newMap[cam] = {
+					stream_url: 'rtsp://',
+					tracker_url: '10.1.1.1',
+					tracker_status: 'none',
+					message: '-',
+				};
+			})
+			console.log("initMapdata : ", newMap);
+
+			setInfoMap(newMap);
+
 			setStep3('none')
 			setStep4(common.selectedTaskId)
 		}
@@ -208,7 +222,7 @@ function Kairos(props) {
 		if (step4 !== 'none') {
 			return (
 				<>
-					<TaskInfoMap from={step0} callback={callback} />
+					<TaskInfoMap from={step0} callback={callback} initMap={infoMap} />
 				</>
 			)
 		} else {
