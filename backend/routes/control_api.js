@@ -293,13 +293,22 @@ router.get('/createmulti/:task_id/:cam_count', async (req, res) => {
     tr_taskid = taskManager.getNewTrTaskNo(req.params.task_id)
 
     try {
-        result = await handler.createMultiTracker(tr_taskid, req.params.task_id, req.params.cam_count)
-        console.log("create multi tracker end ")
+        result, rows = await handler.createMultiTracker(tr_taskid, req.params.task_id, req.params.cam_count)
+        console.log("create multi tracker end ", result, rows)
 
-        res.status(200).json({
-            message: 'success',
-            tracker_taskid: tr_taskid,
-        });
+        if (result < 0) {
+            console.log(err)
+            res.status(500).json({ message: 'fail' })
+
+        }
+        else {
+            res.status(200).json({
+                message: 'success',
+                tracker_taskid: tr_taskid,
+                tracker_exodus_id: rows
+            });
+
+        }
 
     } catch (err) {
         console.log(err)
@@ -316,9 +325,61 @@ router.post('/updatetracker', async (req, res) => {
         result = await handler.updateMultiTracker(req.body.tracker_task_id, req.body.info_map)
         console.log("update multi tracker end ")
 
-        res.status(200).json({
-            message: 'success',
-        });
+        if (result == 0) {
+            let trackers_info = []
+            for (const cam of Object.keys(req.body.info_map)) {
+                let tracker = {}
+                tracker.camera_id = cam
+                tracker.tracker_ip = req.body.info_map[cam].tracker_url
+                tracker.stream_url = req.body.info_map[cam].stream_url
+                trackers_info.push(tracker)
+            }
+
+            try {
+                const options = {
+                    uri: process.env.KAIROS_URL + '/kairos/ready',
+                    method: 'POST',
+                    body: {
+                        task_id: req.body.tracker_task_id,
+                        exodus_id: req.body.exodus_id,
+                        tracker: trackers_info,
+                    },
+                    json: true
+                }
+
+                console.log("send ready command to kairos ", options.body)
+                request.post(options, async function (err, response, body) {
+                    if (!err) {
+                        console.log("Response: " + JSON.stringify(body));
+                        result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+
+                        if (result < 0) {
+                            console.log(err)
+                            res.status(500).json({})
+
+                        }
+                        else {
+                            res.status(200).json({
+                                status: body.status,
+                                job_id: body.job_id,
+                                message: body.message,
+                            });
+                        }
+                    } else {
+                        console.log(err)
+                        res.status(500).json({})
+                    }
+                });
+
+            } catch (err) {
+                console.log(err);
+                res.status(500).json({})
+            }
+
+        }
+        else {
+            res.status(500).json({})
+        }
 
     } catch (err) {
         console.log(err)
@@ -353,6 +414,35 @@ router.post('/ping', async (req, res) => {
     // }
     // });
 
+});
+
+router.put('/tracker_start/:task_id', async (req, res) => {
+
+    console.log("router tracker start  task id : ", req.params.task_id)
+
+    try {
+        const options = {
+            uri: process.env.KAIROS_URL + '/kairos/start/' + req.params.task_id,
+            method: 'PUT',
+            json: true
+        }
+
+        console.log("send start command to kairos ")
+        request.put(options, async function (err, response, body) {
+            if (!err) {
+                console.log("Response: " + JSON.stringify(body));
+                // result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+
+            } else {
+                console.log(err)
+                res.status(500).json({})
+            }
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
 });
 
 module.exports = router;

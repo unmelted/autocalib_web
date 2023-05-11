@@ -27,6 +27,7 @@ const initCommon = {
   leftCanvasImage: '',
   rightCanvasImage: '',
   trackerTaskId: '',
+  trackerTask_exodusId: '',
 }
 
 function App() {

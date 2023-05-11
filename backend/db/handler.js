@@ -433,17 +433,31 @@ exports.createMultiTracker = function (tr_taskId, taskId, camCount) {
         db.getClient((errClient, client) => {
             if (errClient) {
                 console.log("client connect err " + err)
-                resolve(-1)
+                resolve(-1, 0)
             }
 
             db.queryParams("INSERT INTO multi_tracker (tracker_task_id ,task_id, cam_count) VALUES ($1, $2, $3);", [tr_taskId, taskId, camCount], (err) => {
-                client.release(true);
                 if (err) {
                     console.log(err)
-                    resolve(-1);
+                    resolve(-1, 0);
                 }
-                console.log('insert new Tracker query success');
-                resolve(0)
+                else {
+                    db.queryParams("SELECT job_id from task_request WHERE task_id = $1 and request_category = 'GENERATE' and job_result = '100' and job_status ='100';", [taskId], (err, res) => {
+                        client.release(true);
+                        if (err) {
+                            console.log(err)
+                            resolve(-1, 0)
+                        }
+                        if (res.rows.length > 0) {
+                            console.log('select exodus job id query success', res.rows);
+                            resolve(0, res.rows)
+                        }
+                        else {
+                            console.log("updateTaskRequest query no rows ")
+                            resolve(-10, 0)
+                        }
+                    }, client);
+                }
             }, client);
         });
     });
@@ -465,6 +479,28 @@ exports.updateMultiTracker = function (tr_taskId, info_map) {
                     resolve(-1);
                 }
                 console.log('updateMultiTracker query success');
+                resolve(0)
+            }, client);
+        });
+    });
+}
+
+exports.updateMultiTracker_jobid = function (tr_taskId, job_id) {
+    return new Promise((resolve, reject) => {
+
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                resolve(-1)
+            }
+
+            db.queryParams("UPDATE multi_tracker SET kairos_task_id = $2 where tracker_task_id = $1;", [tr_taskId, job_id], (err) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    resolve(-1);
+                }
+                console.log('updateMultiTracker job_id update success');
                 resolve(0)
             }, client);
         });

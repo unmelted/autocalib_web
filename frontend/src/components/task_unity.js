@@ -57,6 +57,8 @@ export const TaskUnityTable = ({ from, callback }) => {
         }
         console.log("createMultitracker : ", taskId);
         console.log("tracker_taskid : ", response.data.tracker_taskid);
+        console.log("tracker_exodus_id : ", response.data.tracker_exodus_id); //furthre process should be added.
+
         changeCommon({ trackerTaskId: response.data.tracker_taskid });
         setTrackerTaskid(response.data.tracker_taskid);
     }
