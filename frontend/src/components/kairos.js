@@ -33,8 +33,8 @@ function Kairos(props) {
 			const newMap = {};
 			common.selectedTaskImages.forEach((cam) => {
 				newMap[cam] = {
-					stream_url: 'rtsp://',
-					tracker_url: '10.1.1.1',
+					stream_url: './videos/3082_270_330.mp4',
+					tracker_url: '10.82.5.148',
 					tracker_status: 'none',
 					message: '-',
 				};

@@ -159,18 +159,42 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
                 return
             }
 
-            if (response && response.data) {
-                console.log('response.data : ', response.data);
-                if (response.data.status === 0) {
-                    console.log('tracker start success');
-                    setTaskStatus('start');
-                }
-                else {
-                    setTaskStatus('start_fail')
-                }
+            if (response) {
+                console.log('response.data : ', response);
+                // if (response.data.status === 0) {
+                //     console.log('tracker start success');
+                //     setTaskStatus('start');
+                // }
+                // else {
+                //     setTaskStatus('start_fail')
+                // }
+            }
+            else {
+                setTaskStatus('start_fail')
             }
 
-        } else {
+        }
+        else if (taskStatus === 'start') {
+            console.log('start tracker task ');
+
+            let response = null;
+            try {
+                response = await axios.put(process.env.REACT_APP_SERVER_URL + `/control/tracker_stop/${trackerTaskId}`);
+            } catch (err) {
+                console.log(err);
+                return
+            }
+            console.log('response.data : ', response);
+
+            if (response && response.data) {
+
+                if (response.data.status === 0) {
+                    console.log('tracker start success');
+                    setTaskStatus('stop');
+                }
+            }
+        }
+        else {
             AlarmMessageBox("Please check the Ready status.")
         }
     }
@@ -318,7 +342,6 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
                                 style={{ width: '120px', marginLeft: '20px' }}
                             >
                             </Button>
-                            <img src='./asset/arrow-right.png' width="20px" alt="" style={{ marginLeft: '20px' }} />
                             <Button
                                 size="sm"
                                 variant="danger"
