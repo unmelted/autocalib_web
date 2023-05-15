@@ -15,6 +15,7 @@ import { commonData } from '../App';
 export const TaskInfoMap = ({ from, callback, initMap }) => {
     const { common, changeCommon } = useContext(commonData)
     const [taskId, setTaskId] = useState(common.selectedTaskId);
+    const [jobId, setJobId] = useState(common.selectedTaskId);
     const [trackerTaskId, setTrackerTaskId] = useState(common.trackerTaskId);
     const [selectedList, setSelectedList] = useState(common.selectedTaskImages);
     const [infoMap, setInfoMap] = useState(initMap);
@@ -58,7 +59,9 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
             for (let i = 0; i < Object.keys(newMap).length; i++) {
                 console.log(" i : ", i, newMap[Object.keys(infoMap)[i]].tracker_url);
                 newMap[Object.keys(infoMap)[i]].tracker_status = 'ready'
+                newMap[Object.keys(infoMap)[i]].job_id = response.data.job_id;
                 newMap[Object.keys(infoMap)[i]].message = response.data.message;
+                setJobId(response.data.job_id)
             }
         }
 
@@ -153,7 +156,7 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
 
             let response = null;
             try {
-                response = await axios.put(process.env.REACT_APP_SERVER_URL + `/control/tracker_start/${trackerTaskId}`);
+                response = await axios.put(process.env.REACT_APP_SERVER_URL + `/control/tracker_start/${jobId}`);
             } catch (err) {
                 console.log(err);
                 return
@@ -161,13 +164,13 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
 
             if (response) {
                 console.log('response.data : ', response);
-                // if (response.data.status === 0) {
-                //     console.log('tracker start success');
-                //     setTaskStatus('start');
-                // }
-                // else {
-                //     setTaskStatus('start_fail')
-                // }
+                if (response.data.status === 0) {
+                    console.log('tracker start success');
+                    setTaskStatus('start');
+                }
+                else {
+                    setTaskStatus('start_fail')
+                }
             }
             else {
                 setTaskStatus('start_fail')
@@ -179,7 +182,7 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
 
             let response = null;
             try {
-                response = await axios.put(process.env.REACT_APP_SERVER_URL + `/control/tracker_stop/${trackerTaskId}`);
+                response = await axios.put(process.env.REACT_APP_SERVER_URL + `/control/tracker_stop/${jobId}`);
             } catch (err) {
                 console.log(err);
                 return

@@ -430,8 +430,49 @@ router.put('/tracker_start/:task_id', async (req, res) => {
         console.log("send start command to kairos ")
         request.put(options, async function (err, response, body) {
             if (!err) {
-                console.log("Response: " + JSON.stringify(body));
+                console.log("Start Response: " + JSON.stringify(body));
                 // result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+
+                res.status(200).json({
+                    result: body.result,
+                    status: body.status,
+                    message: body.message,
+                });
+
+            } else {
+                console.log(err)
+                res.status(500).json({})
+            }
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+});
+
+router.put('/tracker_stop/:task_id', async (req, res) => {
+
+    console.log("router tracker stop task id : ", req.params.task_id)
+
+    try {
+        const options = {
+            uri: process.env.KAIROS_URL + '/kairos/stop/' + req.params.task_id,
+            method: 'PUT',
+            json: true
+        }
+
+        console.log("send start command to kairos ")
+        request.put(options, async function (err, response, body) {
+            if (!err) {
+                console.log("Stop Response: " + JSON.stringify(body));
+                // result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+
+                res.status(200).json({
+                    result: body.result,
+                    status: body.status,
+                    message: body.message,
+                });
 
             } else {
                 console.log(err)

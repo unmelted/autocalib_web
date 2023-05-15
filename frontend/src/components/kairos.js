@@ -36,6 +36,7 @@ function Kairos(props) {
 					stream_url: './videos/3082_270_330.mp4',
 					tracker_url: '10.82.5.148',
 					tracker_status: 'none',
+					job_id: 100,
 					message: '-',
 				};
 			})
