@@ -506,3 +506,41 @@ exports.updateMultiTracker_jobid = function (tr_taskId, job_id) {
         });
     });
 }
+
+
+exports.getCalibJobId = function (task_id, info_map) {
+
+    return new Promise((resolve, reject) => {
+
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                resolve(-1, 0)
+            }
+
+            calib_job_id = {}
+            for (const cam of Object.keys(info_map)) {
+                group = info_map[cam].group
+                cg = group.charAt(0).toUpperCase() + group.slice(1);
+
+                db.queryParams("SELECT job_id FROM task_request WHERE task_id = $1 and group_id = $2 and request_category = 'GENERATE' and job_result = '100' and job_status = '100';", [task_id, cg], (err, res) => {
+
+                    if (err) {
+                        console.log(err)
+                        resolve(-1, 0)
+                    }
+                    if (res.rows.length > 0) {
+                        console.log("get calib job id query success :", res.rows[0]);
+                    } else {
+                        console.log("get calib job id query no rows ")
+                        resolve(-10, 0)
+                    }
+
+                }, client);
+                calib_job_id.cam = res.rows[0].job_id
+            }
+            console.log("return calib_job_id :", calib_job_id)
+            resolve(0, calib_job_id)
+        });
+    });
+}

@@ -324,12 +324,16 @@ router.post('/updatetracker', async (req, res) => {
     try {
         result = await handler.updateMultiTracker(req.body.tracker_task_id, req.body.info_map)
         console.log("update multi tracker end ")
+        if (result == 0) {
+            result, calib_job_id = await handler.getCalibJobId(req.body.tracker_task_id, req.body.info_map)
+        }
 
         if (result == 0) {
             let trackers_info = []
             for (const cam of Object.keys(req.body.info_map)) {
                 let tracker = {}
                 tracker.camera_id = cam
+                tracker.calib_job_id = calib_job_id[cam]
                 tracker.tracker_ip = req.body.info_map[cam].tracker_url
                 tracker.stream_url = req.body.info_map[cam].stream_url
                 trackers_info.push(tracker)

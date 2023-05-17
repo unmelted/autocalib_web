@@ -24,6 +24,7 @@ const initCommon = {
   selectedHistoryId: '',
   selectedRequestId: '',
   selectedTaskImages: [],
+  selectedTaskGroups: [],
   leftCanvasImage: '',
   rightCanvasImage: '',
   trackerTaskId: '',

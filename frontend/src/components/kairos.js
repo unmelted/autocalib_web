@@ -33,6 +33,7 @@ function Kairos(props) {
 			const newMap = {};
 			common.selectedTaskImages.forEach((cam) => {
 				newMap[cam] = {
+					group: 'group1',
 					stream_url: './videos/3082_270_330.mp4',
 					tracker_url: '10.82.5.148',
 					tracker_status: 'none',
@@ -109,8 +110,8 @@ function Kairos(props) {
 					<Row className='justify-content-md-center'>
 						<Col xs lg='2'>
 							<Button variant='no'
-								style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-							><img src='/' width='30px' alt='' /> <p></p>
+								style={{ width: '140px', color: '#FFFFFF', float: 'center' }}>
+								<img src='/' width='30px' alt='' /> <p></p>
 								{''}</Button></Col>
 						<Col xs lg='2'>
 							<Button className='rounded' variant={step0 === 'create' ? 'primary' : 'seconday'}

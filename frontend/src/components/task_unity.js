@@ -18,6 +18,7 @@ export const TaskUnityTable = ({ from, callback }) => {
     const [tableLoad, setTableLoad] = useState(false);
     const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskId + '/';
     const [selectList, setSelectList] = useState([]);
+    const [selectGroupList, setSelectGroupList] = useState([])
     const [message, setMessage] = useState("0 Camera selected ");
 
     console.log("Task Unity Table ", taskId, from, imageUrl);
@@ -63,8 +64,8 @@ export const TaskUnityTable = ({ from, callback }) => {
         setTrackerTaskid(response.data.tracker_taskid);
     }
 
-    const onHandleImageClick = (name) => {
-        console.log("onHandleRowClick : ", name);
+    const onHandleImageClick = (name, group) => {
+        console.log("onHandleRowClick : ", name, group);
 
         if (selectList.includes(name)) {
             setSelectList(selectList.filter((item) => item !== name))
@@ -77,10 +78,25 @@ export const TaskUnityTable = ({ from, callback }) => {
     const onSelectDoneClick = async () => {
 
         await createMultitracker(taskId);
-        changeCommon({ selectedTaskImages: selectList });
-        callback('change_step3')
-        itemData = [];
+        for (const image of selectList) {
+            for (const it of itemData) {
+
+                if (it.name === image) {
+                    setSelectGroupList([...selectGroupList, it.group]);
+                }
+            }
+        }
     }
+
+    useEffect(() => {
+        if (selectGroupList.length !== 0) {
+            changeCommon({ selectedTaskGroups: selectGroupList });
+            changeCommon({ selectedTaskImages: selectList });
+            callback('change_step3')
+            itemData = [];
+        }
+
+    }, [selectGroupList]);
 
     useEffect(() => {
         console.log(selectList);
@@ -106,7 +122,7 @@ export const TaskUnityTable = ({ from, callback }) => {
                     </div>
                     <ImageList sx={{ width: '95%' }} cols={5} rowHeight={240} style={{ marginTop: '20px ' }}>
                         {itemData.map((item) => (
-                            <ImageListItem key={item.name} onClick={() => onHandleImageClick(item.name)}>
+                            <ImageListItem key={item.name} onClick={() => onHandleImageClick(item.name, item.group)}>
                                 <img
                                     src={`${item.img}?w=240&fit=crop&auto=format`}
                                     srcSet={`${item.img}?w=240&fit=crop&auto=format&dpr=2 2x`}
