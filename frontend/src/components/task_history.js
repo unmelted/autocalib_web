@@ -20,24 +20,29 @@ export const TaskHistory = ({ from, callback }) => {
 
 	const onHandleHistoryClick = async (taskId) => {
 		console.log("onHandleRequest buttoin click", taskId);
-		changeCommon({ selectedHistoryId: taskId })
+		changeCommon({ selectedTaskId: taskId })
 		changeCommon({ leftCanvasImage: '' })
 		changeCommon({ leftCanvasImage: '' })
 
+		callback('change_step2')
 	}
 
 	const onHandleRequestClick = async (taskId, task_path) => {
 		console.log("onHandleRequestClck !! ")
-		changeCommon({ selectedRequestId: taskId })
+		changeCommon({ selectedTaskId: taskId })
 		changeCommon({ leftCanvasImage: '' })
 		changeCommon({ leftCanvasImage: '' })
+
+		callback('change_step2_from_create_exodus')
 	}
 
 	const onHandleRowClick = async (taskId, task_path) => {
-		console.log("history table row is clicked ", taskId, task_path)
-		changeCommon({ selectedTaskId: taskId })
+		if (from === 'kairos') {
+			console.log("history table row is clicked ", taskId, task_path)
+			changeCommon({ selectedTaskId: taskId })
 
-		callback('change_step2')
+			callback('change_step2')
+		}
 	}
 
 	const getTasks = async () => {
@@ -59,7 +64,6 @@ export const TaskHistory = ({ from, callback }) => {
 	if (tasksLoaded === false) {
 		getTasks();
 	}
-
 
 	const TaskHistoryRecords = () => {
 		return (

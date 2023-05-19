@@ -5,9 +5,11 @@ import Col from 'react-bootstrap/Col';
 import Button from 'react-bootstrap/Button'
 import { ImageList, ImageListItem, ImageListItemBar } from '@mui/material';
 import CheckCircleIcon from '@mui/icons-material/CheckCircle';
+
 import '../css/task_unity.css';
 
 import { commonData } from '../App';
+
 let selTaskId = '';
 let itemData = [];
 

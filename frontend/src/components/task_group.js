@@ -4,11 +4,13 @@ import { saveAs } from 'file-saver';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import { configData } from '../App.js';
-import { getGroupInfo } from './util.js'
-import { ReviewGallery } from './gallery.js';
-import { PairCanvas } from './canvas.js'
+
+
 import '../css/task.css';
+import { commonData } from '../App';
+import { configData } from '../App';
+import { getGroupInfo } from './util.js'
+
 
 const initItems = {
     'Group1': {
@@ -24,8 +26,9 @@ const initItems = {
     },
 }
 
-export const TaskGroupTable = ({ taskId, taskPath, from }) => {
-    console.log("Task Group Table ", taskId, taskPath, from);
+export const TaskGroupTable = ({ from, callback }) => {
+
+    console.log("Task Group Table ", from);
 
     const CAL_STATE = {
         ERR: -1,
@@ -37,7 +40,11 @@ export const TaskGroupTable = ({ taskId, taskPath, from }) => {
         SUBMIT: 5,
         GEN_COMPLETE: 6,
     }
+
+    const { common, changeCommon } = useContext(commonData)
     const { configure, changeConfigure } = useContext(configData)
+    const [taskId, setTaskId] = useState(common.selectedTaskId);
+    const [taskPath, setTaskPath] = useState(common.selectedTaskPath);
     const [refresh, setRefresh] = useState(0)
     const [groupInfo, setGroupInfo] = useState('');
     const [groupTable, setGroupTable] = useState(initItems);
@@ -126,36 +133,6 @@ export const TaskGroupTable = ({ taskId, taskPath, from }) => {
     const changeGenData = (type, param) => {
         console.log('changeGenData', type, param)
         changeTableDataContext(type, param);
-    }
-
-    const Canvas = () => {
-        if (rightImage !== '' && leftImage !== '') {
-            console.log("Canvas is called 1 : " + rightImage)
-            console.log("Canvas is called 2 : " + canvasJob)
-            return (
-                <>
-                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]} changeHandle={changeGenData}></PairCanvas>
-                </>)
-
-        }
-        else {
-            return <></>
-        }
-
-    }
-
-    const ReviewModal = () => {
-        console.log('review modal .. : ', modalshow)
-        if (modalshow === true) {
-            return (
-                <>
-                    <ReviewGallery taskId={reviewJob[0]} requestId={reviewJob[1]} changeHandle={changeTableDataContext} ></ReviewGallery>
-                </>
-            )
-        }
-        else {
-            return <></>
-        }
     }
 
     const getGroupStatus = async (keyindex) => {
@@ -351,11 +328,17 @@ export const TaskGroupTable = ({ taskId, taskPath, from }) => {
                     const imageUrlSecond = imageUrl + response.data.second_image;
                     console.log(imageUrlFirst)
                     console.log(imageUrlSecond)
-                    setLeftImage(imageUrlFirst);
-                    setRightImage(imageUrlSecond);
-                    setCanvasJob([groupTable[keyindex].job_id, taskId, keyindex])
-                    changeTableDataContext('changestatus', [keyindex, CAL_STATE.PAIR_COMPLETE]);
-                    changeTableDataContext('changegenmsg', [keyindex, `${response.data.first_image}, ${response.data.second_image} is chosen`])
+                    // setLeftImage(imageUrlFirst);
+                    // setRightImage(imageUrlSecond);
+                    // setCanvasJob([groupTable[keyindex].job_id, taskId, keyindex])
+                    // changeTableDataContext('changestatus', [keyindex, CAL_STATE.PAIR_COMPLETE]);
+                    // changeTableDataContext('changegenmsg', [keyindex, `${response.data.first_image}, ${response.data.second_image} is chosen`])
+                    changeCommon({ leftCanvasImage: imageUrlFirst })
+                    changeCommon({ rightCanvasImage: imageUrlSecond })
+                    changeCommon({ selectedJobId: groupTable[keyindex].job_id })
+                    changeCommon({ selectedGroupId: groupTable[keyindex].name })
+                    callback('change_step3')
+
                 } else {
                     return;
                 }
@@ -602,14 +585,6 @@ export const TaskGroupTable = ({ taskId, taskPath, from }) => {
                             disabled={checkedList.length === 0}>
                         </Button>
                     </div>
-                </div>
-                <div className='canvas-container'>
-                    {/* <TableDataContext.Provider value={{ groupTable, changeTableDataContext }}> */}
-                    <Canvas></Canvas>
-                    {/* </TableDataContext.Provider> */}
-                </div>
-                <div>
-                    <ReviewModal />
                 </div>
             </Fragment >
         )

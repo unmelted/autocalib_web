@@ -321,7 +321,8 @@ exports.selectRequestbyTaskId = function (taskId) {
                     }
                     else {
                         console.log("get Groupinfo query no rows ")
-                        reject(-10)
+                        // reject(-10)
+                        resolve([])
                     }
                 }
 

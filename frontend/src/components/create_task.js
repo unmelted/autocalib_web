@@ -1,19 +1,21 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useContext } from 'react';
 import axios from 'axios';
-import '../css/create_task.css';
 import ProgressBar from 'react-bootstrap/ProgressBar'
 import Form from 'react-bootstrap/Form';
 import Button from 'react-bootstrap/Button'
 import InputGroup from 'react-bootstrap/InputGroup';
+
+import '../css/create_task.css';
+
 import { getTotalFileSize, getFileExt, isValidFile, isValidImage } from './util.js'
-import { TaskGroupTable } from './task_group.js'
-import { TaskUnityTable } from './task_unity.js';
+import { commonData } from '../App.js'
 
 
 
-export const CreateTask = ({ from }) => {
+export const CreateTask = ({ from, callback }) => {
     console.log("where from props : ", from)
 
+    const { common, changeCommon } = useContext(commonData)
     const [taskId, setTaskId] = useState('');
     const [taskPath, setTaskPath] = useState('');
     const [taskLoad, setTaskLoad] = useState(false);
@@ -87,9 +89,15 @@ export const CreateTask = ({ from }) => {
             setTaskId(response.data.taskId);
 
             if (from === 'exodus') {
-                setTaskLoad(true);
+                changeCommon({ selectedTaskId: response.data.taskId })
+                changeCommon({ selectedTaskPath: response.data.taskPath })
+                callback('change_step2_from_create_exodus')
+                // setTaskLoad(true);
             } else if (from === 'kairos') {
-                setRequestUnityTable(true);
+                changeCommon({ selectedTaskId: response.data.taskId })
+                changeCommon({ selectedTaskPath: response.data.taskPath })
+                callback('change_step2_from_create_kairos')
+
             }
 
         }
@@ -99,15 +107,7 @@ export const CreateTask = ({ from }) => {
         window.location.reload();
     }
 
-    // const removeCalcTimer = () => {
-    //     clearInterval(calcProgressTimerRef.current);
-    //     calcProgressTimerRef.current = null;
-    // }
 
-    // useEffect(() => {
-    //     initContext();
-    //     console.log(`isUplodaded : ${isUploaded}, isAllTarget : ${isAllTarget}, isSubmitted: ${isSubmitted}`)
-    // }, [canvas]);
     const addFileAlias = async (taskId) => {
         let response = null;
         const task_alias = taskAlias.current.value;
@@ -129,58 +129,6 @@ export const CreateTask = ({ from }) => {
 
         }
     }
-
-    const RequestUnityTable = () => {
-        if (requstUnityTable === true && taskId !== '') {
-            return (
-                <>
-                    <TaskUnityTable taskId={taskId} taskPath={taskPath} from={'kairos'} />
-                </>)
-
-        } else {
-            return (
-                <>
-                </>)
-        }
-    }
-
-    // useEffect(() => {
-    //     if (isUploaded && calculateState === CALC_STATE.START) {
-    //         calcProgressTimerRef.current = setInterval(() => {
-    //             axios.get(process.env.REACT_APP_SERVER_URL + `/api/calculate/status/${jobId}`)
-    //                 .then(response => {
-    //                     const percent = parseInt(response.data.percent);
-
-    //                     if (percent === 100) {
-    //                         removeCalcTimer();
-    //                         setPercent(percent);
-    //                         setCalculateState(CALC_STATE.COMPLETE);
-    //                         setStatusMessage('Calculate Completed!');
-    //                         getTwoImage();
-    //                     } else {
-    //                         setPercent(percent);
-    //                     }
-    //                 })ㄴ
-    //                 .catch(err => {
-    //                     console.log(err);
-    //                     removeCalcTimer();
-    //                 });
-    //         }, 2000);
-    //     } else if (calculateState === CALC_STATE.CANCEL) {
-    //         removeCalcTimer();
-    //         setStatusMessage('Calculate is cancled. Start another Task.');
-    //     }
-    //     return () => {
-    //         removeCalcTimer();
-    //     }
-    // }, [calculateState]);
-
-    // useEffect(() => {
-    //     targetPointRef.current = {
-    //         left: [],
-    //         right: []
-    //     };
-    // }, []);
 
     return (
         <>
@@ -235,13 +183,6 @@ export const CreateTask = ({ from }) => {
                         >
                         </Button>
                     </Form.Group>
-                </div>
-                <div id="div-task-table"
-                    hidden={taskLoad === false}>
-                    <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={'create'} from={from} />
-                </div>
-                <div>
-                    <RequestUnityTable />
                 </div>
             </div>
         </>

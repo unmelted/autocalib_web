@@ -4,11 +4,16 @@ import axios from 'axios';
 import Row from 'react-bootstrap/Row';
 import Button from 'react-bootstrap/Button'
 import Form from 'react-bootstrap/Form';
-import { configData } from '../App.js';
-import { getGroundImage } from './util.js'
+
 import '../css/canvas.css';
 
-export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, changeHandle }) => {
+import { commonData } from '../App';
+import { configData } from '../App.js';
+import { getGroundImage } from './util.js'
+
+
+export const Canvas = ({ from, callback }) => {
+
     const groundtype =
         [
             'GROUND TYPE',
@@ -30,7 +35,16 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
             'FOOTBALL'
         ];
 
+    const { common, changeCommon } = useContext(commonData)
     const { configure, changeConfigure } = useContext(configData)
+    const leftImage = common.leftCanvasImage;
+    const rightImage = common.rightCanvasImage;
+
+    const [jobid, setJobid] = useState(common.selectedJobId)
+    const [taskid, setTaskid] = useState(common.selectedTaskId)
+    const [groupid, setGroupid] = useState(common.selectedGroupId)
+
+
     const canvasLeftRef = useRef(null);
     const canvasRightRef = useRef(null);
     const canvasWorldRef = useRef(null);
@@ -57,9 +71,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
     const [isSubmitted, setIsSubmitted] = useState(false);
     const [isSubmitCompleted, setIsSubmitCompleted] = useState(false);
     const [isAllTarget, setIsAllTarget] = useState(false);
-    const [jobid, setJobid] = useState(jobId)
-    const [taskid, setTaskid] = useState(taskId)
-    const [groupid, setGroupid] = useState(groupId)
+
 
     const canvasWidth = parseInt(process.env.REACT_APP_CANVAS_WIDTH, 10);
     const canvasHeight = parseInt(process.env.REACT_APP_CANVAS_HEIGHT, 10);
@@ -514,7 +526,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
             config: configure
         }
 
-        console.log('submit points to : ', jobId)
+        console.log('submit points to : ', jobid)
         const url = process.env.REACT_APP_SERVER_URL + `/api/generate/${jobid}`;
 
         let response = null;
@@ -529,9 +541,14 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
         if (response && response.data.status === 0) {
             if (response.data.status === 0) {
                 setIsSubmitCompleted(true);
-                changeHandle('addgenid', [groupid, response.data.job_id])
-                changeHandle('changegenmsg', [groupid, `Genenerate pts - ${response.data.job_id} is requested.`])
-                changeHandle('addpostno', [groupid, response.data.request_id])
+                changeCommon({ leftCanvasImage: '' })
+                changeCommon({ rightCanvasImage: '' })
+                changeCommon({ selectedJobId: '' })
+                changeCommon({ selectedGroupId: '' })
+                callback('change_step3_canvas_submit')
+                // changeHandle('addgenid', [groupid, response.data.job_id])
+                // changeHandle('changegenmsg', [groupid, `Genenerate pts - ${response.data.job_id} is requested.`])
+                // changeHandle('addpostno', [groupid, response.data.request_id])
             }
         }
     }
@@ -792,7 +809,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
                 </Row>
             </div >
             <div>
-                <div className='canvas-wrapper' hidden={calibMode.current === 'World'} dialbed={calibMode.current === 'World'}>
+                <div className='canvas-wrapper' hidden={calibMode.current === 'World'} disabled={calibMode.current === 'World'}>
                     <Form.Group>
                         <img
                             id='left-image'
@@ -818,7 +835,7 @@ export const PairCanvas = ({ leftImage, rightImage, jobId, taskId, groupId, chan
                         />
                     </Form.Group>
                 </div>
-                <div className='canvas-wrapper' hidden={calibMode.current === 'World'} disalbed={calibMode.current === 'World'}>
+                <div className='canvas-wrapper' hidden={calibMode.current === 'World'} disabled={calibMode.current === 'World'}>
                     <Form.Group>
                         <img
                             id='right-image'

@@ -1,14 +1,20 @@
 import React, { useState, useContext } from 'react';
 import axios from "axios";
-import "react-image-gallery/styles/css/image-gallery.css";
 import ImageGallery from "react-image-gallery";
 import Modal from 'react-bootstrap/Modal';
+
+import "react-image-gallery/styles/css/image-gallery.css";
 import '../css/task_library.css';
+
+import { commonData } from '../App';
 import { configData } from '../App.js';
 
 
-export const ReviewGallery = ({ taskId, requestId, changeHandle }) => {
+export const ReviewGallery = ({ from, callback }) => {
+    const { common, changeCommon } = useContext(commonData)
     const { configure, changeConfigure } = useContext(configData)
+    const taskId = common.selectedTaskId;
+    const requestId = common.selectedRequestId;
     const [show, setShow] = useState(true)
     // setShow(true)
     const [firstcall, setFirstcall] = useState(false)
@@ -62,7 +68,8 @@ export const ReviewGallery = ({ taskId, requestId, changeHandle }) => {
                 onHide={() => {
                     setShow(false)
                     setLoaded(false)
-                    changeHandle('modalclose', [])
+                    callback('change_step4_review_done')
+                    // changeHandle('modalclose', [])
                 }}
                 size='xl'>
                 <Modal.Header closeButton>

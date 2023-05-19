@@ -82,37 +82,45 @@ router.get('/getrequest/:task_id', async (req, res) => {
 
     try {
         result = await handler.selectRequestbyTaskId(req.params.task_id);
-        console.log("get request  : " + result[0].job_id)
 
-        for (const row of result) {
-            const options = {
-                uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/status/' + row.job_id,
-                method: 'GET',
-                json: true
+        if (result.length === 0) {
+            res.status(200).json({
+                message: 'no records',
+                request_array: [],
+            });
+        }
+        else {
+            for (const row of result) {
+                console.log("get request  : " + result[0].job_id)
+                const options = {
+                    uri: process.env.AUTO_CALIB_EXODUS_URL + '/exodus/autocalib/status/' + row.job_id,
+                    method: 'GET',
+                    json: true
+                }
+
+                console.log("Call Exodus API // request : " + options.uri);
+                request.get(options, async function (err, response, body) {
+                    if (!err) {
+                        console.log("Response: " + JSON.stringify(body));
+                        result2 = await handler.updateTaskRequest([body.status, body.result !== null ? body.result : '', body.message, row.job_id], false);
+                        console.log(" request // updateTask for status is done ");
+
+                    } else {
+                        console.log(err)
+                        res.status(500).json({})
+                    }
+                });
+
             }
 
-            console.log("Call Exodus API // request : " + options.uri);
-            request.get(options, async function (err, response, body) {
-                if (!err) {
-                    console.log("Response: " + JSON.stringify(body));
-                    result2 = await handler.updateTaskRequest([body.status, body.result !== null ? body.result : '', body.message, row.job_id], false);
-                    console.log(" request // updateTask for status is done ");
+            result = await handler.selectRequestbyTaskId(req.params.task_id);
+            console.log("get request again : " + result[0].job_id)
 
-                } else {
-                    console.log(err)
-                    res.status(500).json({})
-                }
+            res.status(200).json({
+                message: 'success',
+                request_array: result,
             });
-
         }
-
-        result = await handler.selectRequestbyTaskId(req.params.task_id);
-        console.log("get request again : " + result[0].job_id)
-
-        res.status(200).json({
-            message: 'success',
-            request_array: result,
-        });
 
     } catch (err) {
         console.log(err)
@@ -329,6 +337,7 @@ router.post('/updatetracker', async (req, res) => {
         }
 
         if (result == 0) {
+            qw
             let trackers_info = []
             for (const cam of Object.keys(req.body.info_map)) {
                 let tracker = {}

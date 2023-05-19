@@ -5,30 +5,31 @@ import Button from 'react-bootstrap/Button'
 import { Form } from 'react-bootstrap'
 import InputGroup from 'react-bootstrap/InputGroup';
 import Table from 'react-bootstrap/Table';
-import { configData } from '../App.js'
+
 import '../css/task_library.css';
+import { commonData } from '../App';
+import { configData } from '../App.js'
 
-import { TaskGroupTable } from './task_group.js'
-import { PairCanvas } from './canvas.js'
-import { ReviewGallery } from './gallery.js';
-import { PositionTracking } from './position_tracking.js';
-import { TaskUnityTable } from './task_unity.js';
+// import { PairCanvas } from './canvas.js'
+// import { ReviewGallery } from './gallery.js';
+// import { PositionTracking } from './position_tracking.js';
+// import { TaskUnityTable } from './task_unity.js';
 
-let taskCarriage = {
-    task: [],
-    task_loaded: false,
-    requestGrouploaded: false,
-    requestHistoryLoaded: false,
-    requestUnityTable: true,
-    task_id: '',
-    task_path: '',
-    leftImage: '',
-    rigbtImage: '',
-    ptShow: false,
-    checkedList: []
-};
-
-export const TaskHistory = async ({ from }) => {
+// let taskCarriage = {
+//     task: [],
+//     task_loaded: false,
+//     requestGrouploaded: false,
+//     requestHistoryLoaded: false,
+//     requestUnityTable: true,
+//     task_id: '',
+//     task_path: '',
+//     leftImage: '',
+//     rigbtImage: '',
+//     ptShow: false,
+//     checkedList: []
+// };
+// // 
+/* export const TaskRequestHistory = async ({ from }) => {
 
     const today = new Date();
     let fromdate = new Date()
@@ -153,32 +154,25 @@ export const TaskHistory = async ({ from }) => {
         )
     }
 };
+ */
 
+export const TaskRequestHistory = ({ from, callback }) => {
 
-export const TaskLibrary = ({ from }) => {
-    console.log("task library from : ", from)
+    const { common, changeCommon } = useContext(commonData)
     const { configure, changeConfigure } = useContext(configData)
 
-    const [loaded, setLoaded] = useState(false);
+    const taskId = common.selectedTaskId;
+    const taskPath = common.selectedTaskPath;
+    console.log("task library from : ", from, taskId)
 
-    const [taskId, setTaskId] = useState('');
-    const [taskPath, setTaskPath] = useState('');
     const [requestTaskIdMessage, setRequestTaskIdMessage] = useState('')
-    const [requestHistoryloaded, setRequestHistoryLoaded] = useState(false)
-    const [requestGrouploaded, setRequestGroupLoaded] = useState(false)
-    const [requstUnityTable, setRequestUnityTable] = useState(false)
+    const [requestHistoryLoaded, setRequestHistoryLoaded] = useState(false)
+
     const [downloadInfo, setDownloadInfo] = useState({ url: '', name: '' });
 
     const [requestHistory, setRequestHistory] = useState('')
-    const [requestGroup, setRequestGroup] = useState('')
-    const [leftImage, setLeftImage] = useState('');
-    const [rightImage, setRightImage] = useState('');
-    const [canvasJob, setCanvasJob] = useState('')
     const [checkedList, setCheckedList] = useState([])
     const [modalshow, setModalShow] = useState(false)
-    const [reviewJob, setReviewJob] = useState('')
-    const [ptshow, setPtShow] = useState(false)
-    const [ptRequestId, setPtRequestId] = useState([])
 
     const changeHandle = (type, param) => {
         console.log('change handle is called', type, param)
@@ -187,8 +181,8 @@ export const TaskLibrary = ({ from }) => {
 
         } else if (type === 'addgenid') {
             console.log('addgen id ', param)
-            setLeftImage('')
-            setRightImage('')
+            // setLeftImage('')
+            // setRightImage('')
 
         } else if (type === 'changegenmsg') {
             console.log('no use.. chagne gen mesage..');
@@ -198,47 +192,8 @@ export const TaskLibrary = ({ from }) => {
         }
     }
 
-    const Canvas = () => {
-        if (rightImage !== '' && leftImage !== '') {
-            console.log("Canvas is called 1 : " + rightImage)
-            console.log("Canvas is called 2 : " + canvasJob)
-            return (
-                <>
-                    <PairCanvas leftImage={leftImage} rightImage={rightImage} jobId={canvasJob[0]} taskId={canvasJob[1]} groupId={canvasJob[2]} changeHandle={changeHandle}></PairCanvas>
-                </>)
-
-        }
-        else {
-            return <></>
-        }
-    }
-    const ReviewModal = () => {
-        console.log('review modal .. : ', modalshow)
-        if (modalshow === true) {
-            return (
-                <>
-                    <ReviewGallery taskId={reviewJob[0]} requestId={reviewJob[1]} changeHandle={changeHandle} ></ReviewGallery>
-                </>
-            )
-        }
-        else {
-            return <></>
-        }
-    }
-
-    const ReviewStatistics = () => {
-        console.log("Review Statistics", ptRequestId[0])
-        if (ptshow === true && ptRequestId[0] !== 0) {
-            return (
-                <>
-                    <PositionTracking request_id={ptRequestId[0]} group_id={ptRequestId[1]} task_id={ptRequestId[2]} job_id={ptRequestId[3]}></PositionTracking>
-                </>
-            )
-        }
-    }
-
     const getRequestHistory = async (taskId) => {
-        console.log("onHandleRequest buttoin click", taskId);
+        console.log("getRequestHistory is started : ", taskId);
         let response = null;
 
         try {
@@ -249,17 +204,30 @@ export const TaskLibrary = ({ from }) => {
             setRequestTaskIdMessage(strmsg)
             setRequestHistoryLoaded(false)
 
-            return
         }
 
         if (response && response.data.request_array) {
-            setRequestHistory(response.data.request_array)
-            setRequestHistoryLoaded(true)
-            setRequestGroupLoaded(false)
-            const count = response.data.request_array.length
-            const strmsg = `${taskId}, ${count} request.`
-            setRequestTaskIdMessage(strmsg)
+            if (response.data.request_array.length > 0) {
+                setRequestHistory(response.data.request_array)
+                setRequestHistoryLoaded(true)
+
+                const count = response.data.request_array.length
+                const strmsg = `${taskId}, ${count} request.`
+                setRequestTaskIdMessage(strmsg)
+            } else {
+                const strmsg = `${taskId}, No request.`
+                setRequestTaskIdMessage(strmsg)
+                setRequestHistoryLoaded(true)
+
+            }
         }
+    }
+
+    useEffect(() => {
+    }, [requestHistoryLoaded])
+
+    if (requestHistoryLoaded === false && taskId !== '') {
+        getRequestHistory(taskId)
     }
 
     const RequstHistoryTable = () => {
@@ -267,7 +235,7 @@ export const TaskLibrary = ({ from }) => {
         const onHandlePairClick = async (category, taskId, groupId, jobId) => {
             console.log("onHandleGetPairClick ", category, taskId, groupId, jobId, configure.pair)
             let response = null;
-            setPtShow(false)
+            // setPtShow(false)
 
             if (category === 'CALCULATE') {
                 try {
@@ -284,9 +252,14 @@ export const TaskLibrary = ({ from }) => {
                     const imageUrlSecond = imageUrl + response.data.second_image;
                     console.log(imageUrlFirst)
                     console.log(imageUrlSecond)
-                    setLeftImage(imageUrlFirst);
-                    setRightImage(imageUrlSecond);
-                    setCanvasJob([jobId, taskId, groupId])
+                    // setLeftImage(imageUrlFirst);
+                    // setRightImage(imageUrlSecond);
+                    // setCanvasJob([jobId, taskId, groupId])
+                    changeCommon({ leftCanvasImage: imageUrlFirst })
+                    changeCommon({ rightCanvasImage: imageUrlSecond })
+                    changeCommon({ selectedJobId: jobId })
+                    changeCommon({ selectedGroupId: groupId })
+                    callback('change_step3')
                 } else {
                     return;
                 }
@@ -305,20 +278,23 @@ export const TaskLibrary = ({ from }) => {
 
         const onHandleReviewClick = (taskId, requestId) => {
             console.log('onHandleReviewClick . ', requestId, modalshow)
-            setReviewJob([taskId, requestId])
-            setModalShow(true)
-            setPtShow(false)
+            changeCommon({ selectedTaskId: taskId })
+            changeCommon({ selectedRequestId: requestId })
+            callback('change_step3_review')
+            // setReviewJob([taskId, requestId])
+            // setModalShow(true)
+            // setPtShow(false)
         }
 
         const onHandleRowClick = (category, request_id, group_id, task_id, job_id) => {
             console.log("onHandle Genclick ", category, request_id, configure.labatory, group_id, task_id, job_id)
             if (category === 'GENERATE' && configure.labatory === 'true') {
-                setPtRequestId([request_id, group_id, task_id, job_id])
-                setPtShow(true)
+                // setPtRequestId([request_id, group_id, task_id, job_id])
+                // setPtShow(true)
             }
         }
 
-        if (requestHistoryloaded === true) {
+        if (requestHistoryLoaded === true && requestHistory.length > 0) {
             return (
                 requestHistory.map((req =>
                     <tr key={req.request_id} onClick={() => onHandleRowClick(req.request_category, req.request_id, req.group_id, req.task_id, req.job_id)}>
@@ -370,20 +346,6 @@ export const TaskLibrary = ({ from }) => {
         }
     }
 
-    const RequestUnityTable = () => {
-        if (requstUnityTable === true && taskPath !== '') {
-            return (
-                <>
-                    <TaskUnityTable taskId={taskId} taskPath={taskPath} from={'kairos'} />
-                </>)
-
-        } else {
-            return (
-                <>
-                </>)
-        }
-    }
-
     const downloadResult = async () => {
         console.log('download result click checked in task_library : ', checkedList)
         const data = {
@@ -417,27 +379,10 @@ export const TaskLibrary = ({ from }) => {
 
     return (
         <>
-            <div className='table-container1'>
-                <p id="task-title" ><img src='./asset/pin.png' width="20px" alt="" />  TASK LIST : {''}</p>
-                <Table id="table-body" striped bordered variant="dark">
-                    <thead>
-                        <tr>
-                            <th id="th-no">Task No</th>
-                            <th id="th-id">Task ID</th>
-                            <th id="th-date">Create Date</th>
-                            <th id="th-alias">Description</th>
-                            <th id="th-request">Request</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <TaskHistory hidden={!taskCarriage['task_loaded']}></TaskHistory>
-                    </tbody>
-                </Table>
-            </div>
-            <p id="task-title2" hidden={!requestHistoryloaded}>
+            <p id="task-title2" hidden={!requestHistoryLoaded}>
                 <img src='./asset/pin.png' width="20px" alt="" />  TASK ID: {requestTaskIdMessage} {'  '}
                 <img src='./asset/refresh.png' width="20px" alt="" onClick={() => getRequestHistory(taskId)} /> </p>
-            <div className='table-container2' hidden={!requestHistoryloaded}>
+            <div className='table-container2' hidden={!requestHistoryLoaded}>
                 <Table id="table-body" striped bordered variant="dark" >
                     <thead>
                         <tr>
@@ -470,24 +415,9 @@ export const TaskLibrary = ({ from }) => {
                     </Button>
                 </div>
             </div>
-            <div id='table-container3'
-                hidden={requestGrouploaded === false}>
-                <TaskGroupTable taskId={taskId} taskPath={taskPath} entry={from} />
-            </div>
-            <div hidden={from === 'kairos'}>
-                <Canvas />
-            </div>
-            <div hidden={ptshow === false || from === 'kairos'}>
-                <ReviewStatistics />
-            </div>
-            <div>
-                <ReviewModal />
-            </div>
-            <div>
-                <RequestUnityTable />
-            </div>
+
         </>
     )
 }
 
-export default TaskLibrary;
+export default TaskRequestHistory;

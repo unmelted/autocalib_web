@@ -21,12 +21,15 @@ const initConfigure = {
 };
 const initCommon = {
   selectedTaskId: '',
+  selectedTaskPath: '',
   selectedHistoryId: '',
   selectedRequestId: '',
   selectedTaskImages: [],
-  selectedTaskGroups: [],
+  selectedTaskGroups: [], //for trackers
   leftCanvasImage: '',
   rightCanvasImage: '',
+  selectedJobId: '',    //for exodus canvas
+  selectedGroupId: '',  //for exodus canvas
   trackerTaskId: '',
   trackerTask_exodusId: '',
 }
@@ -58,7 +61,6 @@ function App() {
     for (const key of keys) {
       for (const pkey of pkeys) {
         if (key === pkey) {
-          console.log("change common data :", key, pkey)
           common[key] = params[pkey]
           console.log("change common data result : ", common[key])
         }
