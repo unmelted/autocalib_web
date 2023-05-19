@@ -337,7 +337,7 @@ router.post('/updatetracker', async (req, res) => {
         }
 
         if (result == 0) {
-            qw
+
             let trackers_info = []
             for (const cam of Object.keys(req.body.info_map)) {
                 let tracker = {}
