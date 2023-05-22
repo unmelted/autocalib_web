@@ -151,7 +151,7 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
     }
 
     const onHandleRunAllClick = async () => {
-        if (taskStatus === 'ready') {
+        if (taskStatus === 'ready' || taskStatus === 'stop') {
             console.log('start tracker task ');
 
             let response = null;
@@ -192,13 +192,34 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
             if (response && response.data) {
 
                 if (response.data.status === 0) {
-                    console.log('tracker start success');
+                    console.log('tracker stop success');
                     setTaskStatus('stop');
                 }
             }
         }
         else {
             AlarmMessageBox("Please check the Ready status.")
+        }
+    }
+
+    const onHandleDestoryClick = async () => {
+
+        let response = null;
+        try {
+            response = await axios.put(process.env.REACT_APP_SERVER_URL + `/control/tracker_destroy/${jobId}`);
+        } catch (err) {
+            console.log(err);
+            return
+        }
+
+        console.log('destory response.data : ', response);
+
+        if (response && response.data) {
+
+            if (response.data.status === 0) {
+                console.log('tracker start success');
+                setTaskStatus('stop');
+            }
         }
     }
 
@@ -352,7 +373,7 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
                                 as="input"
                                 type='button'
                                 value="Destory"
-                                onClick={onHandleRunAllClick}
+                                onClick={onHandleDestoryClick}
                                 style={{ width: '120px', marginLeft: '20px' }}
                             >
                             </Button>

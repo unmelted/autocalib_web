@@ -328,21 +328,27 @@ router.post('/updatetracker', async (req, res) => {
 
     const data = req.body
     console.log("update tracker ", data)
+    let calib_data = {}
+    let code = 0
 
     try {
         result = await handler.updateMultiTracker(req.body.tracker_task_id, req.body.info_map)
         console.log("update multi tracker end ")
+
         if (result == 0) {
-            result, calib_job_id = await handler.getCalibJobId(req.body.tracker_task_id, req.body.info_map)
+            code, calib_data = await handler.getCalibJobId(req.body.tracker_task_id, req.body.info_map)
         }
 
         if (result == 0) {
 
             let trackers_info = []
             for (const cam of Object.keys(req.body.info_map)) {
+                console.log(calib_data)
+                console.log(calib_data.data[cam])
+
                 let tracker = {}
                 tracker.camera_id = cam
-                tracker.calib_job_id = calib_job_id[cam]
+                tracker.calib_job_id = calib_data.data[cam]
                 tracker.tracker_ip = req.body.info_map[cam].tracker_url
                 tracker.stream_url = req.body.info_map[cam].stream_url
                 trackers_info.push(tracker)
@@ -354,7 +360,6 @@ router.post('/updatetracker', async (req, res) => {
                     method: 'POST',
                     body: {
                         task_id: req.body.tracker_task_id,
-                        exodus_id: req.body.exodus_id,
                         tracker: trackers_info,
                     },
                     json: true
@@ -429,13 +434,13 @@ router.post('/ping', async (req, res) => {
 
 });
 
-router.put('/tracker_start/:task_id', async (req, res) => {
+router.put('/tracker_start/:job_id', async (req, res) => {
 
-    console.log("router tracker start  task id : ", req.params.task_id)
+    console.log("router tracker start  job id : ", req.params.job_id)
 
     try {
         const options = {
-            uri: process.env.KAIROS_URL + '/kairos/start/' + req.params.task_id,
+            uri: process.env.KAIROS_URL + '/kairos/start/' + req.params.job_id,
             method: 'PUT',
             json: true
         }
@@ -464,13 +469,13 @@ router.put('/tracker_start/:task_id', async (req, res) => {
     }
 });
 
-router.put('/tracker_stop/:task_id', async (req, res) => {
+router.put('/tracker_stop/:job_id', async (req, res) => {
 
-    console.log("router tracker stop task id : ", req.params.task_id)
+    console.log("router tracker stop job id : ", req.params.job_id)
 
     try {
         const options = {
-            uri: process.env.KAIROS_URL + '/kairos/stop/' + req.params.task_id,
+            uri: process.env.KAIROS_URL + '/kairos/stop/' + req.params.job_id,
             method: 'PUT',
             json: true
         }
@@ -479,6 +484,41 @@ router.put('/tracker_stop/:task_id', async (req, res) => {
         request.put(options, async function (err, response, body) {
             if (!err) {
                 console.log("Stop Response: " + JSON.stringify(body));
+                // result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+
+                res.status(200).json({
+                    result: body.result,
+                    status: body.status,
+                    message: body.message,
+                });
+
+            } else {
+                console.log(err)
+                res.status(500).json({})
+            }
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+});
+
+router.put('/tracker_destroy/:job_id', async (req, res) => {
+
+    console.log("router tracker destory task id : ", req.params.job_id)
+
+    try {
+        const options = {
+            uri: process.env.KAIROS_URL + '/kairos/destroy/' + req.params.job_id,
+            method: 'PUT',
+            json: true
+        }
+
+        console.log("send start command to kairos ")
+        request.put(options, async function (err, response, body) {
+            if (!err) {
+                console.log("destroy Response: " + JSON.stringify(body));
                 // result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
 
                 res.status(200).json({
