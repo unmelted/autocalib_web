@@ -116,6 +116,7 @@ export const CreateTask = ({ from, callback }) => {
         const data = {
             task_alias: task_alias,
             task_id: taskId,
+            from: from,
         }
 
         try {

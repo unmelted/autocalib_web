@@ -342,3 +342,39 @@ exports.parsingDscList = async function (taskId) {
         });
     });
 }
+exports.getCalibPtsFile = async function (taskId) {
+    let pts = ''
+    const baseDir = process.env.AUTO_CALIB_DIR;
+    const fullPath = path.join(String(baseDir), String(taskId)) + '/';
+    console.log(fullPath);
+
+    return new Promise((resolve, reject) => {
+        fs.readdir(fullPath, function (err, filelist) {
+
+            for (const file of filelist) {
+                const ext = file.split('.');
+                if (ext[1].toLowerCase() === 'pts') {
+                    ptsfile = file;
+                    bPtscheck = true;
+                }
+                else if (ext[1].toLowerCase() === 'jpg' || ext[1].toLowerCase() === 'png' ||
+                    ext[1].toLowerCase() === 'jpeg') {
+                    ext_sub = ext[0].split('_');
+                    ext_name = ext_sub[1];
+                    console.log('ext_name : ', ext_name);
+                    imglist.push(ext_sub[0])
+                }
+
+            }
+
+            if (ptsfile == '') {
+                resolve(-1)
+            }
+
+            pts = fullPath + ptsfile;
+            console.log("parsingGroupinfo : " + pts)
+        })
+
+        resolve(pts)
+    });
+}

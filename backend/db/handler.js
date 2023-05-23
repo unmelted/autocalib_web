@@ -62,7 +62,7 @@ exports.updateTask = function (params) {
                 resolve(-1)
             }
             console.log(" update task param : ", params)
-            db.queryParams("UPDATE task SET alias = $1 WHERE task_id = $2;", params, (err) => {
+            db.queryParams("UPDATE task SET alias = $1, wherefrom = $2 WHERE task_id = $3;", params, (err) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
@@ -281,7 +281,7 @@ exports.selectDatewithinRange = function () {
                 resolve(-1);
             }
 
-            db.query("SELECT a.task_no, a.task_id, a.createdate, a.alias, a.task_path, count(distinct b.request_id)\
+            db.query("SELECT a.task_no, a.task_id, a.createdate, a.alias, a.task_path, count(distinct b.request_id), a.wherefrom \
             FROM task as a LEFT OUTER JOIN task_request as b \
             ON a.task_id = b.task_id \
             WHERE a.createdate > (SELECT current_date - 7) and a.task_id != '-1' \

@@ -36,10 +36,11 @@ export const TaskHistory = ({ from, callback }) => {
 		callback('change_step2_from_create_exodus')
 	}
 
-	const onHandleRowClick = async (taskId, task_path) => {
+	const onHandleRowClick = async (taskId, task_path, wherefrom) => {
 		if (from === 'kairos') {
 			console.log("history table row is clicked ", taskId, task_path)
 			changeCommon({ selectedTaskId: taskId })
+			changeCommon({ selectedTask_uploadType: wherefrom })
 
 			callback('change_step2')
 		}
@@ -66,9 +67,16 @@ export const TaskHistory = ({ from, callback }) => {
 	}
 
 	const TaskHistoryRecords = () => {
+
+		let filteredTasks = tasks;
+		if (from === 'exodus') {
+			console.log('from exodus filtered..')
+			filteredTasks = tasks.filter(task => task.wherefrom !== 'kairos');
+		}
+
 		return (
-			tasks.map((task =>
-				<tr key={task.task_no} onClick={() => onHandleRowClick(task.task_id, task.task_path)} >
+			filteredTasks.map((task =>
+				<tr key={task.task_no} onClick={() => onHandleRowClick(task.task_id, task.task_path, task.wherefrom)} >
 					<td> {task.task_no}</td>
 					<td> {task.task_id}</td>
 					<td>{task.createdate}</td>

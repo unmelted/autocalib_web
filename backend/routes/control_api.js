@@ -47,7 +47,7 @@ router.post('/addalias', async (req, res) => {
     console.log("add alias is called ");
 
     try {
-        result = await handler.updateTask([req.body.task_alias, req.body.task_id]);
+        result = await handler.updateTask([req.body.task_alias, req.body.from, req.body.task_id]);
         res.status(200).json({
             message: 'success',
         });
@@ -328,6 +328,7 @@ router.post('/updatetracker', async (req, res) => {
 
     const data = req.body
     console.log("update tracker ", data)
+    let calib_type = ''
     let calib_data = {}
     let code = 0
 
@@ -336,7 +337,13 @@ router.post('/updatetracker', async (req, res) => {
         console.log("update multi tracker end ")
 
         if (result == 0) {
-            code, calib_data = await handler.getCalibJobId(req.body.tracker_task_id, req.body.info_map)
+            if (req.body.upload_type === 'exodus') {
+                calib_type = 'exodus'
+                code, calib_data = await handler.getCalibJobId(req.body.tracker_task_id, req.body.info_map)
+            } else {
+                calib_type = 'file'
+                calib_file = await taskManager.getCalibPtsFile(req.body.taskId)
+            }
         }
 
         if (result == 0) {
@@ -348,7 +355,11 @@ router.post('/updatetracker', async (req, res) => {
 
                 let tracker = {}
                 tracker.camera_id = cam
-                tracker.calib_job_id = calib_data.data[cam]
+                if (calib_type === 'file') {
+                    tracker.calib_job_id = -1
+                } else {
+                    tracker.calib_job_id = calib_data.data[cam]
+                }
                 tracker.tracker_ip = req.body.info_map[cam].tracker_url
                 tracker.stream_url = req.body.info_map[cam].stream_url
                 trackers_info.push(tracker)
@@ -360,6 +371,8 @@ router.post('/updatetracker', async (req, res) => {
                     method: 'POST',
                     body: {
                         task_id: req.body.tracker_task_id,
+                        calib_type: calib_type,
+                        calib_file: calib_file,
                         tracker: trackers_info,
                     },
                     json: true

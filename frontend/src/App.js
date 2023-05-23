@@ -22,6 +22,7 @@ const initConfigure = {
 const initCommon = {
   selectedTaskId: '',
   selectedTaskPath: '',
+  selectedTask_uploadType: '', //exodus or kairos
   selectedHistoryId: '',
   selectedRequestId: '',
   selectedTaskImages: [],
@@ -31,7 +32,8 @@ const initCommon = {
   selectedJobId: '',    //for exodus canvas
   selectedGroupId: '',  //for exodus canvas
   trackerTaskId: '',
-  trackerTask_exodusId: '',
+  trackerCalibType: '',
+  trackerCalibFile: '',
 }
 
 function App() {
