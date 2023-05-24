@@ -16,8 +16,6 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
     const { common, changeCommon } = useContext(commonData)
     const [taskId, setTaskId] = useState(common.selectedTaskId);
     const [jobId, setJobId] = useState(common.selectedTaskId);
-    const [trackerCalibType, setTrackerCalibType] = useState(common.selectedTask_trackerCalibType);
-    const [trackerCalibFile, setTrackerCalibFile] = useState(common.selectedTask_trackerCalibFile);
 
     const [selectedList, setSelectedList] = useState(common.selectedTaskImages);
     const [infoMap, setInfoMap] = useState(initMap);
@@ -60,8 +58,6 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
             console.log('updateInfoMap success');
             setTaskStatus('ready');
             const newMap = { ...infoMap };
-            setTrackerCalibType(response.data.calib_type)
-            setTrackerCalibFile(response.data.calib_file)
 
             for (let i = 0; i < Object.keys(newMap).length; i++) {
                 console.log(" i : ", i, newMap[Object.keys(infoMap)[i]].tracker_url);

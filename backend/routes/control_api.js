@@ -328,7 +328,8 @@ router.post('/updatetracker', async (req, res) => {
 
     const data = req.body
     console.log("update tracker ", data)
-    let calib_type = ''
+    let calib_type = 'None'
+    let calib_file = 'None'
     let calib_data = {}
     let code = 0
 
@@ -337,12 +338,17 @@ router.post('/updatetracker', async (req, res) => {
         console.log("update multi tracker end ")
 
         if (result == 0) {
-            if (req.body.upload_type === 'exodus') {
+            if (req.body.upload_type === 'exodus' || req.body.upload_type === null) {
                 calib_type = 'exodus'
                 code, calib_data = await handler.getCalibJobId(req.body.tracker_task_id, req.body.info_map)
+                console.log("exodus === calib data ", code, calib_data)
+                if (code < 0) {
+                    res.status(500).json({ message: 'There is no generation history' })
+                }
             } else {
                 calib_type = 'file'
-                calib_file = await taskManager.getCalibPtsFile(req.body.taskId)
+                result, calib_file = await taskManager.getCalibPtsFile(req.body.task_id)
+                console.log("kairos upload  calib data ", calib_type, calib_file)
             }
         }
 
@@ -350,15 +356,15 @@ router.post('/updatetracker', async (req, res) => {
 
             let trackers_info = []
             for (const cam of Object.keys(req.body.info_map)) {
-                console.log(calib_data)
-                console.log(calib_data.data[cam])
 
                 let tracker = {}
                 tracker.camera_id = cam
                 if (calib_type === 'file') {
                     tracker.calib_job_id = -1
+
                 } else {
                     tracker.calib_job_id = calib_data.data[cam]
+                    console.log("calib job id ", tracker.calib_job_id)
                 }
                 tracker.tracker_ip = req.body.info_map[cam].tracker_url
                 tracker.stream_url = req.body.info_map[cam].stream_url

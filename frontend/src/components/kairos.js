@@ -28,6 +28,7 @@ function Kairos(props) {
 		console.log("change callback :  ", status)
 		if (status === 'change_step2') {
 			setStep3(common.selectedTaskId)
+			setStep4('none')
 		}
 		else if (status === 'change_step3') {
 			const newMap = {};

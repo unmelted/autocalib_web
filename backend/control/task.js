@@ -342,6 +342,7 @@ exports.parsingDscList = async function (taskId) {
         });
     });
 }
+
 exports.getCalibPtsFile = async function (taskId) {
     let pts = ''
     const baseDir = process.env.AUTO_CALIB_DIR;
@@ -355,26 +356,18 @@ exports.getCalibPtsFile = async function (taskId) {
                 const ext = file.split('.');
                 if (ext[1].toLowerCase() === 'pts') {
                     ptsfile = file;
-                    bPtscheck = true;
+                    break
                 }
-                else if (ext[1].toLowerCase() === 'jpg' || ext[1].toLowerCase() === 'png' ||
-                    ext[1].toLowerCase() === 'jpeg') {
-                    ext_sub = ext[0].split('_');
-                    ext_name = ext_sub[1];
-                    console.log('ext_name : ', ext_name);
-                    imglist.push(ext_sub[0])
-                }
-
             }
 
             if (ptsfile == '') {
-                resolve(-1)
+                resolve(-1, 0)
             }
-
-            pts = fullPath + ptsfile;
-            console.log("parsingGroupinfo : " + pts)
+            else {
+                pts = fullPath + ptsfile;
+                console.log("found pts file : " + pts)
+                resolve(0, pts)
+            }
         })
-
-        resolve(pts)
     });
 }
