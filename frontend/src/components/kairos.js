@@ -32,15 +32,17 @@ function Kairos(props) {
 		}
 		else if (status === 'change_step3') {
 			const newMap = {};
+			let i = 0;
 			common.selectedTaskImages.forEach((cam) => {
 				newMap[cam] = {
-					group: 'group1',
+					group: common.selectedTaskGroups[i],
 					stream_url: './videos/3082_270_330.mp4',
 					tracker_url: '10.82.5.148',
 					tracker_status: 'none',
 					job_id: 100,
 					message: '-',
 				};
+				i++;
 			})
 			console.log("initMapdata : ", newMap);
 

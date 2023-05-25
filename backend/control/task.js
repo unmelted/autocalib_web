@@ -351,6 +351,7 @@ exports.getCalibPtsFile = async function (taskId) {
 
     return new Promise((resolve, reject) => {
         fs.readdir(fullPath, function (err, filelist) {
+            ptsfile = ''
 
             for (const file of filelist) {
                 const ext = file.split('.');
@@ -361,12 +362,12 @@ exports.getCalibPtsFile = async function (taskId) {
             }
 
             if (ptsfile == '') {
-                resolve(-1, 0)
+                resolve([-1, 0])
             }
             else {
                 pts = fullPath + ptsfile;
                 console.log("found pts file : " + pts)
-                resolve(0, pts)
+                resolve([0, pts])
             }
         })
     });

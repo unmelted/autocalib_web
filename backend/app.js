@@ -4,6 +4,7 @@ const bodyParser = require('body-parser')
 const route_file = require('./routes/files')
 const route_api = require('./routes/exodus_api')
 const route_control = require('./routes/control_api')
+const route_4dreplay = require('./routes/4dreplay')
 const path = require("path");
 const app = express()
 
@@ -43,6 +44,8 @@ app.use('/public', express.static('public'))
 app.use('/file', route_file)
 app.use('/api', route_api)
 app.use('/control', route_control)
+app.use('/4dreplay', route_4dreplay)
+
 app.get('/favicon.ico', (req, res) => res.status(204));
 const port = process.env.PORT || 4000
 const server = app.listen(port, () => {

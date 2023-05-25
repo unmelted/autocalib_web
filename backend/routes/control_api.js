@@ -347,7 +347,9 @@ router.post('/updatetracker', async (req, res) => {
                 }
             } else {
                 calib_type = 'file'
-                result, calib_file = await taskManager.getCalibPtsFile(req.body.task_id)
+                const [result, c_file] = await taskManager.getCalibPtsFile(req.body.task_id)
+                calib_file = c_file
+                console.log("result, calib_file", result, calib_file)
                 console.log("kairos upload  calib data ", calib_type, calib_file)
             }
         }
@@ -366,8 +368,11 @@ router.post('/updatetracker', async (req, res) => {
                     tracker.calib_job_id = calib_data.data[cam]
                     console.log("calib job id ", tracker.calib_job_id)
                 }
+
+                tracker.group = req.body.info_map[cam].group
                 tracker.tracker_ip = req.body.info_map[cam].tracker_url
                 tracker.stream_url = req.body.info_map[cam].stream_url
+                console.log("add tracker ", tracker)
                 trackers_info.push(tracker)
             }
 

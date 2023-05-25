@@ -11,7 +11,6 @@ const taskManager = require('../control/task.js')
 const upload_images = (destPath) => {
     const storage = multer.diskStorage({
         destination: (req, file, cb) => {
-            // cb(null, process.env.AUTO_CALIB_DIR);
             cb(null, destPath);
         },
         filename: (req, file, cb) => {
@@ -47,12 +46,13 @@ const upload_images = (destPath) => {
 
 router.post('/upload', async (req, res, next) => {
 
+    console.log("upload post start : " + req)
+
     const imageDir = process.env.AUTO_CALIB_DIR;
-    console.log("upload post start : " + imageDir)
     let taskNo = 0;
     let taskId = 0;
     [taskNo, taskId, fullPath] = await taskManager.createNewTask()
-    console.log("post upload: " + fullPath)
+
 
 
     if (taskNo == -1) {
