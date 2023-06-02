@@ -1,6 +1,10 @@
 require("dotenv").config();
 const fs = require('fs');
 const path = require("path");
+const express = require('express'),
+    multer = require('multer'),
+    router = express.Router();
+
 
 var handler = require('../db/handler.js')
 
@@ -371,4 +375,44 @@ exports.getCalibPtsFile = async function (taskId) {
             }
         })
     });
+}
+
+
+exports.upload_images = function (destPath) {
+    console.log("start upload images..")
+
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, destPath);
+        },
+        filename: (req, file, cb) => {
+            cb(null, file.originalname);
+        }
+    });
+    const isValidFile = (file) => {
+        const mimeType = file.mimetype;
+        let ext = file.originalname.split('.');
+
+        ext = ext.length > 1 ? ext[1].toLowerCase() : '';
+
+        const isValidMimeType = (mimeType == "image/png" || mimeType == "image/jpeg");
+        const isValidExt = (ext == "png" || ext == "jpg" || ext == "jpeg");
+
+        return (isValidMimeType && isValidExt) || ext == "pts" || ext == "txt" || ext == "adj";;
+    }
+
+    const upload = multer({
+        storage: storage,
+        fileFilter: (req, file, cb) => {
+            if (isValidFile(file)) {
+                cb(null, true);
+            } else {
+                cb(null, false);
+                return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+            }
+        }
+    });
+
+    console.log('end upload images..')
+    return upload;
 }

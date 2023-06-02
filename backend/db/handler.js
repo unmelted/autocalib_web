@@ -300,6 +300,32 @@ exports.selectDatewithinRange = function () {
     });
 };
 
+exports.selectTrackerDatewithinRange = function () {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                resolve(-1);
+            }
+
+            db.query("SELECT tracker_task_id, task_id, createdate, kairos_task_id \
+            FROM multi_tracker \
+            WHERE createdate > (SELECT current_date - 7) and command_status != 'destroy' \
+            ORDER BY tracker_task_id DESC;", (err, res) => {
+                client.release(true);
+                if (err) {
+                    console.log(err)
+                    resolve(-1)
+                }
+                else {
+                    console.log('select Date within range  query success', res.rows.length);
+                    resolve(res.rows)
+                }
+            }, client);
+        });
+    });
+};
+
 exports.selectRequestbyTaskId = function (taskId) {
     return new Promise((resolve, reject) => {
         db.getClient((errClient, client) => {

@@ -8,41 +8,44 @@ const express = require('express'),
 const handler = require('../db/handler.js')
 const taskManager = require('../control/task.js')
 
-const upload_images = (destPath) => {
-    const storage = multer.diskStorage({
-        destination: (req, file, cb) => {
-            cb(null, destPath);
-        },
-        filename: (req, file, cb) => {
-            cb(null, file.originalname);
-        }
-    });
-    const isValidFile = (file) => {
-        const mimeType = file.mimetype;
-        let ext = file.originalname.split('.');
+// exports.upload_images = function (destPath) {
+//     console.log("start upload images..")
 
-        ext = ext.length > 1 ? ext[1].toLowerCase() : '';
+//     const storage = multer.diskStorage({
+//         destination: (req, file, cb) => {
+//             cb(null, destPath);
+//         },
+//         filename: (req, file, cb) => {
+//             cb(null, file.originalname);
+//         }
+//     });
+//     const isValidFile = (file) => {
+//         const mimeType = file.mimetype;
+//         let ext = file.originalname.split('.');
 
-        const isValidMimeType = (mimeType == "image/png" || mimeType == "image/jpeg");
-        const isValidExt = (ext == "png" || ext == "jpg" || ext == "jpeg");
+//         ext = ext.length > 1 ? ext[1].toLowerCase() : '';
 
-        return (isValidMimeType && isValidExt) || ext == "pts" || ext == "txt" || ext == "adj";;
-    }
+//         const isValidMimeType = (mimeType == "image/png" || mimeType == "image/jpeg");
+//         const isValidExt = (ext == "png" || ext == "jpg" || ext == "jpeg");
 
-    const upload = multer({
-        storage: storage,
-        fileFilter: (req, file, cb) => {
-            if (isValidFile(file)) {
-                cb(null, true);
-            } else {
-                cb(null, false);
-                return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
-            }
-        }
-    });
+//         return (isValidMimeType && isValidExt) || ext == "pts" || ext == "txt" || ext == "adj";;
+//     }
 
-    return upload;
-}
+//     const upload = multer({
+//         storage: storage,
+//         fileFilter: (req, file, cb) => {
+//             if (isValidFile(file)) {
+//                 cb(null, true);
+//             } else {
+//                 cb(null, false);
+//                 return cb(new Error('Only .png, .jpg and .jpeg format allowed!'));
+//             }
+//         }
+//     });
+
+//     console.log('end upload images..')
+//     return upload;
+// }
 
 router.post('/upload', async (req, res, next) => {
 
@@ -68,7 +71,7 @@ router.post('/upload', async (req, res, next) => {
     //     });
     //   } for delete already existed
 
-    const upload = upload_images(fullPath);
+    const upload = taskManager.upload_images(fullPath);
     upload.array('imgCollection', 1000);
     const uploadObj = util.promisify(upload.any());
 

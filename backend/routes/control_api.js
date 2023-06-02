@@ -76,6 +76,23 @@ router.get('/gettask', async (req, res) => {
     }
 })
 
+router.get('/get_trackertask', async (req, res) => {
+
+    console.log("get_trackertask is called ");
+
+    try {
+        result = await handler.selectTrackerDatewithinRange();
+        res.status(200).json({
+            message: 'success',
+            task_array: result,
+        });
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+})
+
 router.get('/getrequest/:task_id', async (req, res) => {
 
     console.log("getrequest is called ", req.params.task_id);
@@ -504,7 +521,7 @@ router.put('/tracker_stop/:job_id', async (req, res) => {
             json: true
         }
 
-        console.log("send start command to kairos ")
+        console.log("send stop command to kairos ")
         request.put(options, async function (err, response, body) {
             if (!err) {
                 console.log("Stop Response: " + JSON.stringify(body));
@@ -539,7 +556,7 @@ router.put('/tracker_destroy/:job_id', async (req, res) => {
             json: true
         }
 
-        console.log("send start command to kairos ")
+        console.log("send destroy command to kairos ")
         request.put(options, async function (err, response, body) {
             if (!err) {
                 console.log("destroy Response: " + JSON.stringify(body));

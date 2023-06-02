@@ -14,13 +14,17 @@ import { CreateTask } from './create_task.js';
 import { TaskHistory } from './task_history.js';
 import { TaskUnityTable } from './task_unity';
 import { TaskInfoMap } from './task_infomap';
+import { TaskTrackerHistory } from './task_tracker_history.js';
+import { HeatmapExample } from './task_visualize.js';
+
 
 function Kairos(props) {
 	const [step0, setStep0] = useState('both'); // none | both |  create  | play
-	const [step1, setStep1] = useState('both'); // none | both | upload | exodus
-	const [step2, setStep2] = useState('none'); //none | upload | history
+	const [step1, setStep1] = useState('both'); // none | both | upload | exodus //history_tracker
+	const [step2, setStep2] = useState('none'); //none | upload | history // history_infomap
 	const [step3, setStep3] = useState('none'); //none | task_id
 	const [step4, setStep4] = useState('none'); //none | task_id * imagelist
+	const [step5, setStep5] = useState('none'); //none | visualze
 	const { common, changeCommon } = useContext(commonData)
 	const [infoMap, setInfoMap] = useState({});
 
@@ -29,6 +33,10 @@ function Kairos(props) {
 		if (status === 'change_step2') {
 			setStep3(common.selectedTaskId)
 			setStep4('none')
+			setStep5('testHeatmap')
+		}
+		else if (status === 'change_step1_trakcker_history') {
+			console.log('change_step1_trakcker_history')
 		}
 		else if (status === 'change_step3') {
 			const newMap = {};
@@ -175,7 +183,9 @@ function Kairos(props) {
 		}
 		else if (step0 === 'play') {
 			return (
-				<></>
+				<>
+					<TaskTrackerHistory from={'kairos'} callback={callback} />
+				</>
 			)
 		}
 		else {
@@ -235,6 +245,18 @@ function Kairos(props) {
 		}
 	}
 
+	const Step5_Module = () => {
+		if (step5 !== 'none') {
+			return (
+				<>
+					<HeatmapExample from={step0} callback={callback} initMap={infoMap} />
+				</>
+			)
+		} else {
+			return (<></>)
+		}
+	}
+
 	return (
 		<>
 			<div className="App">
@@ -256,6 +278,9 @@ function Kairos(props) {
 					</Row>
 					<Row>
 						<Step4_Module />
+					</Row>
+					<Row>
+						<Step5_Module />
 					</Row>
 				</Container>
 			</div>
