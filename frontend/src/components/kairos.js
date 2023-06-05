@@ -15,16 +15,16 @@ import { TaskHistory } from './task_history.js';
 import { TaskUnityTable } from './task_unity';
 import { TaskInfoMap } from './task_infomap';
 import { TaskTrackerHistory } from './task_tracker_history.js';
-import { HeatmapExample } from './task_visualize.js';
+import { TaskVisualize } from './task_visualize.js';
 
 
 function Kairos(props) {
 	const [step0, setStep0] = useState('both'); // none | both |  create  | play
 	const [step1, setStep1] = useState('both'); // none | both | upload | exodus //history_tracker
-	const [step2, setStep2] = useState('none'); //none | upload | history // history_infomap
-	const [step3, setStep3] = useState('none'); //none | task_id
+	const [step2, setStep2] = useState('none'); //none | upload | history // visualize_prepare
+	const [step3, setStep3] = useState('none'); //none | task_id // visualize
 	const [step4, setStep4] = useState('none'); //none | task_id * imagelist
-	const [step5, setStep5] = useState('none'); //none | visualze
+	const [step5, setStep5] = useState('none'); //none | 
 	const { common, changeCommon } = useContext(commonData)
 	const [infoMap, setInfoMap] = useState({});
 
@@ -35,8 +35,9 @@ function Kairos(props) {
 			setStep4('none')
 			setStep5('testHeatmap')
 		}
-		else if (status === 'change_step1_trakcker_history') {
-			console.log('change_step1_trakcker_history')
+		else if (status === 'change_step2_from_trakcker') {
+			console.log('change_step2_from_trakcker')
+			setStep1('visualie_prepare')
 		}
 		else if (status === 'change_step3') {
 			const newMap = {};
@@ -182,6 +183,7 @@ function Kairos(props) {
 			)
 		}
 		else if (step0 === 'play') {
+
 			return (
 				<>
 					<TaskTrackerHistory from={'kairos'} callback={callback} />
@@ -208,6 +210,13 @@ function Kairos(props) {
 			return (
 				<>
 					<TaskHistory from={'kairos'} callback={callback} />
+				</>
+			)
+		}
+		else if (step1 === 'history_infomap') {
+			return (
+				<>
+					<TaskVisualize from={step1} callback={callback} initMap={infoMap} />
 				</>
 			)
 		}
@@ -249,7 +258,7 @@ function Kairos(props) {
 		if (step5 !== 'none') {
 			return (
 				<>
-					<HeatmapExample from={step0} callback={callback} initMap={infoMap} />
+					<TaskVisualize from={step0} callback={callback} initMap={infoMap} />
 				</>
 			)
 		} else {

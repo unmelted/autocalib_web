@@ -3,7 +3,7 @@ import React, { useState, useRef, useEffect, useContext, Component } from 'react
 // import { ResponsiveHeatMap, ResponsiveHeatMapCanvas } from '@nivo/heatmap';
 import Heatmap from 'heatmap.js';
 
-export const HeatmapExample = () => {
+export const TaskVisualize = () => {
 
     console.log("heatmap example start.. ")
 

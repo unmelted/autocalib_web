@@ -308,9 +308,9 @@ exports.selectTrackerDatewithinRange = function () {
                 resolve(-1);
             }
 
-            db.query("SELECT tracker_task_id, task_id, createdate, kairos_task_id \
+            db.query("SELECT tracker_task_id, task_id, createdate, kairos_task_id, command_status, run_status \
             FROM multi_tracker \
-            WHERE createdate > (SELECT current_date - 7) and command_status != 'destroy' \
+            WHERE createdate > (SELECT current_date - 7) \
             ORDER BY tracker_task_id DESC;", (err, res) => {
                 client.release(true);
                 if (err) {
@@ -463,7 +463,7 @@ exports.createMultiTracker = function (tr_taskId, taskId, camCount) {
                 resolve(-1, 0)
             }
 
-            db.queryParams("INSERT INTO multi_tracker (tracker_task_id ,task_id, cam_count) VALUES ($1, $2, $3);", [tr_taskId, taskId, camCount], (err) => {
+            db.queryParams("INSERT INTO multi_tracker (tracker_task_id ,task_id, cam_count, command_status) VALUES ($1, $2, $3, $4);", [tr_taskId, taskId, camCount, 'created'], (err) => {
                 if (err) {
                     console.log(err)
                     resolve(-1, 0);
@@ -512,7 +512,7 @@ exports.updateMultiTracker = function (tr_taskId, info_map) {
     });
 }
 
-exports.updateMultiTracker_jobid = function (tr_taskId, job_id) {
+exports.updateMultiTracker = function (tr_taskId, type, data) {
     return new Promise((resolve, reject) => {
 
         db.getClient((errClient, client) => {
@@ -520,20 +520,73 @@ exports.updateMultiTracker_jobid = function (tr_taskId, job_id) {
                 console.log("client connect err " + err)
                 resolve(-1)
             }
+            if (type === 'job_id') {
+                db.queryParams("UPDATE multi_tracker SET kairos_task_id = $2 where tracker_task_id = $1;", [tr_taskId, data], (err) => {
+                    client.release(true);
+                    if (err) {
+                        console.log(err)
+                        resolve(-1);
+                    }
+                    console.log('updateMultiTracker job_id update success');
+                    resolve(0)
 
-            db.queryParams("UPDATE multi_tracker SET kairos_task_id = $2 where tracker_task_id = $1;", [tr_taskId, job_id], (err) => {
+                })
+            }
+            else if (type === 'status') {
+                db.queryParams("UPDATE multi_tracker SET command_status = $2 where tracker_task_id = $1;", [tr_taskId, data], (err) => {
+                    client.release(true);
+                    if (err) {
+                        console.log(err)
+                        resolve(-1);
+                    }
+                    console.log('updateMultiTracker command status update success');
+                    resolve(0)
+                })
+            }
+            else if (type === 'run_status') {
+                db.queryParams("UPDATE multi_tracker SET run_status = $2 where tracker_task_id = $1;", [tr_taskId, data], (err) => {
+                    client.release(true);
+                    if (err) {
+                        console.log(err)
+                        resolve(-1);
+                    }
+                    console.log('updateMultiTracker run_status update success');
+                    resolve(0)
+                })
+            }
+
+        }, client);
+    });
+};
+
+exports.getTrackerInfoMap = async function (taskId) {
+    return new Promise((resolve, reject) => {
+        db.getClient((errClient, client) => {
+            if (errClient) {
+                console.log("client connect err " + err)
+                reject(-1)
+            }
+
+            db.queryParams(`SELECT info_map FROM multi_tracker WHERE tracker_task_id = $1; `, [taskId], (err, res) => {
                 client.release(true);
                 if (err) {
                     console.log(err)
-                    resolve(-1);
+                    reject(-1);
                 }
-                console.log('updateMultiTracker job_id update success');
-                resolve(0)
+                else {
+                    if (res.rows.length == 1) {
+                        console.log('get infomap query success ' + res.rows[0], res.rows[0].info_map);
+                        resolve(res.rows[0])
+                    }
+                    else {
+                        console.log("get infomap query no rows ")
+                        reject(-10)
+                    }
+                }
             }, client);
         });
     });
 }
-
 
 exports.getCalibJobId = async function (task_id, info_map) {
 

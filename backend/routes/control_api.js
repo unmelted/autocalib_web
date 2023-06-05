@@ -82,11 +82,51 @@ router.get('/get_trackertask', async (req, res) => {
 
     try {
         result = await handler.selectTrackerDatewithinRange();
-        res.status(200).json({
-            message: 'success',
-            task_array: result,
-        });
 
+        if (result === -1) {
+            res.status(500).json({})
+        }
+        else if (result.length === 0) {
+            res.status(200).json({
+                message: 'no records',
+                task_array: result,
+            });
+        }
+        else {
+            for (const row of result) {
+                console.log(row)
+                console.log("get tracker status  : " + row.kairos_task_id)
+                if (row.kairos_task_id !== null || parseInt(row.kairos_task_id) > 0) {
+                    const options = {
+                        uri: process.env.AUTO_CALIB_EXODUS_URL + '/kairos/status/' + row.kairos_task_id,
+                        method: 'GET',
+                        json: true
+                    }
+
+                    console.log("Call Exodus API // request : " + options.uri);
+                    request.get(options, async function (err, response, body) {
+                        if (!err) {
+                            result = await handler.updateMultiTracker(req.body.tracker_task_id, 'run_status', body.status)
+                            console.log("Response: " + JSON.stringify(body));
+                            row.run_status = body.status
+                            row.message = body.message
+                        } else {
+                            console.log(err)
+                            res.status(500).json({})
+                        }
+                    });
+                }
+                else {
+                    row.run_status = 'None'
+                    row.message = 'None'
+                }
+            }
+
+            res.status(200).json({
+                message: 'success',
+                task_array: result,
+            });
+        }
     } catch (err) {
         console.log(err)
         res.status(500).json({})
@@ -410,7 +450,7 @@ router.post('/updatetracker', async (req, res) => {
                 request.post(options, async function (err, response, body) {
                     if (!err) {
                         console.log("Response: " + JSON.stringify(body));
-                        result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+                        result = await handler.updateMultiTracker(req.body.tracker_task_id, body.job_id)
 
                         if (result < 0) {
                             console.log(err)
@@ -445,6 +485,41 @@ router.post('/updatetracker', async (req, res) => {
         res.status(500).json({})
     }
 });
+
+router.get('/get_trackerinfomap/:task_id', async (req, res) => {
+
+    console.log("get_trackerinfomap task id : ", req.params.task_id)
+
+    try {
+        data = await handler.getTrackerInfoMap(req.params.task_id)
+        console.log("getTrackerInfomap end ", JSON.parse(data.info_map))
+        if (data < 0) {
+            console.log(err)
+            res.status(500).json({ message: 'fail' })
+
+        }
+        else {
+            if (data.info_map === null) {
+                res.status(200).json({
+                    message: 'no data',
+                    tracker_info: '',
+                });
+
+            } else {
+                res.status(200).json({
+                    message: 'success',
+                    tracker_info: JSON.parse(data.info_map),
+                });
+            }
+
+        }
+
+    } catch (err) {
+        console.log(err)
+        res.status(500).json({})
+    }
+});
+
 
 router.post('/ping', async (req, res) => {
 
@@ -490,7 +565,7 @@ router.put('/tracker_start/:job_id', async (req, res) => {
         request.put(options, async function (err, response, body) {
             if (!err) {
                 console.log("Start Response: " + JSON.stringify(body));
-                // result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+                result = await handler.updateMultiTracker(req.body.tracker_task_id, 'status', 'start')
 
                 res.status(200).json({
                     result: body.result,
@@ -525,7 +600,7 @@ router.put('/tracker_stop/:job_id', async (req, res) => {
         request.put(options, async function (err, response, body) {
             if (!err) {
                 console.log("Stop Response: " + JSON.stringify(body));
-                // result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+                result = await handler.updateMultiTracker(req.body.tracker_task_id, 'status', 'stop')
 
                 res.status(200).json({
                     result: body.result,
@@ -560,7 +635,7 @@ router.put('/tracker_destroy/:job_id', async (req, res) => {
         request.put(options, async function (err, response, body) {
             if (!err) {
                 console.log("destroy Response: " + JSON.stringify(body));
-                // result = await handler.updateMultiTracker_jobid(req.body.tracker_task_id, body.job_id)
+                result = await handler.updateMultiTracker(req.body.tracker_task_id, 'status', 'destroy')
 
                 res.status(200).json({
                     result: body.result,

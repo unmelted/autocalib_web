@@ -28,7 +28,7 @@ export const TaskInfoMap = ({ from, callback, initMap }) => {
 
     const ipRegex = /^([0-9]{1,3}\.){3}[0-9]{1,3}$/;
 
-    console.log("Task Info map ", taskId, selectedList);
+    console.log("Task Info map ", from, taskId, selectedList);
     console.log("task info map initMap : ", initMap);
 
 
