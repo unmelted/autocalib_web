@@ -1,13 +1,15 @@
 import React, { useState, useEffect, useContext } from 'react';
-import Modal from 'react-modal';
 import axios from 'axios';
-import Button from 'react-bootstrap/Button'
 import Table from 'react-bootstrap/Table';
-import { commonData } from '../App.js'
+
+import { commonData } from '../App.js';
+import { PopupMessage } from './popup.js';
+
 import '../css/task_library.css';
 
 
 export const TaskTrackerHistory = ({ from, callback }) => {
+
 	const { common, changeCommon } = useContext(commonData)
 
 	const today = new Date();
@@ -22,27 +24,12 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 	const [infoMap, setInfoMap] = useState({});
 	const [isModalOpen, setIsModalOpen] = useState(false);
 
-	const PopupMessage = ({ show, handleClose }) => {
-		console.log("popup message is called", show)
-		return (
-			<Modal show={show} onHide={handleClose}>
-				<Modal.Header closeButton>
-					<Modal.Title>Message</Modal.Title>
-				</Modal.Header>
-				<Modal.Body>
-					<p>kairos_taskId is null</p>
-				</Modal.Body>
-				<Modal.Footer>
-					<Button variant="secondary" onClick={handleClose}>
-						Close
-					</Button>
-				</Modal.Footer>
-			</Modal>
-		);
-	};
-
 	const handleCloseModal = () => {
 		setIsModalOpen(false);
+	};
+
+	const handleOpenModal = () => {
+		setIsModalOpen(true);
 	};
 
 	const onHandleRowClick = async (tr_taskId, taskId, kairos_taskId) => {
@@ -51,8 +38,8 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 			getTrackerInfoMap(tr_taskId)
 		}
 		else {
-			console.log("is it callded ?", kairos_taskId)
-			setIsModalOpen(true);
+			console.log("is it callded ?")
+			handleOpenModal()
 		}
 	}
 
@@ -148,7 +135,10 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 		return (
 			<>
 				<div className='table-container1'>
-					<PopupMessage show={isModalOpen} handleClose={handleCloseModal} />
+					<PopupMessage show={isModalOpen}
+						handleClose={handleCloseModal}
+						title="WARNING"
+						content={<p>This task is not available for visualization.</p>} />
 					<p id="task-title" ><img src='./asset/checkbox.png' width="20px" alt="" />  TASK LIST : {daterange}</p>
 					<Table id="table-body" striped bordered variant="dark">
 						<thead>
