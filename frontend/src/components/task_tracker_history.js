@@ -38,7 +38,6 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 			getTrackerInfoMap(tr_taskId)
 		}
 		else {
-			console.log("is it callded ?")
 			handleOpenModal()
 		}
 	}
@@ -53,7 +52,7 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 		}
 
 		if (response && response.data.task_array) {
-			console.log('gettasks response', response.data.task_array);
+			console.log('get tracker tasks response', response.data.task_array);
 			setTasks(response.data.task_array)
 			setTasksLoaded(true)
 		}
@@ -78,11 +77,12 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 			setInfoMap(response.data.tracker_info)
 			setTrackerTaskId(taskId)
 
-			callback('chage_step2_from_tracker')
+			callback('change_step2_from_tracker')
 		}
 		else {
 			setInfoMap({})
 			setTrackerTaskId('')
+			handleOpenModal()
 		}
 
 	}
@@ -94,7 +94,7 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 	const TaskTrackerHistoryRecords = () => {
 
 		return (
-			tasks.map(((task, index) =>
+			tasks.map((task, index) => (
 				<tr key={task.tracker_task_id} onClick={() => onHandleRowClick(task.tracker_task_id, task.task_id, task.kairos_task_id)} >
 					<td> {index + 1}</td>
 					<td> {task.tracker_task_id}</td>
@@ -104,18 +104,19 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 					<td> {task.run_status}</td>
 				</tr >
 			))
-		)
-	}
+		);
+	};
 
 	const TaskTrackerInfomap = () => {
 		console.log('tracker infomap draw', infoMap)
 		console.log(Object.keys(infoMap))
-		let index = 1;
+		let index = 0;
 
 		return (
 			Object.keys(infoMap).map(key => {
 				const item = infoMap[key];
 				console.log(index, key, item)
+				index = index + 1;
 				return (
 					<tr key={key}>
 						<td>{index}</td>
@@ -125,7 +126,6 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 						<td>{item.stream_url}</td>
 					</tr>
 				);
-				index = index + 1;
 			})
 		)
 	}

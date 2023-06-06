@@ -31,13 +31,14 @@ function Kairos(props) {
 	const callback = (status) => {
 		console.log("change callback :  ", status)
 		if (status === 'change_step2') {
+			console.log("change_step2 is set.. ", common.selectedTaskId)
+			setStep1('none')
 			setStep3(common.selectedTaskId)
 			setStep4('none')
-			setStep5('testHeatmap')
 		}
-		else if (status === 'change_step2_from_trakcker') {
-			console.log('change_step2_from_trakcker')
-			setStep1('visualie_prepare')
+		else if (status === 'change_step2_from_tracker') {
+			console.log('change_step2_from_tracker')
+			setStep1('visualize_prepare')
 		}
 		else if (status === 'change_step3') {
 			const newMap = {};
@@ -67,11 +68,11 @@ function Kairos(props) {
 	}
 
 	const initStep = (step) => {
-		if (step === 0) {
+		if (step0 === 0) {
 			setStep1('none')
 		}
 
-		if (step === 0 || step === 1) {
+		if (step0 === 0 || step === 1) {
 			setStep2('none')
 			setStep3('none')
 			setStep4('none')
@@ -80,7 +81,7 @@ function Kairos(props) {
 
 	useEffect(() => {
 
-	}, [step3])
+	}, [step1, step3])
 
 	const Step0_Module = () => {
 		console.log("step0_module start ")
@@ -128,7 +129,7 @@ function Kairos(props) {
 						<Col xs lg='2'>
 							<Button className='rounded' variant={step0 === 'create' ? 'primary' : 'seconday'}
 								style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-								onClick={() => { initStep(0); setStep0('create'); }}><img src='./asset/plus.png' width='60px' alt='' /><p></p>
+								onClick={() => { initStep(0); setStep0('create'); setStep1('none') }}><img src='./asset/plus.png' width='60px' alt='' /><p></p>
 								CREATE</Button> </Col>
 						<Col xs lg='2'>
 							<Button variant='no'
@@ -138,7 +139,7 @@ function Kairos(props) {
 						<Col xs lg='2'>
 							<Button variant={step0 === 'play' ? 'primary' : 'seconday'}
 								style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
-								onClick={() => { initStep(0); setStep0('play'); }}><img src='./asset/play.png' width='60px' alt='' /> <p></p>
+								onClick={() => { initStep(0); setStep0('play'); setStep1('none') }}><img src='./asset/play.png' width='60px' alt='' /> <p></p>
 								PLAY</Button></Col>
 					</Row>
 					<p></p>
@@ -198,6 +199,7 @@ function Kairos(props) {
 	};
 
 	const Step2_Module = () => {
+		console.log("step2_module start : ", step1);
 
 		if (step1 === 'upload') {
 			return (
@@ -213,7 +215,7 @@ function Kairos(props) {
 				</>
 			)
 		}
-		else if (step1 === 'history_infomap') {
+		else if (step1 === 'visualize_prepare') {
 			return (
 				<>
 					<TaskVisualize from={step1} callback={callback} initMap={infoMap} />
@@ -237,7 +239,8 @@ function Kairos(props) {
 					<TaskUnityTable from={'kairos'} callback={callback} />
 				</>
 			)
-		} else {
+		}
+		else {
 			return (<></>)
 		}
 	}
@@ -258,7 +261,7 @@ function Kairos(props) {
 		if (step5 !== 'none') {
 			return (
 				<>
-					<TaskVisualize from={step0} callback={callback} initMap={infoMap} />
+					{/* <TaskVisualize from={step0} callback={callback} initMap={infoMap} /> */}
 				</>
 			)
 		} else {

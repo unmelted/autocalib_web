@@ -21,6 +21,8 @@ export const TaskUnityTable = ({ from, callback }) => {
     const imageUrl = process.env.REACT_APP_SERVER_IMAGE_URL + '/' + taskId + '/';
     const [selectList, setSelectList] = useState([]);
     const [selectGroupList, setSelectGroupList] = useState([])
+    const [dataDone, setDataDone] = useState(false);
+    // const selectGroupList = []
     const [message, setMessage] = useState("0 Camera selected ");
 
     console.log("Task Unity Table ", taskId, from, imageUrl);
@@ -84,13 +86,19 @@ export const TaskUnityTable = ({ from, callback }) => {
             for (const it of itemData) {
 
                 if (it.name === image) {
-                    setSelectGroupList([...selectGroupList, it.group]);
+                    setSelectGroupList(prevSelectGroupList => [...prevSelectGroupList, it.group]);
+                    break;
                 }
             }
         }
+        setDataDone(true);
+        console.log("set group list length : ", selectGroupList.length);
+        console.log("set dataDone ");
     }
 
     useEffect(() => {
+        console.log("group list length : ", selectGroupList.length);
+
         if (selectGroupList.length !== 0) {
             changeCommon({ selectedTaskGroups: selectGroupList });
             changeCommon({ selectedTaskImages: selectList });
@@ -105,7 +113,7 @@ export const TaskUnityTable = ({ from, callback }) => {
         setMessage(selectList.length + " Camera selected");
     }, [selectList]);
 
-    if (tableLoad === false && selTaskId !== taskId) {
+    if (tableLoad === false) { // && selTaskId !== taskId) {
         selTaskId = taskId;
         getTaskData(taskId);
     }

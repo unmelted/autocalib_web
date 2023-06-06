@@ -391,7 +391,7 @@ router.post('/updatetracker', async (req, res) => {
     let code = 0
 
     try {
-        result = await handler.updateMultiTracker(req.body.tracker_task_id, req.body.info_map)
+        result = await handler.updateMultiTrackerMap(req.body.tracker_task_id, req.body.info_map)
         console.log("update multi tracker end ")
 
         if (result == 0) {
@@ -450,19 +450,27 @@ router.post('/updatetracker', async (req, res) => {
                 request.post(options, async function (err, response, body) {
                     if (!err) {
                         console.log("Response: " + JSON.stringify(body));
-                        result = await handler.updateMultiTracker(req.body.tracker_task_id, body.job_id)
+                        console.log(Object.keys(body))
 
-                        if (result < 0) {
+                        if (Object.keys(body).includes('job_id')) {
+                            result = await handler.updateMultiTracker(req.body.tracker_task_id, 'job_id', body.job_id)
+                            console.log("update multi tracker job id end result : ", result)
+
+                            if (result < 0) {
+                                console.log(err)
+                                res.status(500).json({})
+
+                            }
+                            else {
+                                res.status(200).json({
+                                    status: body.status,
+                                    job_id: body.job_id,
+                                    message: body.message,
+                                });
+                            }
+                        } else {
                             console.log(err)
                             res.status(500).json({})
-
-                        }
-                        else {
-                            res.status(200).json({
-                                status: body.status,
-                                job_id: body.job_id,
-                                message: body.message,
-                            });
                         }
                     } else {
                         console.log(err)

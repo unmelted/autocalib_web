@@ -1,8 +1,40 @@
 import React, { useState, useRef, useEffect, useContext, Component } from 'react';
-// import { ResponsiveBar } from '@nivo/bar';
-// import { ResponsiveHeatMap, ResponsiveHeatMapCanvas } from '@nivo/heatmap';
+import ButtonGroup from 'react-bootstrap/ButtonGroup';
+import ToggleButton from 'react-bootstrap/ToggleButton';
 import Heatmap from 'heatmap.js';
+import { Task } from '@mui/icons-material';
 
+export const TaskVisualizePrepare = ({ tr_taskid, kairos_taskid }) => {
+
+    const vis_mode = [
+        { name: 'Heatmap', value: '1' },
+        { name: '3D Position in Ground', value: '2' },
+        { name: 'Raw-Multichannel', value: '3' },
+    ];
+    const [checked, setChecked] = useState(false);
+    const [radioValue, setRadioValue] = useState('1');
+
+    return (
+        <div>
+            <ButtonGroup>
+                {vis_mode.map((radio, idx) => (
+                    <ToggleButton
+                        key={idx}
+                        id={`radio-${idx}`}
+                        type="radio"
+                        variant="primary"
+                        name="radio"
+                        value={radio.value}
+                        checked={radioValue === radio.value}
+                        onChange={(e) => setRadioValue(e.currentTarget.value)}
+                    >
+                        {radio.name}
+                    </ToggleButton>
+                ))}
+            </ButtonGroup>
+        </div>
+    )
+}
 export const TaskVisualize = () => {
 
     console.log("heatmap example start.. ")
@@ -67,8 +99,13 @@ export const TaskVisualize = () => {
     }, []);
 
     return (
-        <div id="heatmapContainer" style={{ width: '100%', height: '400px', margin: '20px auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
-
-        </div>
+        <>
+            <div>
+                <TaskVisualizePrepare />
+            </div>
+            <div id="heatmapContainer" style={{ width: '100%', height: '400px', margin: '20px auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+            </div>
+        </>
     );
 };
+

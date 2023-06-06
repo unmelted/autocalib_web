@@ -490,7 +490,7 @@ exports.createMultiTracker = function (tr_taskId, taskId, camCount) {
     });
 }
 
-exports.updateMultiTracker = function (tr_taskId, info_map) {
+exports.updateMultiTrackerMap = function (tr_taskId, info_map) {
     return new Promise((resolve, reject) => {
 
         db.getClient((errClient, client) => {
@@ -520,7 +520,11 @@ exports.updateMultiTracker = function (tr_taskId, type, data) {
                 console.log("client connect err " + err)
                 resolve(-1)
             }
+
+            console.log("updateMultiTracker start ", tr_taskId, type, data)
+
             if (type === 'job_id') {
+                console.log("updateMultiTracker job_id update : ", tr_taskId, typeof tr_taskId, data, typeof data)
                 db.queryParams("UPDATE multi_tracker SET kairos_task_id = $2 where tracker_task_id = $1;", [tr_taskId, data], (err) => {
                     client.release(true);
                     if (err) {
@@ -530,9 +534,10 @@ exports.updateMultiTracker = function (tr_taskId, type, data) {
                     console.log('updateMultiTracker job_id update success');
                     resolve(0)
 
-                })
+                }, client)
             }
             else if (type === 'status') {
+                console.log("updateMultiTracker command status update : ", tr_taskId, data)
                 db.queryParams("UPDATE multi_tracker SET command_status = $2 where tracker_task_id = $1;", [tr_taskId, data], (err) => {
                     client.release(true);
                     if (err) {
@@ -541,9 +546,10 @@ exports.updateMultiTracker = function (tr_taskId, type, data) {
                     }
                     console.log('updateMultiTracker command status update success');
                     resolve(0)
-                })
+                }, client)
             }
             else if (type === 'run_status') {
+                console.log("updateMultiTracker run statue update : ", tr_taskId, data)
                 db.queryParams("UPDATE multi_tracker SET run_status = $2 where tracker_task_id = $1;", [tr_taskId, data], (err) => {
                     client.release(true);
                     if (err) {
@@ -552,10 +558,9 @@ exports.updateMultiTracker = function (tr_taskId, type, data) {
                     }
                     console.log('updateMultiTracker run_status update success');
                     resolve(0)
-                })
+                }, client)
             }
-
-        }, client);
+        });
     });
 };
 
