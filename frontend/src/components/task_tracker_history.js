@@ -35,6 +35,7 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 	const onHandleRowClick = async (tr_taskId, taskId, kairos_taskId) => {
 		console.log("tracker history table row is clicked ", tr_taskId, taskId, kairos_taskId)
 		if (kairos_taskId !== null) {
+			changeCommon({ trackerTaskId: tr_taskId });
 			getTrackerInfoMap(tr_taskId)
 		}
 		else {

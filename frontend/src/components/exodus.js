@@ -116,6 +116,7 @@ function Exodus(props) {
             <>
                 <Row>
                     <Row>
+                        <Col><h2 style={{ fontSize: '24px', fontWeight: 'bold' }}>EXODUS</h2> </Col>
                         <Col xs align='right'> <Badge bg="primary" style={{ width: '80px' }}>VERSION </Badge>  {version}</Col>
                     </Row>
                     <Row>

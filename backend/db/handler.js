@@ -525,7 +525,7 @@ exports.updateMultiTracker = function (tr_taskId, type, data) {
 
             if (type === 'job_id') {
                 console.log("updateMultiTracker job_id update : ", tr_taskId, typeof tr_taskId, data, typeof data)
-                db.queryParams("UPDATE multi_tracker SET kairos_task_id = $2 where tracker_task_id = $1;", [tr_taskId, data], (err) => {
+                db.queryParams("UPDATE multi_tracker SET kairos_task_id = $2, command_status ='ready' where tracker_task_id = $1;", [tr_taskId, data], (err) => {
                     client.release(true);
                     if (err) {
                         console.log(err)

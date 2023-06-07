@@ -68,11 +68,15 @@ function Kairos(props) {
 	}
 
 	const initStep = (step) => {
-		if (step0 === 0) {
+
+		if (step === 0) {
 			setStep1('none')
+			setStep2('none')
+			setStep3('none')
+			setStep4('none')
 		}
 
-		if (step0 === 0 || step === 1) {
+		if (step === 1) {
 			setStep2('none')
 			setStep3('none')
 			setStep4('none')
@@ -113,12 +117,12 @@ function Kairos(props) {
 			<>
 				<Row>
 					<Row>
+						<Col><h2 style={{ fontSize: '24px', fontWeight: 'bold' }}>KAIROS</h2> </Col>
 						<Col xs align='right'> <Badge bg='primary' style={{ width: '80px' }}>VERSION </Badge>  {version}</Col>
 					</Row>
 					<Row>
 						<Col xs align='right'> <Badge bg='dark' style={{ width: '80px' }}>LAB </Badge> <img src={alienTarget} width='20px' alt='' /></Col>
 					</Row>
-					<p></p>
 					<hr />
 					<Row className='justify-content-md-center'>
 						<Col xs lg='2'>
@@ -140,7 +144,7 @@ function Kairos(props) {
 							<Button variant={step0 === 'play' ? 'primary' : 'seconday'}
 								style={{ width: '140px', color: '#FFFFFF', float: 'center' }}
 								onClick={() => { initStep(0); setStep0('play'); setStep1('none') }}><img src='./asset/play.png' width='60px' alt='' /> <p></p>
-								PLAY</Button></Col>
+								VISUALIZATION</Button></Col>
 					</Row>
 					<p></p>
 					<hr />
@@ -173,7 +177,7 @@ function Kairos(props) {
 								id='exodus'
 								as="input"
 								type='button'
-								value="FROM EXODUS"
+								value="FROM LIBRARY"
 								style={{ width: '160px' }}
 								onClick={() => { initStep(1); setStep1('exodus') }}>
 							</Button>
