@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect, useContext, Component } from 'react';
 import axios from 'axios';
+import Button from 'react-bootstrap/Button'
 import ButtonGroup from 'react-bootstrap/ButtonGroup';
 import ToggleButton from 'react-bootstrap/ToggleButton';
 import Row from 'react-bootstrap/Row';
@@ -30,14 +31,7 @@ export const SlideRange = ({ min, max, start, end }) => {
     };
 
     useEffect(() => {
-        const sliderHandle = document.querySelector('.custom-slider .rc-slider-handle');
-        if (sliderHandle) {
 
-            const minPosition = range[0]
-            const maxPosition = range[1]
-            sliderHandle.style.left = `${minPosition}%`;
-            sliderHandle.style.width = `${maxPosition - minPosition}%`;
-        }
     }, [range, min, max]);
 
     return (
@@ -51,6 +45,7 @@ export const SlideRange = ({ min, max, start, end }) => {
                     onChange={handleSliderChange}
                     defaultValue={range}
                     allowCross={false}
+                    value={range}
                     className="custom-slider"
                 />
                 <Row>
@@ -59,7 +54,7 @@ export const SlideRange = ({ min, max, start, end }) => {
                             <label htmlFor="minInput">Start Frame :</label>
                             <input
                                 type="number"
-                                id="numInput"
+                                id="numInput1"
                                 value={range[0]}
                                 onChange={handleStartInputChange}
                             />
@@ -70,7 +65,7 @@ export const SlideRange = ({ min, max, start, end }) => {
                             <label htmlFor="maxInput">End Frame :</label>
                             <input
                                 type="number"
-                                id="numInput"
+                                id="numInput2"
                                 value={range[1]}
                                 onChange={handleEndInputChange}
                             />
@@ -90,6 +85,11 @@ export const SlideSimple = ({ min, max, init }) => {
         setValue(val);
     };
 
+    const handleStartInputChange = (event) => {
+        const newValue = parseInt(event.target.value);
+        setValue(newValue)
+    };
+
     return (
         <div>
             <Row>
@@ -101,9 +101,23 @@ export const SlideSimple = ({ min, max, init }) => {
                     onChange={handleSliderChange}
                     defaultValue={value}
                     allowCross={false}
+                    value={value}
                     className="custom-slider"
                 />
-                <p>Frame Range : {min} - {max},  Time Pick : {((value - { min }) / 30).toFixed(2)} sec.</p>
+                <Row>
+                    <Col>
+                        <div className="input-container2">
+                            <label htmlFor="minInput">Start Frame :</label>
+                            <input
+                                type="number"
+                                id="numInput1"
+                                value={value}
+                                onChange={handleStartInputChange}
+                            />
+                        </div>
+                    </Col>
+                </Row>
+                <p>Frame Pick : {value},  Time Pick : {(value / 30).toFixed(2)} sec.</p>
             </Row>
         </div>
     );
@@ -135,14 +149,20 @@ export const TaskVisualize = ({ from, callback }) => {
         }
     }
 
+
+    const handleApplyVisualize = () => {
+
+    }
+
     const TaskVisualizeOpions = ({ type }) => {
+        console.log("TaskVisualizeOpions  start.. ", type)
+
         if (type === '1') {
             return (
                 <>
                     <div className="slider-container">
                         <SlideRange min={1000} max={108000} start={3000} end={7500} />
                     </div>
-
                 </>
             )
         }
@@ -150,23 +170,19 @@ export const TaskVisualize = ({ from, callback }) => {
             return (
                 <>
                     <div className="slider-container">
-                        <SlideRange min={1000} max={108000} start={3000} end={7500} />
+                        <SlideSimple min={1000} max={108000} init={3000} />
                     </div>
-
                 </>
             )
-
         }
         else if (type === '3') {
             return (
                 <>
                     <div className="slider-container">
-                        <SlideRange min={1000} max={108000} start={3000} end={7500} />
+                        <SlideSimple min={1000} max={108000} init={3000} />
                     </div>
-
                 </>
             )
-
         }
         else {
             return (
@@ -197,7 +213,7 @@ export const TaskVisualize = ({ from, callback }) => {
                             value={radio.value}
                             checked={radioValue === radio.value}
                             onChange={(e) => setRadioValue(e.currentTarget.value)}
-                            style={{ flex: 1 }}
+                            style={{ flex: 1, padding: '15px' }}
                             className="text-nowrap"
                         >
                             {radio.name}
@@ -210,63 +226,8 @@ export const TaskVisualize = ({ from, callback }) => {
     }
 
     useEffect(() => {
-        const generateRandomData = () => {
-            const points = [];
-            let max = 0;
-            const width = 840;
-            const height = 400;
-            let len = 300;
+    }, [radioValue]);
 
-            while (len--) {
-                const val = Math.floor(Math.random() * 100);
-                // now also with custom radius
-                const radius = Math.floor(Math.random() * 70);
-
-                max = Math.max(max, val);
-                const point = {
-                    x: Math.floor(Math.random() * width),
-                    y: Math.floor(Math.random() * height),
-                    value: val,
-                    // radius configuration on point basis
-                    radius: radius
-                };
-                points.push(point);
-            }
-
-            // heatmap data format
-            const data = {
-                max: max,
-                data: points
-            };
-
-            return data;
-        };
-
-        const heatmapInstance = Heatmap.create({
-            container: document.getElementById('heatmapContainer'),
-            radius: 30,
-            maxOpacity: 0.7,
-            blur: 0.9,
-            // gradient: {
-            //     '0.4': 'blue',
-            //     '0.65': 'lime',
-            //     '0.95': 'red'
-            // },
-            data: generateRandomData()
-        });
-
-        const interval = setInterval(() => {
-            const data = generateRandomData();
-            heatmapInstance.setData(data);
-        }, 2000);
-
-
-        // Cleanup the heatmap instance when the component unmounts
-        return () => {
-            heatmapInstance.setData({ data: [] }); // Clear heatmap data
-            clearInterval(interval);
-        };
-    }, []);
 
     return (
         <>
@@ -275,6 +236,11 @@ export const TaskVisualize = ({ from, callback }) => {
             </div>
             <div className="modebtn-wrapper" hidden={radioValue === '0'}>
                 <TaskVisualizeOpions type={radioValue} />
+            </div>
+            <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <Button id='applyBtn'
+                    onClick={handleApplyVisualize}
+                >Apply</Button>
             </div>
             <div id="heatmapContainer" style={{ width: '100%', height: '400px', margin: '20px auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}
                 hidden={loaded === false}>
