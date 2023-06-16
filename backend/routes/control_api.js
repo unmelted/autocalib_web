@@ -695,5 +695,34 @@ router.get('/get_visualinfo/:task_id', async (req, res) => {
 });
 
 
+router.get('/get_visualdata/:task_id/:type/:target_frame1/:target_frame2', async (req, res) => {
+
+    console.log("get_visualdata task id : ", req.params.task_id)
+    const options = {
+        uri: process.env.KRONOS_URL + '/kronos/visualdata/' + req.params.task_id + req.params.type + '/' + req.params.target_frame1 + '/' + req.params.target_frame2,
+        method: 'GET',
+        json: true
+    }
+
+    console.log("Call Kronos API // request : " + options.uri);
+    request.get(options, async function (err, response, body) {
+        if (!err) {
+            result = JSON.stringify(body.status)
+            console.log("Response status : " + result);
+
+            res.status(200).json({
+                status: body.status,
+                result: body.result,
+                message: body.message,
+                data: body.data,
+            });
+
+        } else {
+            console.log(err)
+            res.status(500).json({})
+        }
+    });
+
+});
 
 module.exports = router;

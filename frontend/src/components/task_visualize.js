@@ -131,7 +131,7 @@ export const TaskVisualize = ({ from, callback }) => {
 
     const [checked, setChecked] = useState(false);
     const [radioValue, setRadioValue] = useState('0');
-    const [loaded, setLoaded] = useState(false);
+    const [loaded, setLoaded] = useState(true);
 
     const getRange = async () => {
         let response = null;
@@ -213,7 +213,7 @@ export const TaskVisualize = ({ from, callback }) => {
                             value={radio.value}
                             checked={radioValue === radio.value}
                             onChange={(e) => setRadioValue(e.currentTarget.value)}
-                            style={{ flex: 1, padding: '15px' }}
+                            style={{ flex: 1, paddingLeft: '36px', paddingRight: '36px' }}
                             className="text-nowrap"
                         >
                             {radio.name}
@@ -234,12 +234,13 @@ export const TaskVisualize = ({ from, callback }) => {
             <div>
                 <TaskVisualizePrepare />
             </div>
-            <div className="modebtn-wrapper" hidden={radioValue === '0'}>
+            <div className="modebtn-wrapper" hidden={radioValue === '0' || loaded === false}>
                 <TaskVisualizeOpions type={radioValue} />
             </div>
             <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 <Button id='applyBtn'
                     onClick={handleApplyVisualize}
+                    hidden={radioValue === '0'} // || loaded === false}
                 >Apply</Button>
             </div>
             <div id="heatmapContainer" style={{ width: '100%', height: '400px', margin: '20px auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }}

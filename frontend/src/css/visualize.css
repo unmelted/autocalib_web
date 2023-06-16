@@ -1,0 +1,136 @@
+.modebtn-wrapper {
+    width: 95%;
+    border: 2px solid rgb(65, 106, 182);
+    margin: 15px;
+    height: 200px;
+    /* align-items: center; */
+}
+
+.slider-container {
+    width: 96%;
+    margin: 10px;
+    padding: 10px;
+    color: #d7d2d2;
+}
+
+.input-container {
+    width: 100%;
+    margin: 10px;
+    color: #d7d2d2;
+}
+
+.input-container2 {
+    width: 50%;
+    margin: 10px;
+    color: #d7d2d2;
+}
+
+#numInput1 {
+    width: 25%;
+    margin: 5px;
+    color: #5d5d5d;
+    background-color: rgb(209, 209, 209);
+    text-align: right;
+}
+
+#numInput2 {
+    width: 25%;
+    margin: 5px;
+    color: #5d5d5d;
+    background-color: rgb(209, 209, 209);
+    text-align: right;
+}
+
+.slider {
+    width: 100%;
+}
+
+.slider-value1 {
+    text-align: left;
+}
+
+.slider-value2 {
+    text-align: right;
+}
+
+.custom-slider .rc-slider-track {
+    background-color: #48b6f6;
+    height: 7px;
+    /* Adjust the desired thickness */
+}
+
+.custom-slider .rc-slider-rail {
+    background-color: #3669c3;
+    /* Change to desired color for the background bar */
+    height: 7px;
+    /* Adjust the desired thickness for the background bar */
+}
+
+.custom-slider .rc-slider-handle {
+    width: 18px;
+    /* Change to the desired width of the slider handle */
+    height: 18px;
+    /* Change to the desired height of the slider handle */
+    background-color: #ffffff;
+    /* Change to desired color for the range circle icon */
+}
+
+
+#applyBtn {
+    justify-content: center;
+    display: flex;
+    width: 200px;
+    margin: 20px;
+}
+
+.canvas-wrapper {
+    /* margin: 20px 5px 5px 5px; */
+    /* margin-left: 70px; */
+    width: 95%;
+    margin-top: 20px;
+    justify-content: center;
+    display: flex;
+}
+
+.modeButton {
+    text-align: left;
+    margin: 15px 5px 15px 5px;
+    color: yellowgreen;
+}
+
+#groundtype-select {
+    float: left;
+    width: 200px;
+    margin-left: 20px;
+}
+
+.modebtn-message {
+    width: 95%;
+    text-align: left;
+    /* align-items: left; */
+    margin-top: 10px;
+    margin-left: 30px;
+    color: rgb(153, 153, 153);
+    white-space: pre-line;
+}
+
+.modebtn-message2 {
+    width: 90%;
+    text-align: left;
+    /* align-items: left; */
+    margin-top: 10px;
+    margin-left: 30px;
+    color: rgb(153, 153, 153);
+    white-space: pre-line;
+
+    border: 2px solid gray;
+    height: 140px;
+}
+
+.modebtn-ptApply {
+    float: left;
+    width: 120px;
+    margin-left: 20px;
+    margin-top: 20px;
+    margin-bottom: 20px;
+}

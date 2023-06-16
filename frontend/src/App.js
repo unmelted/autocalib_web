@@ -34,6 +34,7 @@ const initCommon = {
   trackerTaskId: '',
   trackerCalibType: '',
   trackerCalibFile: '',
+  trackerInfoMap: {},
 }
 
 function App() {

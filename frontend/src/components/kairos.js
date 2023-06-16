@@ -15,15 +15,16 @@ import { TaskHistory } from './task_history.js';
 import { TaskUnityTable } from './task_unity';
 import { TaskInfoMap } from './task_infomap';
 import { TaskTrackerHistory } from './task_tracker_history.js';
+import { TaskTrackerInfomap } from './task_tracker_history.js';
 import { TaskVisualize } from './task_visualize.js';
 
 
 function Kairos(props) {
 	const [step0, setStep0] = useState('both'); // none | both |  create  | play
 	const [step1, setStep1] = useState('both'); // none | both | upload | exodus //history_tracker
-	const [step2, setStep2] = useState('none'); //none | upload | history // visualize_prepare
-	const [step3, setStep3] = useState('none'); //none | task_id // visualize
-	const [step4, setStep4] = useState('none'); //none | task_id * imagelist
+	const [step2, setStep2] = useState('none'); //none | upload | history // history_tracker_info
+	const [step3, setStep3] = useState('none'); //none | task_id // visualize_prepare
+	const [step4, setStep4] = useState('none'); //none | task_id * imagelist // visulize
 	const [step5, setStep5] = useState('none'); //none | 
 	const { common, changeCommon } = useContext(commonData)
 	const [infoMap, setInfoMap] = useState({});
@@ -38,7 +39,15 @@ function Kairos(props) {
 		}
 		else if (status === 'change_step2_from_tracker') {
 			console.log('change_step2_from_tracker')
-			setStep1('visualize_prepare')
+			setStep1('tracker_infomap')
+			setStep2('none')
+		}
+		else if (status === 'change_step2_from_tracker_none') {
+			setStep1('none')
+			setStep2('none')
+		}
+		else if (status === 'change_step3_from_tracker') {
+			setStep3('visualize_prepare')
 		}
 		else if (status === 'change_step3') {
 			const newMap = {};
@@ -219,10 +228,10 @@ function Kairos(props) {
 				</>
 			)
 		}
-		else if (step1 === 'visualize_prepare') {
+		else if (step1 === 'tracker_infomap') {
 			return (
 				<>
-					<TaskVisualize from={step1} callback={callback} initMap={infoMap} />
+					<TaskTrackerInfomap from={step1} callback={callback} />
 				</>
 			)
 		}
@@ -237,7 +246,14 @@ function Kairos(props) {
 	const Step3_Module = () => {
 		console.log("step3_module start : ", step3);
 
-		if (step3 !== 'none') {
+		if (step3 === 'visualize_prepare') {
+			return (
+				<>
+					<TaskVisualize from={step1} callback={callback} initMap={infoMap} />
+				</>
+			)
+		}
+		else if (step3 !== 'none') {
 			return (
 				<>
 					<TaskUnityTable from={'kairos'} callback={callback} />

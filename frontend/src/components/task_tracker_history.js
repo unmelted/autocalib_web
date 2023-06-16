@@ -8,6 +8,71 @@ import { PopupMessage } from './popup.js';
 import '../css/task_library.css';
 
 
+export const TaskTrackerInfomap = ({ from, callback }) => {
+
+	let index = 0;
+
+	const { common, changeCommon } = useContext(commonData)
+	const [mapLoaded, setMapLoaded] = useState(false);
+	const [trackerTaskId, setTrackerTaskId] = useState(common.trackerTaskId);
+	const [infoMap, setInfoMap] = useState(common.trackerInfoMap);
+
+	console.log('tracker infomap draw', trackerTaskId, infoMap)
+
+	useEffect(() => {
+		console.log("uese effect is called? ")
+		if (trackerTaskId !== '' && trackerTaskId !== null) {
+			callback('change_step3_from_tracker')
+		}
+
+	}, [infoMap, trackerTaskId])
+
+
+	const TaskTrackerInfomapTable = () => {
+		return (
+			Object.keys(infoMap).map(key => {
+				const item = infoMap[key];
+				console.log(index, key, item)
+				index = index + 1;
+
+				return (
+					<tr key={key}>
+						<td>{index}</td>
+						<td>{key} </td>
+						<td>{item.group}</td>
+						<td>{item.tracker_url}</td>
+						<td>{item.stream_url}</td>
+					</tr>
+				);
+			})
+
+		)
+	}
+
+	return (
+		<>
+			<div className='table-container2' hidden={trackerTaskId === '' || trackerTaskId === null}>
+				<p id="task-title" ><img src='./asset/checkbox.png' width="20px" alt="" />  TASK : {trackerTaskId}</p>
+				<Table id="table-body" striped bordered variant="dark">
+					<thead>
+						<tr>
+							<th id="th-no">NO</th>
+							<th id="th-status">CAMERA ID</th>
+							<th id="th-status">GROUP</th>
+							<th id="th-date">TRACKER URL</th>
+							<th id="th-date">STREAM URL</th>
+						</tr>
+					</thead>
+					<tbody>
+						<TaskTrackerInfomapTable />
+					</tbody>
+				</Table>
+			</div>
+		</>
+	)
+}
+
+
 export const TaskTrackerHistory = ({ from, callback }) => {
 
 	const { common, changeCommon } = useContext(commonData)
@@ -35,12 +100,16 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 	const onHandleRowClick = async (tr_taskId, taskId, kairos_taskId) => {
 		console.log("tracker history table row is clicked ", tr_taskId, taskId, kairos_taskId)
 		if (kairos_taskId !== null) {
-			changeCommon({ trackerTaskId: tr_taskId });
 			getTrackerInfoMap(tr_taskId)
 		}
 		else {
+			setInfoMap({})
+			setTrackerTaskId('')
+			changeCommon({ trackerTaskId: '' })
+			callback('change_step2_from_tracker_none')
 			handleOpenModal()
 		}
+
 	}
 
 	const getTasks = async () => {
@@ -59,10 +128,6 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 		}
 	}
 
-	if (tasksLoaded === false) {
-		getTasks();
-	}
-
 	const getTrackerInfoMap = async (taskId) => {
 
 		let response = null;
@@ -75,22 +140,23 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 
 		if (response && response.data) {
 			console.log('get tracker info response', response.data.tracker_info);
-			setInfoMap(response.data.tracker_info)
 			setTrackerTaskId(taskId)
-
+			changeCommon({ trackerTaskId: taskId })
+			changeCommon({ trackerInfoMap: response.data.tracker_info })
 			callback('change_step2_from_tracker')
 		}
 		else {
 			setInfoMap({})
 			setTrackerTaskId('')
+			changeCommon({ trackerTaskId: '' })
+			callback('change_step2_from_tracker_none')
 			handleOpenModal()
 		}
-
 	}
 
-	useEffect(() => {
-
-	}, [infoMap])
+	if (tasksLoaded === false) {
+		getTasks()
+	}
 
 	const TaskTrackerHistoryRecords = () => {
 
@@ -107,30 +173,6 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 			))
 		);
 	};
-
-	const TaskTrackerInfomap = () => {
-		console.log('tracker infomap draw', infoMap)
-		console.log(Object.keys(infoMap))
-		let index = 0;
-
-		return (
-			Object.keys(infoMap).map(key => {
-				const item = infoMap[key];
-				console.log(index, key, item)
-				index = index + 1;
-				return (
-					<tr key={key}>
-						<td>{index}</td>
-						<td>{key} </td>
-						<td>{item.group}</td>
-						<td>{item.tracker_url}</td>
-						<td>{item.stream_url}</td>
-					</tr>
-				);
-			})
-		)
-	}
-
 
 	if (tasksLoaded === true) {
 		return (
@@ -154,23 +196,6 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 						</thead>
 						<tbody>
 							<TaskTrackerHistoryRecords />
-						</tbody>
-					</Table>
-				</div>
-				<div className='table-container2' hidden={trackerTaskId === ''}>
-					<p id="task-title" ><img src='./asset/checkbox.png' width="20px" alt="" />  TASK : {trackerTaskId}</p>
-					<Table id="table-body" striped bordered variant="dark">
-						<thead>
-							<tr>
-								<th id="th-no">NO</th>
-								<th id="th-status">CAMERA ID</th>
-								<th id="th-status">GROUP</th>
-								<th id="th-date">TRACKER URL</th>
-								<th id="th-date">STREAM URL</th>
-							</tr>
-						</thead>
-						<tbody>
-							<TaskTrackerInfomap />
 						</tbody>
 					</Table>
 				</div>

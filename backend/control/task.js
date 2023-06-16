@@ -300,7 +300,7 @@ exports.parsingDscList = async function (taskId) {
                     ext[1].toLowerCase() === 'jpeg') {
                     ext_sub = ext[0].split('_');
                     ext_main = ext_sub[0];
-                    ext_sub = ext_sub[1];
+                    ext_sub = ext_sub[1] === undefined ? '' : ext_sub[1];
                     ext_name = ext[1];
                     console.log(ext[0])
                     console.log('ext : ', ext_sub, ext_name);
@@ -337,7 +337,7 @@ exports.parsingDscList = async function (taskId) {
                         dsclist.push({
                             name: obj.points[i].dsc_id,
                             group: obj.points[i].Group,
-                            img: obj.points[i].dsc_id + '_' + ext_sub + '.' + ext_name
+                            img: ext_sub === '' ? obj.points[i].dsc_id + '.' + ext_name : obj.points[i].dsc_id + '_' + ext_sub + '.' + ext_name
                         });
                     }
                 }
