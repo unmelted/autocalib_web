@@ -107,7 +107,7 @@ router.get('/get_trackertask', async (req, res) => {
                     request.get(options, async function (err, response, body) {
                         if (!err) {
                             result = await handler.updateMultiTracker(req.body.tracker_task_id, 'run_status', body.status)
-                            console.log("Response: " + JSON.stringify(body));
+
                             row.run_status = body.status
                             row.message = body.message
                         } else {
@@ -668,22 +668,26 @@ router.get('/get_visualinfo/:task_id', async (req, res) => {
 
     console.log("get_visualzeragne task id : ", req.params.task_id)
     const options = {
-        uri: process.env.KRONOS_URL + '/kronos/visualinfo/' + req.params.task_id,
+        uri: process.env.KAIROS_URL + '/kairos/visualinfo/' + req.params.task_id,
         method: 'GET',
         json: true
     }
 
-    console.log("Call Kronos API // request : " + options.uri);
+    console.log("Call Kairos API // request : " + options.uri);
     request.get(options, async function (err, response, body) {
         if (!err) {
-            result = JSON.stringify(body.status)
-            console.log("Response status : " + result);
+
+            console.log("returned body : ", body)
+            json_body = JSON.parse(body.data)
 
             res.status(200).json({
                 status: body.status,
                 result: body.result,
                 message: body.message,
-                data: body.data,
+                start_time: json_body.start_time,
+                end_time: json_body.end_time,
+                start_frame: json_body.start_frame,
+                end_frame: json_body.end_frame
             });
 
         } else {
@@ -699,16 +703,17 @@ router.get('/get_visualdata/:task_id/:type/:target_frame1/:target_frame2', async
 
     console.log("get_visualdata task id : ", req.params.task_id)
     const options = {
-        uri: process.env.KRONOS_URL + '/kronos/visualdata/' + req.params.task_id + req.params.type + '/' + req.params.target_frame1 + '/' + req.params.target_frame2,
+        uri: process.env.KAIROS_URL + '/kairos/visualdata/' + req.params.task_id + '/' + req.params.type + '/' + req.params.target_frame1 + '/' + req.params.target_frame2,
         method: 'GET',
         json: true
     }
 
-    console.log("Call Kronos API // request : " + options.uri);
+    console.log("Call Kairos API // request : " + options.uri);
     request.get(options, async function (err, response, body) {
+
         if (!err) {
-            result = JSON.stringify(body.status)
-            console.log("Response status : " + result);
+            console.log("returned body result: ", body.result)
+            console.log(body.data)
 
             res.status(200).json({
                 status: body.status,

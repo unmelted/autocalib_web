@@ -101,6 +101,7 @@ export const TaskTrackerHistory = ({ from, callback }) => {
 		console.log("tracker history table row is clicked ", tr_taskId, taskId, kairos_taskId)
 		if (kairos_taskId !== null) {
 			getTrackerInfoMap(tr_taskId)
+			changeCommon({ trackerKairosId: kairos_taskId })
 		}
 		else {
 			setInfoMap({})

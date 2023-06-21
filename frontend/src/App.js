@@ -32,6 +32,7 @@ const initCommon = {
   selectedJobId: '',    //for exodus canvas
   selectedGroupId: '',  //for exodus canvas
   trackerTaskId: '',
+  trackerKairosId: '',
   trackerCalibType: '',
   trackerCalibFile: '',
   trackerInfoMap: {},
