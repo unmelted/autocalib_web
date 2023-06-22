@@ -702,6 +702,12 @@ router.get('/get_visualinfo/:task_id', async (req, res) => {
 router.get('/get_visualdata/:task_id/:type/:target_frame1/:target_frame2', async (req, res) => {
 
     console.log("get_visualdata task id : ", req.params.task_id)
+    if (req.params.target_frame1 === null || req.params.target_frame1 === undefined ||
+        req.params.target_frame2 === null || req.params.target_frame2 === undefined) {
+        console.log("get_visualdata target frame is null ")
+        res.status(500).json({})
+    }
+
     const options = {
         uri: process.env.KAIROS_URL + '/kairos/visualdata/' + req.params.task_id + '/' + req.params.type + '/' + req.params.target_frame1 + '/' + req.params.target_frame2,
         method: 'GET',

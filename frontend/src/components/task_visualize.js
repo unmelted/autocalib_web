@@ -13,29 +13,37 @@ import 'rc-slider/assets/index.css';
 
 import { commonData } from '../App';
 
-export const SlideRange = ({ min, max, start, end, onChange, start_time, end_time }) => {
-    const [range, setRange] = useState([start, end]);
+export const SlideRange = ({ min, max, start, end, range, onChange, start_time, end_time }) => {
+    // const [range, setRange] = useState([start, end])
+    // const [range, setRange] = useState(() => {
+    //     const storedRange = JSON.parse(localStorage.getItem('slideRange'));
+    //     if (storedRange && Array.isArray(storedRange) && storedRange.length === 2) {
+    //         return storedRange;
+    //     }
+    //     return [start, end];
+    // });
+    console.log("slide range start..", range)
 
     const handleSliderChange = (newRange) => {
-        setRange(newRange);
+        // setRange(newRange);
         onChange(newRange)
     };
 
     const handleStartInputChange = (event) => {
         const newstartValue = parseInt(event.target.value);
-        setRange([newstartValue, range[1]]);
+        // setRange([newstartValue, range[1]]);
         onChange([newstartValue, range[1]])
     };
 
     const handleEndInputChange = (event) => {
         const newEndValue = parseInt(event.target.value);
-        setRange([range[0], newEndValue]);
+        // setRange([range[0], newEndValue]);
         onChange([range[0], newEndValue])
     };
 
-    useEffect(() => {
+    // useEffect(() => {
 
-    }, [range, min, max]);
+    // }, [range]);
 
     return (
         <div>
@@ -131,17 +139,17 @@ export const SlideSimple = ({ min, max, init, onChange, start_time, end_time }) 
 const HeatmapDraw = ({ data }) => {
     const heatmapRef = useRef(null);
     const width = 960;
-    const height = 540;
+    const height = 640;
 
     useEffect(() => {
         if (data.length === 0) return;
 
         const heatmapInstance = Heatmap.create({
             container: heatmapRef.current,
-            radius: 20,
+            radius: 30,
             maxOpacity: 0.8,
             minOpacity: 0,
-            blur: 0.75,
+            blur: 0.7
         });
 
         heatmapInstance.setData({
@@ -149,35 +157,41 @@ const HeatmapDraw = ({ data }) => {
             data: data.map(point => ({
                 x: point.x * (width / 50),
                 y: point.y * (height / 28),
-                value: point.value * 2,
+                value: point.value,
             })),
         });
 
         return () => {
-            heatmapRef.current.innerHTML = '';
+            heatmapInstance.setData({ data: [] });
         };
     }, [data]);
 
-    return <div ref={heatmapRef} style={{ width: '960px', height: '540px' }} />;
+    return (
+
+        <div
+            style={{
+                width: '100%',
+                height: '640px',
+                position: 'relative',
+            }}
+        >
+
+            < div ref={heatmapRef}
+                style={{
+                    width: { width }, height: { height },
+                }} />
+            <div id='div-heatmap'
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                }}
+            />
+        </div >
+    )
 }
-
-// export const HeatmapDraw = ({ datas, max, callback }) => {
-
-//     const heatmapInstance = Heatmap.create({
-//         container: document.getElementById('heatmapContainer'),
-//         radius: 25,
-//         maxOpacity: .7,
-//         blur: 0.9,
-//         data: datas
-//     });
-
-//     const input = {
-//         max: max,
-//         data: datas
-//     }
-//     heatmapInstance.setData(input);
-//     callback(true)
-// }
 
 export const TaskVisualize = ({ from, callback }) => {
     const { common, changeCommon } = useContext(commonData)
@@ -192,10 +206,10 @@ export const TaskVisualize = ({ from, callback }) => {
     const [max, setMax] = useState(0);
     const [start, setStart] = useState(0);
     const [end, setEnd] = useState(0);
-    const [points, setPoints] = useState([{ x: 10, y: 15, value: 100 }, { x: 20, y: 25, value: 200 }]);
+    const [points, setPoints] = useState([{ x: 10, y: 15, value: 0 }, { x: 20, y: 25, value: 0 }]);
     const [visualStart, setVisualStart] = useState(false);
-
-    let range = []
+    const [range, setRange] = useState([0, 0])
+    // let range = []
     let targetFrame = 0;
 
     const getRange = async () => {
@@ -213,13 +227,14 @@ export const TaskVisualize = ({ from, callback }) => {
             setMax(response.data.end_frame)
             setStart(response.data.start_time)
             setEnd(response.data.end_time)
+            setRange([response.data.start_frame, response.data.end_frame])
             setLoaded(true)
         }
     }
 
     const onRangeChange = (newRange) => {
         console.log("onRange is called .. ", newRange)
-        range = newRange;
+        setRange(newRange);
     }
     const onTargetFrameChange = (newTargetFrame) => {
         console.log("onTargetFrameChange is called .. ", newTargetFrame)
@@ -243,7 +258,6 @@ export const TaskVisualize = ({ from, callback }) => {
                 console.log("response.data : ", response.data)
                 arr = response.data.data;
                 const points = [];
-                let max = 0;
 
                 for (let y = 0; y < arr.length; y++) {
                     const row = arr[y];
@@ -251,13 +265,12 @@ export const TaskVisualize = ({ from, callback }) => {
                         const value = row[x];
                         if (value !== 0) {
                             points.push({ x, y, value });
-                            max = Math.max(max, value);
                         }
                     }
                 }
                 console.log("points : ", points)
                 setPoints(points)
-                // HeatmapDraw(datas = { points }, max = { max }, callback = { setVisualStart })
+                setVisualStart(true)
             }
         }
         else {
@@ -282,13 +295,17 @@ export const TaskVisualize = ({ from, callback }) => {
     }
 
     const TaskVisualizeOpions = ({ type }) => {
-        console.log("TaskVisualizeOpions  start.. ", type)
+        console.log("TaskVisualizeOpions  start.. ", type, range)
 
         if (type === '1') {
             return (
                 <>
                     <div className="slider-container">
-                        <SlideRange min={min} max={max} start={min + ((max - min) / 4)} end={min + ((max - min) * 3 / 4)} onChange={onRangeChange} start_time={start} end_time={end} />
+                        <SlideRange
+                            min={min} max={max}
+                            start={min + ((max - min) / 4)} end={min + ((max - min) * 3 / 4)}
+                            range={range}
+                            onChange={onRangeChange} start_time={start} end_time={end} />
                     </div>
                 </>
             )
@@ -353,7 +370,9 @@ export const TaskVisualize = ({ from, callback }) => {
     }
 
     useEffect(() => {
+
     }, [radioValue, loaded])
+
 
     return (
         <>
@@ -369,10 +388,9 @@ export const TaskVisualize = ({ from, callback }) => {
                     hidden={radioValue === '0'} // || loaded === false}
                 >Apply</Button>
             </div>
-            <div id="heatmapContainer" style={{ width: '100%', height: '400px', margin: '20px auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }} >
-                {/* hidden={visualStart === false}> */}
-            </div>
-            <div>
+            {/* <div id="heatmapContainer" style={{ width: '100%', height: '400px', margin: '20px auto', display: 'flex', justifyContent: 'center', alignItems: 'center' }} >
+            </div> */}
+            <div className="heatmap-wrapper" hidden={visualStart === false}>
                 <HeatmapDraw data={points} />
             </div>
         </>
