@@ -23,27 +23,52 @@ export const SlideRange = ({ min, max, start, end, range, onChange, start_time, 
     //     return [start, end];
     // });
     console.log("slide range start..", range)
+    const [inputValue, setInputValue] = useState(range);
+    const [isTyping, setIsTyping] = useState(false);
+    const typingTimeoutRef = useRef(null);
 
     const handleSliderChange = (newRange) => {
-        // setRange(newRange);
         onChange(newRange)
     };
 
     const handleStartInputChange = (event) => {
-        const newstartValue = parseInt(event.target.value);
+        const newStartValue = parseInt(event.target.value);
         // setRange([newstartValue, range[1]]);
-        onChange([newstartValue, range[1]])
+        // onChange([newstartValue, range[1]])
+        setInputValue([newStartValue, inputValue[1]]);
+        setIsTyping(true);
+
+        clearTimeout(typingTimeoutRef.current)
+
+        typingTimeoutRef.current = setTimeout(() => {
+            if (!isNaN(newStartValue)) {
+                setIsTyping(false);
+                onChange([newStartValue, inputValue[1]]);
+            }
+        }, 500);
+
     };
 
     const handleEndInputChange = (event) => {
         const newEndValue = parseInt(event.target.value);
         // setRange([range[0], newEndValue]);
-        onChange([range[0], newEndValue])
+        // onChange([range[0], newEndValue])
+        setInputValue([inputValue[0], newEndValue]);
+        setIsTyping(true);
+
+        clearTimeout(typingTimeoutRef.current)
+
+        typingTimeoutRef.current = setTimeout(() => {
+            if (!isNaN(newEndValue)) {
+                setIsTyping(false);
+                onChange([inputValue[0], newEndValue]);
+            }
+        }, 500);
     };
 
-    // useEffect(() => {
-
-    // }, [range]);
+    useEffect(() => {
+        setInputValue(range);
+    }, [range]);
 
     return (
         <div>
@@ -66,7 +91,7 @@ export const SlideRange = ({ min, max, start, end, range, onChange, start_time, 
                             <input
                                 type="number"
                                 id="numInput1"
-                                value={range[0]}
+                                value={inputValue[0]}
                                 onChange={handleStartInputChange}
                             />
                         </div>
@@ -77,7 +102,7 @@ export const SlideRange = ({ min, max, start, end, range, onChange, start_time, 
                             <input
                                 type="number"
                                 id="numInput2"
-                                value={range[1]}
+                                value={inputValue[1]}
                                 onChange={handleEndInputChange}
                             />
                         </div>
@@ -89,19 +114,35 @@ export const SlideRange = ({ min, max, start, end, range, onChange, start_time, 
     );
 };
 
-export const SlideSimple = ({ min, max, init, onChange, start_time, end_time }) => {
-    const [value, setValue] = useState(init);
+export const SlideSimple = ({ min, max, targetFrame, onChange, start_time, end_time }) => {
+    const [inputValue, setInputValue] = useState(targetFrame);
+    const [isTyping, setIsTyping] = useState(false);
+    const typingTimeoutRef = useRef(null);
 
     const handleSliderChange = (val) => {
-        setValue(val);
         onChange(val)
     };
 
     const handleStartInputChange = (event) => {
         const newValue = parseInt(event.target.value);
-        setValue(newValue)
-        onChange(newValue)
+        setInputValue(newValue);
+        setIsTyping(true);
+
+        clearTimeout(typingTimeoutRef.current)
+
+        typingTimeoutRef.current = setTimeout(() => {
+            const parsedValue = parseInt(newValue);
+            if (!isNaN(parsedValue)) {
+                setIsTyping(false);
+                onChange(parsedValue);
+            }
+        }, 500);
     };
+
+    useEffect(() => {
+        setInputValue(targetFrame);
+
+    }, [targetFrame]);
 
     return (
         <div>
@@ -112,25 +153,24 @@ export const SlideSimple = ({ min, max, init, onChange, start_time, end_time }) 
                     min={min}
                     max={max}
                     onChange={handleSliderChange}
-                    defaultValue={value}
-                    allowCross={false}
-                    value={value}
+                    defaultValue={targetFrame}
+                    value={targetFrame}
                     className="custom-slider"
                 />
                 <Row>
                     <Col>
                         <div className="input-container2">
-                            <label htmlFor="minInput">Start Frame :</label>
+                            <label htmlFor="minInput">Target Frame :</label>
                             <input
                                 type="number"
                                 id="numInput1"
-                                value={value}
+                                value={inputValue}
                                 onChange={handleStartInputChange}
                             />
                         </div>
                     </Col>
                 </Row>
-                <p>Frame Pick : {value},  Time Pick : {(value / 30).toFixed(2)} sec.</p>
+                <p>Frame Pick : {targetFrame},  Time Pick : {(targetFrame / 30).toFixed(2)} sec.</p>
             </Row>
         </div>
     );
@@ -143,6 +183,7 @@ const HeatmapDraw = ({ data }) => {
 
     useEffect(() => {
         if (data.length === 0) return;
+        console.log("heatmap draw start.. ..", data)
 
         const heatmapInstance = Heatmap.create({
             container: heatmapRef.current,
@@ -175,11 +216,6 @@ const HeatmapDraw = ({ data }) => {
                 position: 'relative',
             }}
         >
-
-            < div ref={heatmapRef}
-                style={{
-                    width: { width }, height: { height },
-                }} />
             <div id='div-heatmap'
                 style={{
                     width: '100%',
@@ -189,6 +225,11 @@ const HeatmapDraw = ({ data }) => {
                     left: 0,
                 }}
             />
+
+            < div ref={heatmapRef}
+                style={{
+                    width: '960px', height: '640px',
+                }} />
         </div >
     )
 }
@@ -208,9 +249,9 @@ export const TaskVisualize = ({ from, callback }) => {
     const [end, setEnd] = useState(0);
     const [points, setPoints] = useState([{ x: 10, y: 15, value: 0 }, { x: 20, y: 25, value: 0 }]);
     const [visualStart, setVisualStart] = useState(false);
-    const [range, setRange] = useState([0, 0])
-    // let range = []
-    let targetFrame = 0;
+    const [range, setRange] = useState([0, 1000])
+    const [targetFrame, setTargetFrame] = useState(0)
+
 
     const getRange = async () => {
         let response = null;
@@ -238,7 +279,7 @@ export const TaskVisualize = ({ from, callback }) => {
     }
     const onTargetFrameChange = (newTargetFrame) => {
         console.log("onTargetFrameChange is called .. ", newTargetFrame)
-        targetFrame = newTargetFrame
+        setTargetFrame(newTargetFrame)
     }
 
     const handleApplyVisualize = async () => {
@@ -277,14 +318,29 @@ export const TaskVisualize = ({ from, callback }) => {
             console.log("target frame : ", targetFrame)
             let response = null;
             try {
-                response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/get_visualdata/${kairosId}/${radioValue}/${targetFrame}`);
+                response = await axios.get(process.env.REACT_APP_SERVER_URL + `/control/get_visualdata/${kairosId}/${radioValue}/${targetFrame}/${targetFrame}`);
             }
             catch (err) {
                 console.log(err)
             }
 
             if (response && response.data) {
+                console.log("response.data : ", response.data)
+                arr = response.data.data;
+                const points = [];
 
+                for (let y = 0; y < arr.length; y++) {
+                    const row = arr[y];
+                    for (let x = 0; x < row.length; x++) {
+                        const value = row[x];
+                        if (value !== 0) {
+                            points.push({ x, y, value });
+                        }
+                    }
+                }
+                console.log("points : ", points)
+                setPoints(points)
+                setVisualStart(true)
             }
         }
 
@@ -295,7 +351,7 @@ export const TaskVisualize = ({ from, callback }) => {
     }
 
     const TaskVisualizeOpions = ({ type }) => {
-        console.log("TaskVisualizeOpions  start.. ", type, range)
+        console.log("TaskVisualizeOpions  start.. ", type, range, targetFrame)
 
         if (type === '1') {
             return (
@@ -314,7 +370,13 @@ export const TaskVisualize = ({ from, callback }) => {
             return (
                 <>
                     <div className="slider-container">
-                        <SlideSimple min={min} max={max} init={(min + max) / 2} onChange={onTargetFrameChange} start_time={start} end_time={end} />
+                        <SlideSimple
+                            key={targetFrame}
+                            min={min} max={max}
+                            targetFrame={targetFrame}
+                            onChange={onTargetFrameChange}
+                            start_time={start}
+                            end_time={end} />
                     </div>
                 </>
             )
@@ -323,7 +385,13 @@ export const TaskVisualize = ({ from, callback }) => {
             return (
                 <>
                     <div className="slider-container">
-                        <SlideSimple min={min} max={max} init={(min + max) / 2} onChange={onTargetFrameChange} start_time={start} end_time={end} />
+                        <SlideSimple
+                            key={targetFrame}
+                            min={min} max={max}
+                            stargetFrame={targetFrame}
+                            onChange={onTargetFrameChange}
+                            start_time={start}
+                            end_time={end} />
                     </div>
                 </>
             )
@@ -356,7 +424,10 @@ export const TaskVisualize = ({ from, callback }) => {
                             name="radio"
                             value={radio.value}
                             checked={radioValue === radio.value}
-                            onChange={(e) => setRadioValue(e.currentTarget.value)}
+                            onChange={(e) => {
+                                setRadioValue(e.currentTarget.value)
+                                setVisualStart(false)
+                            }}
                             style={{ flex: 1, paddingLeft: '36px', paddingRight: '36px' }}
                             className="text-nowrap"
                         >
