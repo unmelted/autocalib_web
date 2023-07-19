@@ -98,7 +98,7 @@ router.get('/get_trackertask', async (req, res) => {
                 console.log("get tracker status  : " + row.kairos_task_id)
                 if (row.kairos_task_id !== null || parseInt(row.kairos_task_id) > 0) {
                     const options = {
-                        uri: process.env.AUTO_CALIB_EXODUS_URL + '/kairos/status/' + row.kairos_task_id,
+                        uri: process.env.AUTO_CALIB_EXODUS_URL + '/kairos/mct/status/' + row.kairos_task_id,
                         method: 'GET',
                         json: true
                     }
@@ -435,7 +435,7 @@ router.post('/updatetracker', async (req, res) => {
 
             try {
                 const options = {
-                    uri: process.env.KAIROS_URL + '/kairos/ready',
+                    uri: process.env.KAIROS_URL + '/kairos/mct/ready',
                     method: 'POST',
                     body: {
                         task_id: req.body.tracker_task_id,
@@ -564,7 +564,7 @@ router.put('/tracker_start/:job_id', async (req, res) => {
 
     try {
         const options = {
-            uri: process.env.KAIROS_URL + '/kairos/start/' + req.params.job_id,
+            uri: process.env.KAIROS_URL + '/kairos/mct/start/' + req.params.job_id,
             method: 'PUT',
             json: true
         }
@@ -599,7 +599,7 @@ router.put('/tracker_stop/:job_id', async (req, res) => {
 
     try {
         const options = {
-            uri: process.env.KAIROS_URL + '/kairos/stop/' + req.params.job_id,
+            uri: process.env.KAIROS_URL + '/kairos/mct/stop/' + req.params.job_id,
             method: 'PUT',
             json: true
         }
@@ -634,7 +634,7 @@ router.put('/tracker_destroy/:job_id', async (req, res) => {
 
     try {
         const options = {
-            uri: process.env.KAIROS_URL + '/kairos/destroy/' + req.params.job_id,
+            uri: process.env.KAIROS_URL + '/kairos/mct/destroy/' + req.params.job_id,
             method: 'PUT',
             json: true
         }
@@ -668,7 +668,7 @@ router.get('/get_visualinfo/:task_id', async (req, res) => {
 
     console.log("get_visualzeragne task id : ", req.params.task_id)
     const options = {
-        uri: process.env.KAIROS_URL + '/kairos/visualinfo/' + req.params.task_id,
+        uri: process.env.KAIROS_URL + '/kairos/mct/visualinfo/' + req.params.task_id,
         method: 'GET',
         json: true
     }
@@ -709,7 +709,7 @@ router.get('/get_visualdata/:task_id/:type/:target_frame1/:target_frame2', async
     }
 
     const options = {
-        uri: process.env.KAIROS_URL + '/kairos/visualdata/' + req.params.task_id + '/' + req.params.type + '/' + req.params.target_frame1 + '/' + req.params.target_frame2,
+        uri: process.env.KAIROS_URL + '/kairos/mct/visualdata/' + req.params.task_id + '/' + req.params.type + '/' + req.params.target_frame1 + '/' + req.params.target_frame2,
         method: 'GET',
         json: true
     }
